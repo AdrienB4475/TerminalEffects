@@ -1,0 +1,26 @@
+---
+title: "Studying Terminal Effects in Northern Elephant Seals"
+format:
+  html:
+    echo: false
+    fig-width: 7
+    fig-height: 5
+    code-fold: true
+    code-tools: true
+    warning: false
+    toc: true
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
+
+```
+
+Age seems to be calculated incorrectly
+
+Both males and females included in data, not sure if we will need males
