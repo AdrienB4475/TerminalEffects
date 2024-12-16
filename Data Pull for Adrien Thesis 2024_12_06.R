@@ -30,8 +30,8 @@ library(RMark)
 # write.csv(Animal,'animalforadrien.csv',row.names=FALSE)
 # write.csv(PupObs,'pupobsforadrien.csv',row.names=FALSE)
 
-animal <- read_csv("animalforadrien.csv") 
-resight <- read_csv("resightforadrien.csv") 
+animal <- read_csv(here::here("data/animalforadrien.csv"))
+resight <- read_csv(here::here("data/resightforadrien.csv")) 
 
 # specify which animals (pups) to select
 animals_to_select <- animal %>%
