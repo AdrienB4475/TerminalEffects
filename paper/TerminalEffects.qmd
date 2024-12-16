@@ -95,6 +95,8 @@ ggplot(avg_lactation, aes(x= age, y= avg_lact)) +
            x = "age", 
            y = "lact_duration")
 
+
+
 ```
 
 Age seems to be calculated incorrectly
@@ -104,3 +106,33 @@ Both males and females included in data, not sure if we will need males
 Figure out how to operate github pages
 
 how can we see how many of those animals went on to have pups of their own?
+
+```{r}
+#Calculating Bio age
+head(sealdat)
+sealdat$animalID
+
+sealdat %>% filter(animalID == 170, observed == 1) %>% 
+  mutate(age = year - yearborn, 
+         max_age = max(age), 
+         bio_age = max_age - age) %>% view()
+#Bioage clean
+bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
+  group_by(animalID) %>%
+  mutate(age = year - yearborn, 
+         max_age = max(age), 
+         bio_age = max_age - age) %>%
+  filter(age > 2)
+
+#Playing with bio pup sex
+ggplot(bioseal, aes(x = Wt, y = age, color = pupsex)) +
+  geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
+  geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
+  labs(
+    title = "Relationship between Weight and Age by Pup Sex",
+    x = "Weight",
+    y = "Age"
+  ) +
+  theme_minimal()
+
+```
