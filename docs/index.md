@@ -1,1 +1,1 @@
-Set up the readme
+Terminal Effects figures visible [here](TerminalEffects.html)
