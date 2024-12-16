@@ -1,2 +1,2 @@
 # TerminalEffects
-Studying Terminal Effects in NES. View figures [here](TerminalEffects.html)
+Studying Terminal Effects in NES. View figures [here](paper/TerminalEffects.html)
