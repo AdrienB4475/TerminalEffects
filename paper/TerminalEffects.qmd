@@ -14,7 +14,6 @@ editor: visual
 
 ```{r}
 #| label: setup
-#| include: false
 
 library(tidyverse)
 sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
@@ -33,28 +32,29 @@ ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
   ) +
   theme_minimal()
 
-#Making a Bargraph to start Comparing Age to sex, bleh made before
-ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
-  geom_bar(stat = "identity", position = "stack") +  # Stack bars
-  labs(
-    title = "Percentage Distribution by Age and Pup Sex",
-    x = "Age",
-    y = "Percentage"
-  ) +
-  theme_minimal()
+# #Making a Bargraph to start Comparing Age to sex, bleh made before
+# ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
+#   geom_bar(stat = "identity", position = "stack") +  # Stack bars
+#   labs(
+#     title = "Percentage Distribution by Age and Pup Sex",
+#     x = "Age",
+#     y = "Percentage"
+#   ) +
+#   theme_minimal()
 
     #Lets add to this by changing ages 18-21 as just old ages kinda how we did for age paper 
-age_sealgraph <- age_sealgraph %>% 
-  filter(!(age %in% c(18, 19, 20, 21)))
-ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
-  geom_bar(stat = "identity", position = "stack") +
-  geom_hline(yintercept = 50, linetype = "dotted", color = "black", size = 1) +
-  labs(
-    title = "Percentage Distribution by Age and Pup Sex",
-    x = "Age",
-    y = "Percentage"
-  ) +
-  theme_minimal()
+
+# age_sealgraph <- age_sealgraph %>% 
+  # filter(!(age %in% c(18, 19, 20, 21)))
+# ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
+#   geom_bar(stat = "identity", position = "stack") +
+#   geom_hline(yintercept = 50, linetype = "dotted", color = "black", size = 1) +
+#   labs(
+#     title = "Percentage Distribution by Age and Pup Sex",
+#     x = "Age",
+#     y = "Percentage"
+#   ) +
+#   theme_minimal()
 
 #Age vs weight or their pup? wowww
 ggplot(cleanseal, aes(x = age, y = Wt, color = pupsex)) +
@@ -82,7 +82,10 @@ ggplot(avg_weights, aes(x = age, y = avg_weight)) +
 cleanseal$firstobsbreed <- as.Date(cleanseal$firstobsbreed, format = "%Y-%m-%d")
 cleanseal$lastobsbreed <- as.Date(cleanseal$lastobsbreed, format = "%Y-%m-%d")
 cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, cleanseal$firstobsbreed, units = "days"))
-
+#OK.. lets get the avg lact dur? then rerun code above
+avg_lactation <- cleanseal %>%
+  group_by(age) %>%
+  summarize(avg_lact = mean(lactation_duration, na.rm = TRUE))
 #YASS THAT WORKSSS SOOO NOW LETS PLOT AGAINST THE MALE V F LACT PERIOD FOR AGES IN LAST YEARS OF LIFE 
 ggplot(avg_lactation, aes(x= age, y= avg_lact)) +
          geom_point() +
@@ -91,10 +94,7 @@ ggplot(avg_lactation, aes(x= age, y= avg_lact)) +
            title ="lactation duration in ages",
            x = "age", 
            y = "lact_duration")
-#OK.. lets get the avg lact dur? then rerun code above
-avg_lactation <- cleanseal %>%
-  group_by(age) %>%
-  summarize(avg_lact = mean(lactation_duration, na.rm = TRUE))
+
 ```
 
 Age seems to be calculated incorrectly
