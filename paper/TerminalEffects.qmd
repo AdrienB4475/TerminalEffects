@@ -22,15 +22,15 @@ cleanseal <- sealdat %>% filter(!is.na(animalID), !is.na(year), !is.na(observed)
 #Pup sex vs Wt of pups/weans graph easy
 library(ggplot2)
 
-ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
-  geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
-  geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
-  labs(
-    title = "Relationship between Weight and Age by Pup Sex",
-    x = "Weight",
-    y = "Age"
-  ) +
-  theme_minimal()
+#ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
+ # geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
+ # geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
+ # labs(
+  #  title = "Relationship between Weight and Age by Pup Sex",
+   # x = "Weight",
+   # y = "Age"
+ # ) +
+ # theme_minimal()
 
 # #Making a Bargraph to start Comparing Age to sex, bleh made before
 # ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
@@ -134,5 +134,67 @@ ggplot(bioseal, aes(x = Wt, y = age, color = pupsex)) +
     y = "Age"
   ) +
   theme_minimal()
+
+#Looking at weights? Come back to 
+ggplot(bioseal, aes(x = bio_age, y = Wt)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+
+#Calculate Lactation Duration
+bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
+bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
+bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
+#Calculate Average lac for bio age 
+avg_lactation <- bioseal %>%
+  group_by(bio_age) %>%
+  summarize(avg_lact = mean(lactation_duration, na.rm = TRUE))
+
+
+
+```
+
+OK.. I gotta clean stuff up fr
+
+```{r}
+#Lets restart.. lets look at our first idea! How do mothers in their last year haul out? Early or later.. 
+
+ggplot(bioseal, aes(x = bio_age, y= firstobsbreeddoy))+
+         geom_point()+ 
+         geom_smooth(method = "loess") +
+         labs( 
+           title = "Do moms in their last year arrrive early?", 
+           x = "Years before death", 
+           y = "arrival time")
+           
+
+#Then we wanted to see lactation duration
+ggplot(avg_lactation, aes(x= bio_age, y= avg_lact)) +
+         geom_point() +
+         geom_smooth(method = "loess") +
+         labs(
+           title ="lactation duration in ages",
+           x = "age", 
+           y = "lact_duration")
+
+#Then Weights?
+ggplot(bioseal, aes(x = bio_age, y = Wt)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+
+```
+
+```{r}
+#Random effect model
+library(lme4)
+lact_dat <- bioseal %>% 
+  filter(!is.na(lactation_duration)) %>%
+  mutate(year_fct = factor(year)) %>% 
+           select(animalID, year_fct, bio_age, lactation_duration)
+  
+lact_mod <- glmer(
+    lactation_duration ~ bio_age + (1 | animalID),
+    lact_dat, 
+    family = "binomial"
+)
 
 ```
