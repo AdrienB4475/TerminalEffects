@@ -14,23 +14,21 @@ editor: visual
 
 ```{r}
 #| label: setup
-
+#Libraries:
 library(tidyverse)
+library(ggplot2)
 sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
 cleanseal <- sealdat %>% filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
 
-#Pup sex vs Wt of pups/weans graph easy
-library(ggplot2)
-
-#ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
- # geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
- # geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
- # labs(
-  #  title = "Relationship between Weight and Age by Pup Sex",
-   # x = "Weight",
-   # y = "Age"
- # ) +
- # theme_minimal()
+ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
+  geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
+  geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
+  labs(
+    title = "Relationship between Weight and Age by Pup Sex",
+    x = "Weight",
+    y = "Age"
+  ) +
+  theme_minimal()
 
 # #Making a Bargraph to start Comparing Age to sex, bleh made before
 # ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
@@ -184,17 +182,58 @@ ggplot(bioseal, aes(x = bio_age, y = Wt)) +
 ```
 
 ```{r}
+#modify bioseal to have lactation duration
+bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
+bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
+bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
 #Random effect model
 library(lme4)
 lact_dat <- bioseal %>% 
   filter(!is.na(lactation_duration)) %>%
-  mutate(year_fct = factor(year)) %>% 
-           select(animalID, year_fct, bio_age, lactation_duration)
-  
-lact_mod <- glmer(
-    lactation_duration ~ bio_age + (1 | animalID),
-    lact_dat, 
-    family = "binomial"
+  mutate(year_fct = factor(year), 
+         lac_rescale = (lactation_duration / 12)) %>% 
+           select(animalID, 
+                  year_fct, 
+                  bio_age, 
+                  lactation_duration,
+                  lac_rescale)
+
+# lac_sd <- sqrt((sum((lact_dat$lactation_duration - mean(lact_dat$lactation_duration))^2)) / length(lact_dat$lactation_duration))
+
+#If it is binomial we can do .. but maybe not??
+lact_mod <- glmer.nb(
+  lac_rescale ~ bio_age + (1 | animalID),
+  data = lact_dat)
+
+#if it is continuos we can do 
+lact_mod <- lmer(
+  lactation_duration ~ bio_age + (1 | animalID),  # Fixed and random effects
+  data = lact_dat
 )
+summary(lact_mod)
+
+#going with the continuous we should be able to graph or calculate predicted values 
+lact_dat$predicted <- predict(lact_mod, type = "response")
+
+#and then to graph 
+ggplot(lact_dat, aes(x = bio_age, y = lactation_duration)) +
+  geom_point(aes(color = animalID), alpha = 0.6) +  # Observed points
+  geom_line(aes(y = predicted, group = animalID), color = "blue") +  # Predicted values
+  theme_minimal()
+```
+
+In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
+
+Lets look at prime ages instead??
+
+```{r}
+#this should give us the same data set but only with prime ages 7-11
+primeseal <- bioseal %>%
+  filter(age >= 7 & age <= 11)
+
+#sumthing
+ggplot(primeseal, aes(x = bio_age, y = Wt)) +
+  geom_point() +
+  geom_smooth(method = "loess")
 
 ```
