@@ -188,27 +188,37 @@ bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
 bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
 #Random effect model
 library(lme4)
-lact_dat <- bioseal %>% 
-  filter(!is.na(lactation_duration)) %>%
-  mutate(year_fct = factor(year), 
-         lac_rescale = (lactation_duration / 12)) %>% 
-           select(animalID, 
-                  year_fct, 
-                  bio_age, 
-                  lactation_duration,
-                  lac_rescale)
+lact_dat1 <- bioseal %>% 
+  filter(lactation_duration > 0) %>% 
+  select(animalID, 
+         bio_age, 
+         lactation_duration, 
+         year)
 
-# lac_sd <- sqrt((sum((lact_dat$lactation_duration - mean(lact_dat$lactation_duration))^2)) / length(lact_dat$lactation_duration))
+hist(lact_dat$lactation_duration)
+
+lact_dat2 <- lact_dat %>% 
+  mutate(year_fct = factor(year), 
+         lac_rescale = (lactation_duration - mean(lactation_duration)) / 10)
+  
 
 #If it is binomial we can do .. but maybe not??
 lact_mod <- glmer.nb(
   lac_rescale ~ bio_age + (1 | animalID),
   data = lact_dat)
 
+#control = glmerControl(optimizer = "bobyqa")
+
+#CONTINUING HERE WITH NON-INTEGER ERROR, 
+#may have to round it ton clear non-integer error?
+lact_dat$lac_rescale <- round(lact_dat$lac_rescale)
+
+
 #if it is continuos we can do 
 lact_mod <- lmer(
-  lactation_duration ~ bio_age + (1 | animalID),  # Fixed and random effects
-  data = lact_dat
+  lac_rescale ~ bio_age + (1 | year),  # Fixed and random effects
+  data = lact_dat, 
+  control = lmerControl(optimizer = "bobyqa")
 )
 summary(lact_mod)
 
@@ -235,5 +245,39 @@ primeseal <- bioseal %>%
 ggplot(primeseal, aes(x = bio_age, y = Wt)) +
   geom_point() +
   geom_smooth(method = "loess")
+
+```
+
+New Idea:\
+We want to create a threshold that has a prime age threshold in the figure. Ideally, it should show chronological age on the x axis and lactation duration on the y axis.
+
+However, since we only were interested in looking at the last years of life to examine terminal investment we FILTERED out animals as bio_age \> 0. We still looked at chronological age to see how lactation duration changes in the last years of life among different age classes. We potentially will define animals as YOUNG OR OLD also to make it binomial.
+
+Nothing is really shown maybe? It look's like its just the same result.. so I tried looking at the average lactation duration instead amongst ages and then plotted that. Eh.
+
+```{r}
+bio_seal2 <- bioseal %>%
+  filter(bio_age < 1) %>%
+  group_by(age) %>%
+  mutate(avg_lact_dur = mean(lactation_duration, na.rm = TRUE)) %>%
+  ungroup() 
+  
+  
+
+#Lactation Duration across ages
+ggplot(bio_seal2, aes(x = age , y = lactation_duration)) +
+         geom_point()+
+         geom_smooth(method = "lm" , se = TRUE)+
+  labs(title = "Lactation Duration Across Ages in Last Years", 
+       x = "age" , 
+       y = "Lactation Duration")
+
+#Average Lactation Durate across Age
+ggplot(bio_seal2, aes(x = age , y = avg_lact_dur)) +
+         geom_point()+
+         geom_smooth(method = "loess" , se = TRUE)+
+  labs(title = "Lactation Duration Across Ages in Last Years", 
+       x = "age" , 
+       y = "Lactation Duration")
 
 ```
