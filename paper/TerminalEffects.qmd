@@ -188,6 +188,12 @@ bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
 bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
 #Random effect model
 library(lme4)
+lact_dat <- bioseal %>% 
+  filter(lactation_duration > 0) %>% 
+  select(animalID, 
+         bio_age, 
+         lactation_duration, 
+         year)
 lact_dat1 <- bioseal %>% 
   filter(lactation_duration > 0) %>% 
   select(animalID, 
@@ -195,11 +201,11 @@ lact_dat1 <- bioseal %>%
          lactation_duration, 
          year)
 
-hist(lact_dat$lactation_duration)
+
 
 lact_dat2 <- lact_dat %>% 
   mutate(year_fct = factor(year), 
-         lac_rescale = (lactation_duration - mean(lactation_duration)) / 10)
+         (lac_rescale = (lactation_duration - mean(lactation_duration))) / 10)
   
 
 #If it is binomial we can do .. but maybe not??
@@ -208,10 +214,6 @@ lact_mod <- glmer.nb(
   data = lact_dat)
 
 #control = glmerControl(optimizer = "bobyqa")
-
-#CONTINUING HERE WITH NON-INTEGER ERROR, 
-#may have to round it ton clear non-integer error?
-lact_dat$lac_rescale <- round(lact_dat$lac_rescale)
 
 
 #if it is continuos we can do 
@@ -228,7 +230,7 @@ lact_dat$predicted <- predict(lact_mod, type = "response")
 #and then to graph 
 ggplot(lact_dat, aes(x = bio_age, y = lactation_duration)) +
   geom_point(aes(color = animalID), alpha = 0.6) +  # Observed points
-  geom_line(aes(y = predicted, group = animalID), color = "blue") +  # Predicted values
+  geom_smooth(method = "loess", se = FALSE) +
   theme_minimal()
 ```
 
@@ -279,5 +281,46 @@ ggplot(bio_seal2, aes(x = age , y = avg_lact_dur)) +
   labs(title = "Lactation Duration Across Ages in Last Years", 
        x = "age" , 
        y = "Lactation Duration")
+
+```
+
+POST MAX:
+
+We will have :
+
+L be lactation duration
+
+A = chronological age
+
+T = terminal (0 or 1 to create a yes no situation)
+
+C = age category (young or old) we define young as ages 3-7 and old as 8+
+
+In order to graph this we will look at L \~ Gamma(mean, sd)... mean = overall mean +coefficient for chronological age
+
+When coding this it would be like: Stay tuned.
+
+```{r}
+#First let's make a new data set for this graph called (well really just adding to the lact_dat data set already there... i went ahead and moved all that code below now. )
+lact_dat <- bioseal %>% 
+  filter(lactation_duration > 0) %>% 
+  select(animalID, 
+         bio_age, 
+         lactation_duration, 
+         year,
+         age,
+         ) %>% 
+  mutate(terminal = ifelse(bio_age == 0, 1, 0))%>%
+  mutate(ageclass = ifelse(age == 8, "old", "young"))
+
+  #So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
+# This is gamma
+glmer(lactation_duration ~ age + terminal : ageclass + (1 | animalID) + (1 | year),
+      family = Gamma(link = "inverse"),
+      data = lact_dat)
+#This is Negative Binomial
+glmer.nb(lactation_duration ~ age + terminal : ageclass + (1 | animalID) + (1 | year),
+         data = lact_dat)
+  
 
 ```
