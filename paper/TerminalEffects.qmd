@@ -301,26 +301,155 @@ In order to graph this we will look at L \~ Gamma(mean, sd)... mean = overall me
 When coding this it would be like: Stay tuned.
 
 ```{r}
+
+# This is gamma
+mod1 <- glmer(lactation_duration ~ age + terminal:ageclass + (1 | year),
+              family = Gamma(link = "inverse"),
+              data = lact_dat, 
+              control = glmerControl(optimizer = "bobyqa"))
+
+
+# mod3 <- glmer(
+#   lactation_duration ~ age + terminal:ageclass + (1 | year),
+#   family = Gamma(link = "inverse"),
+#   data = lact_dat,
+#   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 10000))
+# )
+# 
+# neg.bin <- glmer.nb(
+#   lactation_duration ~ age + terminal : ageclass + (1 | year),
+#   family = Gamma(link = "inverse"),
+#   data = lact_dat,
+#   control = glmerControl(optimizer = "bobyqa"))
+
+# plot(neg.bin)
+# summary(neg.bin)
+
+#Lets try new stuff
+#negative binomial
+neg.binomial = glm(lactation_duration ~ age, data=lact_dat, family = quasipoisson())
+par(mfrow=c(2,2))  # Arrange multiple plots in a grid
+plot(neg.binomial)  # This will produce multiple diagnostic plots
+summary(neg.binomial)
+
+
+#compare.fits(lactation_duration ~ age, data = lact_dat, poisson, neg.binomial, jitter = c(0, .1))
+neg.binomial <- glm(lactation_duration ~ age, data=lact_dat, family = quasipoisson())
+
+```
+
+So now lets make some figures for some not so important findings just to put into my thesis right now.
+
+```{r}
+#Lactation duration vs weight
+ggplot(lact_dat, aes(x = lactation_duration, y = Wt , color = pupsex))+ 
+       geom_point() +
+       geom_smooth(method = "lm", se = TRUE)+
+  labs(title = "Lactation Duration Effect on Weight",
+       x = "lactation duration", 
+       y = "Wean Weight")
+
+#Lactation duration against Biological age 
+ggplot(lact_dat, aes(x = bio_age, y = lactation_duration ))+ 
+       geom_point() +
+       geom_smooth(method = "lm", se = TRUE)+
+  labs(title = "Lactation Duration Effected by Last year",
+       x = "Biological Age", 
+       y = "lactation duration")
+```
+
+```{r}
 #First let's make a new data set for this graph called (well really just adding to the lact_dat data set already there... i went ahead and moved all that code below now. )
+maturity <- 5
 lact_dat <- bioseal %>% 
-  filter(lactation_duration > 0) %>% 
-  select(animalID, 
-         bio_age, 
-         lactation_duration, 
-         year,
-         age,
-         ) %>% 
-  mutate(terminal = ifelse(bio_age == 0, 1, 0))%>%
-  mutate(ageclass = ifelse(age == 8, "old", "young"))
+  filter(lactation_duration > 0 & lactation_duration < 45) %>% 
+  select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+  mutate(terminal = ifelse(bio_age == 0, 1, 0), 
+         ageclass = ifelse(age >= maturity, "old", "young"), 
+         age10 = (age - maturity) / 10, 
+         year_fct = factor(year))
+
+view(lact_dat)
 
   #So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
-# This is gamma
-glmer(lactation_duration ~ age + terminal : ageclass + (1 | animalID) + (1 | year),
-      family = Gamma(link = "inverse"),
-      data = lact_dat)
-#This is Negative Binomial
-glmer.nb(lactation_duration ~ age + terminal : ageclass + (1 | animalID) + (1 | year),
+#Negative Binomial model
+lac_mod <- glmer.nb(lactation_duration ~ age10 + terminal:ageclass + (1 | year),
          data = lact_dat)
-  
 
+summary(mod2)$coefficients
+
+#Adrien points out that we need to be sure they are dead... 7 years like the Age paper
+#creating prediction grid (so that we can use confidence intervals later)
+lac_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1) %>% 
+  mutate(age10 = (age - maturity) / 10, 
+         ageclass = factor(ifelse(age >= maturity, "old", "young"), 
+                           levels = c("old", "young")))
+
+lac_years <- count(lact_dat, year_fct)
+
+#create population predictions 
+lac_pred_pop <- lac_grid %>% 
+  mutate(predicted = predict(lac_mod, 
+                             newdata = lac_grid, 
+                             re.form = NA, 
+                             type = "response"))
+
+#plot predictions, raw data, and residuals (residuals separately - resid on y axis, predictors on the x axis)
+
+#Plot 1:
+#first left join the columns
+lact_dat <- lact_dat %>%
+  left_join(lac_pred_pop %>% select(age, terminal, predicted), by = c("age", "terminal"))
+
+#Now calculate residuals
+lact_dat <- lact_dat %>%
+  mutate(residuals = lactation_duration - predicted)
+
+#Need to add age class to lac_pred_pop
+lac_pred_pop <- lact_dat %>%
+  mutate(ageclass = ifelse(age >= maturity, "old", "young"))
+
+#predictions: 
+predictions <- predict(lac_mod, newdata = lac_pred_pop, re.form = NA, type = "response", se.fit = TRUE)
+#Create confidence intervals:
+lac_pred_pop <- lac_pred_pop %>%
+  mutate(
+    predicted = predictions$fit,
+    se_fit = predictions$se.fit,
+    conf_lo = predicted - 1.96 * se_fit,  # Lower bound of 95% CI
+    conf_hi = predicted + 1.96 * se_fit   # Upper bound of 95% CI
+  )
+
+
+# Predictions vs Raw Data Plot
+lact_plot <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
+  geom_point(data = lact_dat, aes(x = age, y = lactation_duration), alpha = 0.5, color = "gray") +  # Raw data points
+  geom_line(aes(group = interaction(ageclass, year_fct)), alpha = 0.1, data = lac_pred_pop) +  # Predicted lines by age class and year
+  geom_ribbon(aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass), alpha = 0.2) +  # Confidence intervals
+  geom_line(aes(color = ageclass), linewidth = 1.2) +  # Mean predicted line by age class
+  geom_line(aes(y = predicted, group = ageclass), linetype = "dotted", linewidth = 1.2, alpha = 0.5) +  # Dotted predicted lines
+  geom_pointrange(aes(y = lactation_duration), alpha = 0.5, color = "blue", size = 0.8) +  # Raw data summarized by points
+  theme_minimal() +
+  labs(title = "Predictions vs Raw Data", y = "Lactation Duration", x = "Age")
+
+
+
+
+#Residuals Plot
+residuals_plot <- ggplot(lact_dat, aes(x = age, y = residuals)) +
+  geom_point(alpha = 0.5, color = "gray") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_minimal() +
+  labs(title = "Residuals vs Age", y = "Residuals", x = "Age")
+
+#Arrange grids
+grid.arrange(lact_plot, residuals_plot, ncol = 2)
+
+```
+
+Im restarting:
+
+```{}
 ```
