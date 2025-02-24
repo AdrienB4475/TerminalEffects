@@ -17,18 +17,19 @@ editor: visual
 #Libraries:
 library(tidyverse)
 library(ggplot2)
+library(lme4)
 sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
 cleanseal <- sealdat %>% filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
 
-ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
-  geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
-  geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
-  labs(
-    title = "Relationship between Weight and Age by Pup Sex",
-    x = "Weight",
-    y = "Age"
-  ) +
-  theme_minimal()
+# ggplot(cleanseal, aes(x = Wt, y = age, color = pupsex)) +
+#   geom_point(alpha = 0.5, size = 3) +  # Transparent points for less clutter
+#   geom_smooth(method = "lm", se = FALSE) +  # Line of best fit 
+#   labs(
+#     title = "Relationship between Weight and Age by Pup Sex",
+#     x = "Weight",
+#     y = "Age"
+#   ) +
+#   theme_minimal()
 
 # #Making a Bargraph to start Comparing Age to sex, bleh made before
 # ggplot(age_sealgraph, aes(x = factor(age), y = percent, fill = pupsex)) +
@@ -60,20 +61,20 @@ ggplot(cleanseal, aes(x = age, y = Wt, color = pupsex)) +
   geom_smooth(method = "loess", se = FALSE) +  # Line of best fit (linear regression)
   labs(
     title = "Looking at Weight Relation to Age of Mother",
-    x = "Age", 
+    x = "Age",
     y = "Weight"
   ) +
   theme_minimal()
 
 #Average weight in the years? 
 #FIRST find average weights
-avg_weights <- cleanseal %>%
-  group_by(age) %>%
-   filter(!(age %in% c(18, 19, 20, 21))) %>%
-  summarise(avg_weight = mean(Wt, na.rm = TRUE))
-ggplot(avg_weights, aes(x = age, y = avg_weight)) +
-  geom_point() +
-  geom_smooth(method = "loess")
+# avg_weights <- cleanseal %>%
+#   group_by(age) %>%
+#    filter(!(age %in% c(18, 19, 20, 21))) %>%
+#   summarise(avg_weight = mean(Wt, na.rm = TRUE))
+# ggplot(avg_weights, aes(x = age, y = avg_weight)) +
+#   geom_point() +
+#   geom_smooth(method = "loess")
 
 
 #Calculating lactation duration, can i make this cleaner somehow? 
@@ -134,9 +135,9 @@ ggplot(bioseal, aes(x = Wt, y = age, color = pupsex)) +
   theme_minimal()
 
 #Looking at weights? Come back to 
-ggplot(bioseal, aes(x = bio_age, y = Wt)) +
-  geom_point() +
-  geom_smooth(method = "loess")
+# ggplot(bioseal, aes(x = bio_age, y = Wt)) +
+#   geom_point() +
+#   geom_smooth(method = "loess")
 
 #Calculate Lactation Duration
 bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
@@ -156,82 +157,82 @@ OK.. I gotta clean stuff up fr
 ```{r}
 #Lets restart.. lets look at our first idea! How do mothers in their last year haul out? Early or later.. 
 
-ggplot(bioseal, aes(x = bio_age, y= firstobsbreeddoy))+
-         geom_point()+ 
-         geom_smooth(method = "loess") +
-         labs( 
-           title = "Do moms in their last year arrrive early?", 
-           x = "Years before death", 
-           y = "arrival time")
-           
+# ggplot(bioseal, aes(x = bio_age, y= firstobsbreeddoy))+
+#          geom_point()+ 
+#          geom_smooth(method = "loess") +
+#          labs( 
+#            title = "Do moms in their last year arrrive early?", 
+#            x = "Years before death", 
+#            y = "arrival time")
+#            
+# 
+# #Then we wanted to see lactation duration
+# ggplot(avg_lactation, aes(x= bio_age, y= avg_lact)) +
+#          geom_point() +
+#          geom_smooth(method = "loess") +
+#          labs(
+#            title ="lactation duration in ages",
+#            x = "age", 
+#            y = "lact_duration")
 
-#Then we wanted to see lactation duration
-ggplot(avg_lactation, aes(x= bio_age, y= avg_lact)) +
-         geom_point() +
-         geom_smooth(method = "loess") +
-         labs(
-           title ="lactation duration in ages",
-           x = "age", 
-           y = "lact_duration")
-
-#Then Weights?
-ggplot(bioseal, aes(x = bio_age, y = Wt)) +
-  geom_point() +
-  geom_smooth(method = "loess")
+# #Then Weights?
+# ggplot(bioseal, aes(x = bio_age, y = Wt)) +
+#   geom_point() +
+#   geom_smooth(method = "loess")
 
 ```
 
 ```{r}
-#modify bioseal to have lactation duration
-bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
-bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
-bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
-#Random effect model
+# #modify bioseal to have lactation duration
+# bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
+# bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
+# bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
+# #Random effect model
 library(lme4)
-lact_dat <- bioseal %>% 
-  filter(lactation_duration > 0) %>% 
-  select(animalID, 
-         bio_age, 
-         lactation_duration, 
+lact_dat <- bioseal %>%
+  filter(lactation_duration > 0) %>%
+  select(animalID,
+         bio_age,
+         lactation_duration,
          year)
-lact_dat1 <- bioseal %>% 
-  filter(lactation_duration > 0) %>% 
-  select(animalID, 
-         bio_age, 
-         lactation_duration, 
-         year)
+# lact_dat1 <- bioseal %>%
+#   filter(lactation_duration > 0) %>%
+#   select(animalID,
+#          bio_age,
+#          lactation_duration,
+#          year)
 
-
-
-lact_dat2 <- lact_dat %>% 
-  mutate(year_fct = factor(year), 
-         (lac_rescale = (lactation_duration - mean(lactation_duration))) / 10)
-  
-
-#If it is binomial we can do .. but maybe not??
-lact_mod <- glmer.nb(
-  lac_rescale ~ bio_age + (1 | animalID),
-  data = lact_dat)
-
-#control = glmerControl(optimizer = "bobyqa")
-
-
-#if it is continuos we can do 
-lact_mod <- lmer(
-  lac_rescale ~ bio_age + (1 | year),  # Fixed and random effects
-  data = lact_dat, 
-  control = lmerControl(optimizer = "bobyqa")
-)
-summary(lact_mod)
-
-#going with the continuous we should be able to graph or calculate predicted values 
-lact_dat$predicted <- predict(lact_mod, type = "response")
-
-#and then to graph 
-ggplot(lact_dat, aes(x = bio_age, y = lactation_duration)) +
-  geom_point(aes(color = animalID), alpha = 0.6) +  # Observed points
-  geom_smooth(method = "loess", se = FALSE) +
-  theme_minimal()
+# 
+# 
+# lact_dat2 <- lact_dat %>% 
+#   mutate(year_fct = factor(year), 
+#          (lac_rescale = (lactation_duration - mean(lactation_duration))) / 10)
+#   
+# 
+# #If it is binomial we can do .. but maybe not??
+# lact_mod <- glmer.nb(
+#   lac_rescale ~ bio_age + (1 | animalID),
+#   data = lact_dat)
+# 
+# #control = glmerControl(optimizer = "bobyqa")
+# 
+# 
+# #if it is continuos we can do 
+# lact_mod <- lmer(
+#   lac_rescale ~ bio_age + (1 | year),  # Fixed and random effects
+#   data = lact_dat, 
+#   control = lmerControl(optimizer = "bobyqa")
+# )
+# summary(lact_mod)
+# 
+# #going with the continuous we should be able to graph or calculate predicted values 
+# lact_dat$predicted <- predict(lact_mod, type = "response")
+# 
+# #and then to graph 
+# ggplot(lact_dat, aes(x = bio_age, y = lactation_duration)) +
+#   geom_point(aes(color = animalID), alpha = 0.6) +  # Observed points
+#   geom_smooth(method = "loess", se = FALSE) +
+#   theme_minimal()
 ```
 
 In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
@@ -240,13 +241,13 @@ Lets look at prime ages instead??
 
 ```{r}
 #this should give us the same data set but only with prime ages 7-11
-primeseal <- bioseal %>%
-  filter(age >= 7 & age <= 11)
-
-#sumthing
-ggplot(primeseal, aes(x = bio_age, y = Wt)) +
-  geom_point() +
-  geom_smooth(method = "loess")
+# primeseal <- bioseal %>%
+#   filter(age >= 7 & age <= 11)
+# 
+# #sumthing
+# ggplot(primeseal, aes(x = bio_age, y = Wt)) +
+#   geom_point() +
+#   geom_smooth(method = "loess")
 
 ```
 
@@ -258,29 +259,29 @@ However, since we only were interested in looking at the last years of life to e
 Nothing is really shown maybe? It look's like its just the same result.. so I tried looking at the average lactation duration instead amongst ages and then plotted that. Eh.
 
 ```{r}
-bio_seal2 <- bioseal %>%
-  filter(bio_age < 1) %>%
-  group_by(age) %>%
-  mutate(avg_lact_dur = mean(lactation_duration, na.rm = TRUE)) %>%
-  ungroup() 
+# bio_seal2 <- bioseal %>%
+#   filter(bio_age < 1) %>%
+#   group_by(age) %>%
+#   mutate(avg_lact_dur = mean(lactation_duration, na.rm = TRUE)) %>%
+#   ungroup() 
   
   
-
-#Lactation Duration across ages
-ggplot(bio_seal2, aes(x = age , y = lactation_duration)) +
-         geom_point()+
-         geom_smooth(method = "lm" , se = TRUE)+
-  labs(title = "Lactation Duration Across Ages in Last Years", 
-       x = "age" , 
-       y = "Lactation Duration")
-
-#Average Lactation Durate across Age
-ggplot(bio_seal2, aes(x = age , y = avg_lact_dur)) +
-         geom_point()+
-         geom_smooth(method = "loess" , se = TRUE)+
-  labs(title = "Lactation Duration Across Ages in Last Years", 
-       x = "age" , 
-       y = "Lactation Duration")
+# 
+# #Lactation Duration across ages
+# ggplot(bio_seal2, aes(x = age , y = lactation_duration)) +
+#          geom_point()+
+#          geom_smooth(method = "lm" , se = TRUE)+
+#   labs(title = "Lactation Duration Across Ages in Last Years", 
+#        x = "age" , 
+#        y = "Lactation Duration")
+# 
+# #Average Lactation Durate across Age
+# ggplot(bio_seal2, aes(x = age , y = avg_lact_dur)) +
+#          geom_point()+
+#          geom_smooth(method = "loess" , se = TRUE)+
+#   labs(title = "Lactation Duration Across Ages in Last Years", 
+#        x = "age" , 
+#        y = "Lactation Duration")
 
 ```
 
@@ -302,11 +303,11 @@ When coding this it would be like: Stay tuned.
 
 ```{r}
 
-# This is gamma
-mod1 <- glmer(lactation_duration ~ age + terminal:ageclass + (1 | year),
-              family = Gamma(link = "inverse"),
-              data = lact_dat, 
-              control = glmerControl(optimizer = "bobyqa"))
+# # This is gamma
+# mod1 <- glmer(lactation_duration ~ age + terminal:ageclass + (1 | year),
+#               family = Gamma(link = "inverse"),
+#               data = lact_dat, 
+#               control = glmerControl(optimizer = "bobyqa"))
 
 
 # mod3 <- glmer(
@@ -315,12 +316,12 @@ mod1 <- glmer(lactation_duration ~ age + terminal:ageclass + (1 | year),
 #   data = lact_dat,
 #   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 10000))
 # )
-# 
-# neg.bin <- glmer.nb(
-#   lactation_duration ~ age + terminal : ageclass + (1 | year),
-#   family = Gamma(link = "inverse"),
-#   data = lact_dat,
-#   control = glmerControl(optimizer = "bobyqa"))
+
+neg.bin <- glmer.nb(
+  lactation_duration ~ age + terminal : ageclass + (1 | year),
+  family = Gamma(link = "inverse"),
+  data = lact_dat,
+  control = glmerControl(optimizer = "bobyqa"))
 
 # plot(neg.bin)
 # summary(neg.bin)
@@ -332,6 +333,12 @@ par(mfrow=c(2,2))  # Arrange multiple plots in a grid
 plot(neg.binomial)  # This will produce multiple diagnostic plots
 summary(neg.binomial)
 
+neg.binomial = glm(lactation_duration ~ age10 + terminal : ageclass + (1| animalID) + (1| year),
+                   data=lact_dat, 
+                   family = quasipoisson()
+                     )
+
+summary(neg.binomial)$coefficients
 
 #compare.fits(lactation_duration ~ age, data = lact_dat, poisson, neg.binomial, jitter = c(0, .1))
 neg.binomial <- glm(lactation_duration ~ age, data=lact_dat, family = quasipoisson())
@@ -341,21 +348,21 @@ neg.binomial <- glm(lactation_duration ~ age, data=lact_dat, family = quasipoiss
 So now lets make some figures for some not so important findings just to put into my thesis right now.
 
 ```{r}
-#Lactation duration vs weight
-ggplot(lact_dat, aes(x = lactation_duration, y = Wt , color = pupsex))+ 
-       geom_point() +
-       geom_smooth(method = "lm", se = TRUE)+
-  labs(title = "Lactation Duration Effect on Weight",
-       x = "lactation duration", 
-       y = "Wean Weight")
-
-#Lactation duration against Biological age 
-ggplot(lact_dat, aes(x = bio_age, y = lactation_duration ))+ 
-       geom_point() +
-       geom_smooth(method = "lm", se = TRUE)+
-  labs(title = "Lactation Duration Effected by Last year",
-       x = "Biological Age", 
-       y = "lactation duration")
+# #Lactation duration vs weight
+# ggplot(lact_dat, aes(x = lactation_duration, y = Wt , color = pupsex))+ 
+#        geom_point() +
+#        geom_smooth(method = "lm", se = TRUE)+
+#   labs(title = "Lactation Duration Effect on Weight",
+#        x = "lactation duration", 
+#        y = "Wean Weight")
+# 
+# #Lactation duration against Biological age 
+# ggplot(lact_dat, aes(x = bio_age, y = lactation_duration ))+ 
+#        geom_point() +
+#        geom_smooth(method = "lm", se = TRUE)+
+#   labs(title = "Lactation Duration Effected by Last year",
+#        x = "Biological Age", 
+#        y = "lactation duration")
 ```
 
 ```{r}
@@ -365,18 +372,21 @@ lact_dat <- bioseal %>%
   filter(lactation_duration > 0 & lactation_duration < 45) %>% 
   select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
   mutate(terminal = ifelse(bio_age == 0, 1, 0), 
-         ageclass = ifelse(age >= maturity, "old", "young"), 
+         ageclass = ifelse(age <= maturity, "young", "old"),
          age10 = (age - maturity) / 10, 
          year_fct = factor(year))
 
-view(lact_dat)
+# view(lact_dat)
 
   #So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
 #Negative Binomial model
-lac_mod <- glmer.nb(lactation_duration ~ age10 + terminal:ageclass + (1 | year),
-         data = lact_dat)
+lac_mod <- glmer.nb(
+  lactation_duration ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID),
+  data = lact_dat
+)
 
-summary(mod2)$coefficients
+summary(lac_mod)
+summary(lac_mod)$coefficients
 
 #Adrien points out that we need to be sure they are dead... 7 years like the Age paper
 #creating prediction grid (so that we can use confidence intervals later)
@@ -384,8 +394,7 @@ lac_grid <- expand_grid(
   age = 3:22, 
   terminal = 0:1) %>% 
   mutate(age10 = (age - maturity) / 10, 
-         ageclass = factor(ifelse(age >= maturity, "old", "young"), 
-                           levels = c("old", "young")))
+         ageclass = ifelse(age <= maturity, "young", "old"))
 
 lac_years <- count(lact_dat, year_fct)
 
@@ -394,7 +403,8 @@ lac_pred_pop <- lac_grid %>%
   mutate(predicted = predict(lac_mod, 
                              newdata = lac_grid, 
                              re.form = NA, 
-                             type = "response"))
+                             type = "response"),
+         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
 
 #plot predictions, raw data, and residuals (residuals separately - resid on y axis, predictors on the x axis)
 
@@ -423,33 +433,60 @@ lac_pred_pop <- lac_pred_pop %>%
   )
 
 
-# Predictions vs Raw Data Plot
-lact_plot <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
-  geom_point(data = lact_dat, aes(x = age, y = lactation_duration), alpha = 0.5, color = "gray") +  # Raw data points
-  geom_line(aes(group = interaction(ageclass, year_fct)), alpha = 0.1, data = lac_pred_pop) +  # Predicted lines by age class and year
-  geom_ribbon(aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass), alpha = 0.2) +  # Confidence intervals
-  geom_line(aes(color = ageclass), linewidth = 1.2) +  # Mean predicted line by age class
-  geom_line(aes(y = predicted, group = ageclass), linetype = "dotted", linewidth = 1.2, alpha = 0.5) +  # Dotted predicted lines
-  geom_pointrange(aes(y = lactation_duration), alpha = 0.5, color = "blue", size = 0.8) +  # Raw data summarized by points
-  theme_minimal() +
-  labs(title = "Predictions vs Raw Data", y = "Lactation Duration", x = "Age")
-
-
-
-
-#Residuals Plot
-residuals_plot <- ggplot(lact_dat, aes(x = age, y = residuals)) +
-  geom_point(alpha = 0.5, color = "gray") +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-  theme_minimal() +
-  labs(title = "Residuals vs Age", y = "Residuals", x = "Age")
-
-#Arrange grids
-grid.arrange(lact_plot, residuals_plot, ncol = 2)
-
 ```
 
-Im restarting:
+Trying to plot the predictions:
 
-```{}
+```{r}
+# # Predictions vs Raw Data Plot
+lact_summ <- lact_dat %>% 
+  ungroup() %>% 
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
+  group_by(age, terminal_fct, ageclass) %>% 
+  summarize(mean_lact = mean(lactation_duration),
+            se_lact = sd(lactation_duration) / sqrt(n()),
+            .groups = "drop") %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
+  geom_pointrange(aes(y = mean_lact,
+                      ymin = mean_lact - 1.96 * se_lact,
+                      ymax = mean_lact + 1.96 * se_lact,
+                      linetype = terminal_fct,
+                      color = ageclass),
+                  lact_summ) +
+  geom_line(aes(linetype = terminal_fct, color = ageclass), 
+            linewidth = 1.2) +  # Dotted predicted lines 
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed")
+
+
++  # Predicted lines by age class and year
+#   geom_ribbon(aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass), alpha = 0.2) +  # Confidence intervals
+#   geom_line(aes(color = ageclass), linewidth = 1.2) +  # Mean predicted line by age class
+#   geom_pointrange(aes(y = lactation_duration), alpha = 0.5, color = "blue", size = 0.8) +  # Raw data summarized by points
+#   theme_minimal() +
+#   labs(title = "Predictions vs Raw Data", y = "Lactation Duration", x = "Age")
+# 
+# 
+# 
+# 
+# #Residuals Plot
+# residuals_plot <- ggplot(lact_dat, aes(x = age, y = residuals)) +
+#   geom_point(alpha = 0.5, color = "gray") +
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+#   theme_minimal() +
+#   labs(title = "Residuals vs Age", y = "Residuals", x = "Age")
+# 
+# #Arrange grids
+# grid.arrange(lact_plot, residuals_plot, ncol = 2)
+```
+
+```{r}
+lac_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1
+) %>% 
+  mutate(age10 = (age - maturity) / 10, 
+         ageclass = factor(ifelse(age <= maturity, "young", "old"), 
+                           levels = c("young", "old")))
+
 ```
