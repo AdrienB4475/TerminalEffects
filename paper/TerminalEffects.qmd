@@ -1,0 +1,459 @@
+---
+title: "Studying Terminal Effects in Northern Elephant Seals"
+format:
+  html:
+    echo: false
+    fig-width: 7
+    fig-height: 5
+    code-fold: true
+    code-tools: true
+    warning: false
+    toc: true
+editor: visual
+---
+
+```{r}
+#| label: setup
+#Libraries: 
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(cowplot)
+library(car)
+sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
+cleanseal <- sealdat %>% filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
+
+#Calculating lactation duration, can i make this cleaner somehow? 
+cleanseal$firstobsbreed <- as.Date(cleanseal$firstobsbreed, format = "%Y-%m-%d")
+cleanseal$lastobsbreed <- as.Date(cleanseal$lastobsbreed, format = "%Y-%m-%d")
+cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, cleanseal$firstobsbreed, units = "days"))
+
+
+```
+
+Both males and females included in data, not sure if we will need males
+
+```{r}
+#Calculating Bio age
+head(sealdat)
+# sealdat$animalID
+
+sealdat %>% filter(animalID == 170, observed == 1) %>% 
+  mutate(age = year - yearborn, 
+         max_age = max(age), 
+         bio_age = max_age - age) %>% view()
+#Bioage clean
+bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
+  group_by(animalID) %>%
+  mutate(age = year - yearborn, 
+         max_age = max(age), 
+         bio_age = max_age - age) %>%
+  filter(age > 2)
+
+
+#Calculate Lactation Duration
+bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
+bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
+bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
+
+
+
+```
+
+```{r}
+lact_dat <- bioseal %>%
+  filter(lactation_duration > 0) %>%
+  select(animalID,
+         bio_age,
+         lactation_duration,
+         year)
+
+```
+
+In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
+
+New Idea:\
+We want to create a threshold that has a prime age threshold in the figure. Ideally, it should show chronological age on the x axis and lactation duration on the y axis.
+
+However, since we only were interested in looking at the last years of life to examine terminal investment we FILTERED out animals as bio_age \> 0. We still looked at chronological age to see how lactation duration changes in the last years of life among different age classes. We potentially will define animals as YOUNG OR OLD also to make it binomial.
+
+POST MAX:
+
+We will have :
+
+L be lactation duration
+
+A = chronological age
+
+T = terminal (0 or 1 to create a yes no situation)
+
+C = age category (young or old) we define young as ages 3-7 and old as 8+
+
+In order to graph this we will look at L \~ Gamma(mean, sd)... mean = overall mean +coefficient for chronological age
+
+```{r}
+#First let's make a new data set for this graph called (well really just adding to the lact_dat data set already there... i went ahead and moved all that code below now. )
+maturity <- 6
+lact_dat <- bioseal %>% 
+  filter(lactation_duration > 0 & lactation_duration < 45) %>% 
+  select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+  mutate(terminal = ifelse(bio_age == 0, 1, 0), 
+         ageclass = ifelse(age <= maturity, "young", "old"),
+         age10 = (age - maturity) / 10, 
+         year_fct = factor(year))
+
+# view(lact_dat)
+
+  #So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
+#Negative Binomial model
+lac_mod <- glmer.nb(
+  lactation_duration ~ age10 + terminal:ageclass + (1 | year) ,
+  data = lact_dat
+)
+
+summary(lac_mod)
+summary(lac_mod)$coefficients
+
+#Adrien points out that we need to be sure they are dead... 7 years like the Age paper
+#creating prediction grid (so that we can use confidence intervals later)
+lac_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1) %>% 
+  mutate(age10 = (age - maturity) / 10, 
+         ageclass = ifelse(age <= maturity, "young", "old"))
+
+lac_years <- count(lact_dat, year_fct)
+
+#create population predictions 
+lac_pred_pop <- lac_grid %>% 
+  mutate(predicted = predict(lac_mod, 
+                             newdata = lac_grid, 
+                             re.form = NA,
+                             type = "response"),
+         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+
+```
+
+Trying to plot the predictions:
+
+```{r}
+# # Predictions vs Raw Data Plot
+lact_summ <- lact_dat %>% 
+  ungroup() %>% 
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
+  group_by(age, terminal_fct, ageclass) %>% 
+  summarize(mean_lact = mean(lactation_duration),
+            se_lact = sd(lactation_duration) / sqrt(n()),
+            .groups = "drop") %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# lact_fig <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
+#   geom_pointrange(aes(y = mean_lact,
+#                       ymin = mean_lact - 1.96 * se_lact,
+#                       ymax = mean_lact + 1.96 * se_lact,
+#                       linetype = terminal_fct,
+#                       color = ageclass),
+#                   lact_summ) +
+#   geom_line(aes(linetype = terminal_fct, color = ageclass), 
+#             linewidth = 1.2) +  # Dotted predicted lines 
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed")
+
+# plot(lact_fig)
+
+# Predicted lines by age class and year
+  # geom_ribbon(aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass), alpha = 0.2) +  # Confidence intervals
+#   geom_line(aes(color = ageclass), linewidth = 1.2) +  # Mean predicted line by age class
+#   geom_pointrange(aes(y = lactation_duration), alpha = 0.5, color = "blue", size = 0.8) +  # Raw data summarized by points
+# #   theme_minimal() +
+#   labs(title = "Predictions vs Raw Data", y = "Lactation Duration", x = "Age")
+# 
+# 
+# 
+# 
+# #Residuals Plot
+# residuals_plot <- ggplot(lact_dat, aes(x = age, y = residuals)) +
+#   geom_point(alpha = 0.5, color = "gray") +
+#   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+#   theme_minimal() +
+#   labs(title = "Residuals vs Age", y = "Residuals", x = "Age")
+# 
+# #Arrange grids
+# grid.arrange(lact_plot, residuals_plot, ncol = 2)
+
+ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
+  geom_pointrange(aes(
+    y = mean_lact, 
+    ymin = mean_lact - 1.96 * se_lact, 
+    ymax = mean_lact + 1.96 * se_lact, 
+    linetype = terminal_fct,   
+    color = ageclass
+  ), lact_summ) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass            
+  ), linewidth = 1.2) + 
+    geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+  
+  # Adjust the theme for aesthetic girl cute appearance
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(title = "Effect of Age on Lactation Duration", 
+       x = "Mother's Age (Years)", 
+       y = "Lactation Duration (days)") +
+  
+  # Custom color palette for lines and points
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+```
+
+```{r}
+library(segmented)
+install.packages("lmerTest")
+library(lmerTest)
+
+#Wean Weight Time!
+wt_dat <- bioseal %>%
+  dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+  filter(!is.na(Wt))%>%
+  mutate(terminal = ifelse(bio_age == 0, 1, 0), 
+         ageclass = ifelse(age <= maturity, "young", "old"),
+         age10 = (age - maturity) / 10, 
+         year_fct = factor(year))
+
+#Hist was evenly distributed: using glmer because of this:
+wt_mod <- lmer(
+  Wt ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID), 
+  data = wt_dat,
+  )
+summary(wt_mod)
+
+
+#COME BACK TO:
+# wt_mod_seg <- segmented(wt_mod, 
+#                         seg.Z = ~ age10, 
+#                         psi = (c(6,11) - maturity) / 10)
+
+#IDEA, What if we create two datasets and plot them on the same graph of like one with a threshold at 6 and ends age 10, and then the other dataset consists of animals 11 and beyond and then it will automatically do that.. maybe we have to set two different threshold stuff too like maturity and then super mature. 
+
+
+wt_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1) %>% 
+  mutate(age10 = (age - maturity) / 10, 
+         ageclass = ifelse(age <= maturity, "young", "old"))
+
+
+
+#create population predictions 
+wt_pred_pop <- wt_grid %>% 
+  mutate(predicted = predict(wt_mod,  # Use the model object here
+                             newdata = wt_grid, 
+                             re.form = NA,    # If you're using glmer or similar
+                             type = "response"),
+         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+
+#Now summary?
+
+wt_summ <- wt_dat %>% 
+  ungroup() %>% 
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
+  group_by(age, terminal_fct, ageclass) %>% 
+  summarize(mean_wt = mean(Wt, na.rm = TRUE),  #should i remove Na value for weight? 
+    se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),  
+    .groups = "drop"
+  ) %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+#Figure time! 
+ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+  geom_pointrange(aes(
+    y = mean_wt, 
+    ymin = mean_wt - 1.96 * se_wt, 
+    ymax = mean_wt + 1.96 * se_wt, 
+    linetype = terminal_fct,   
+    color = ageclass
+  ), wt_summ) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass            
+  ), linewidth = 1.2) +     
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+  
+  # Adjust the theme for aesthetic girl cute appearance
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(title = "Impact of Age on Wean Weight", 
+       subtitle = "Terminal vs Non-Terminal",
+       x = "Mother's Age (Years)", 
+       y = "Wean Weight(kg)") +
+  
+  # Custom color palette for lines and points
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+
+
+
+
+
+
+#Keeping this code here to show that some moms did produce super weans 
+ggplot(wt_dat, aes(x = age, y = Wt)) +
+  geom_point(aes(color = pupsex), alpha = 0.7, size = 4, shape = 16) +
+  geom_smooth(method = "loess", se = TRUE, color = "#9B59B6", fill = "pink", alpha = 0.2, linetype = "solid") +
+  
+  labs(
+    title = "Pup Weight at Weaning",
+    subtitle = "Impacted by Mom's age",
+    x = "Mom's Age (Years)",
+    y = "Pup weight (kg)"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    panel.grid.major = element_line(color = "pink", size = 0.3),  # Light grid lines
+    panel.grid.minor = element_blank(),  # No minor grid lines
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  # Purple title color
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),  # Grey color for axis text
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  # Purple title color
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),  # Subtle subtitle
+    legend.title = element_text(size = 12, face = "bold", color = "purple"),
+    legend.text = element_text(size = 12, color = "purple")
+  ) +
+
+  # Custom color scale for Pup Sex (assuming 'sex' is a variable in your data)
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2"))  # Soft pink and light blue
+
+
+#Change this to a histogram figure!
+```
+
+```{r}
+# #Just trying something here
+# wt_dat$Wt <- round(wt_dat$Wt)
+# 
+# wt_mod_glmer <- glmer(
+#   Wt ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID),
+#   data = wt_dat,
+#   family = poisson(link = "log")  # For count data
+# )
+# summary(wt_mod_glmer)
+# # 
+# wt_grid2 <- expand_grid(
+#   age = 3:22,
+#   terminal = 0:1) %>%
+#   mutate(age10 = (age - maturity) / 10,
+#          ageclass = ifelse(age <= maturity, "young", "old"))
+# 
+# wt_pred_pop2 <- wt_grid %>%
+#   mutate(predicted = predict(wt_mod,  # Use the model object here
+#                              newdata = wt_grid,
+#                              re.form = NA,    # If you're using glmer or similar
+#                              type = "response"),
+#          terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+# 
+# wt_summ2 <- wt_dat %>%
+#   ungroup() %>%
+#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+#   group_by(age, terminal_fct, ageclass) %>%
+#   summarize(mean_wt = mean(Wt, na.rm = TRUE),  #should i remove Na value for weight?
+#     se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),
+#     .groups = "drop"
+#   ) %>%
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# 
+# 
+# #Figure:
+# ggplot(wt_pred_pop2, aes(x = age, y = predicted)) +
+#   geom_pointrange(aes(
+#     y = mean_wt, 
+#     ymin = mean_wt - 1.96 * se_wt, 
+#     ymax = mean_wt + 1.96 * se_wt, 
+#     linetype = terminal_fct,   
+#     color = ageclass
+#   ), wt_summ2) +
+#   geom_line(aes(
+#     linetype = terminal_fct,    
+#     color = ageclass            
+#   ), linewidth = 1.2) +     
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") 
+```
+
+Now lets do offspring sex ratios:
+
+```{r}
+
+# NICER LOOKING GRAPH 
+off_summ <- wt_dat %>%
+  group_by(age, pupsex) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(prop = n / sum(n))  # Compute proportion for fill
+
+off_summ$pupsex <- as.factor(off_summ$pupsex)
+
+ggplot(data = off_summ, aes(x = age, y = prop)) + 
+  geom_col(aes(fill = pupsex), position = 'fill') +  # Set fill inside geom_col()
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") +
+  scale_x_continuous(breaks = 3:22) +
+  scale_y_continuous(labels = scales::percent_format(scale = 100)) +
+  labs(
+    title = "Sex Ratio of Offspring Linked to Age of Mother",
+    x = "Mother's Age (Years)",
+    y = "Sex Ratio (%)",
+    fill = "Pup Sex"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    panel.grid.major = element_line(color = "pink", size = 0.3),  
+    panel.grid.minor = element_blank(),  
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),  
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
+    legend.title = element_text(size = 12, face = "bold", color = "purple"),
+    legend.text = element_text(size = 12, color = "purple")
+  ) +
+  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
+```
+
+Just a plot to have full sample size:
+
+```{r}
+pop_breed <- bioseal %>% 
+  group_by(age) %>% 
+  count(age) %>% 
+  ggplot(aes(x = age, y = n,)) + 
+   geom_col(fill = "#66B2B2")  +
+  labs(x = "Age", y = "Number of Individuals")+ 
+  theme_minimal(base_size = 15) +
+  theme(
+    panel.grid.major = element_line(color = "pink", size = 0.3),  
+    panel.grid.minor = element_blank(),  
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),  
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
+    legend.title = element_text(size = 12, face = "bold", color = "purple"),
+    legend.text = element_text(size = 12, color = "purple")
+  ) +
+  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
+
+plot_grid(pop_breed)
+```
