@@ -147,38 +147,7 @@ lact_summ <- lact_dat %>%
             se_lact = sd(lactation_duration) / sqrt(n()),
             .groups = "drop") %>% 
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-# lact_fig <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
-#   geom_pointrange(aes(y = mean_lact,
-#                       ymin = mean_lact - 1.96 * se_lact,
-#                       ymax = mean_lact + 1.96 * se_lact,
-#                       linetype = terminal_fct,
-#                       color = ageclass),
-#                   lact_summ) +
-#   geom_line(aes(linetype = terminal_fct, color = ageclass), 
-#             linewidth = 1.2) +  # Dotted predicted lines 
-#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed")
 
-# plot(lact_fig)
-
-# Predicted lines by age class and year
-  # geom_ribbon(aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass), alpha = 0.2) +  # Confidence intervals
-#   geom_line(aes(color = ageclass), linewidth = 1.2) +  # Mean predicted line by age class
-#   geom_pointrange(aes(y = lactation_duration), alpha = 0.5, color = "blue", size = 0.8) +  # Raw data summarized by points
-# #   theme_minimal() +
-#   labs(title = "Predictions vs Raw Data", y = "Lactation Duration", x = "Age")
-# 
-# 
-# 
-# 
-# #Residuals Plot
-# residuals_plot <- ggplot(lact_dat, aes(x = age, y = residuals)) +
-#   geom_point(alpha = 0.5, color = "gray") +
-#   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-#   theme_minimal() +
-#   labs(title = "Residuals vs Age", y = "Residuals", x = "Age")
-# 
-# #Arrange grids
-# grid.arrange(lact_plot, residuals_plot, ncol = 2)
 
 ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
   geom_pointrange(aes(
@@ -394,7 +363,7 @@ ggplot(wt_dat, aes(x = age, y = Wt)) +
 #   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") 
 ```
 
-Now lets do offspring sex ratios:
+Now lets do offspring sex ratios: (below is just for the senior thesis class- may build off this)
 
 ```{r}
 
@@ -430,6 +399,85 @@ ggplot(data = off_summ, aes(x = age, y = prop)) +
     legend.text = element_text(size = 12, color = "purple")
   ) +
   scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
+```
+
+I would like to have a nicer one though using glmer so lets try here!:
+
+```{r}
+library(lme4)
+library(ggeffects)
+library(ggplot2)
+#Make New df
+ofsp_dat <- bioseal %>%
+  dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+  filter(!is.na(Wt))%>%
+  mutate(terminal = ifelse(bio_age == 0, 1, 0), 
+         ageclass = ifelse(age <= maturity, "young", "old"),
+         age10 = (age - maturity) / 10, 
+         year_fct = factor(year),
+         pup_sex = ifelse(pupsex == "M", 1, 0))
+
+#Calculations for creating our model - optimizer bobyqa didn't work 
+ofsp_mod <- glmer(pup_sex ~ age10 + terminal:ageclass + (1|animalID) + (1|year),
+                  data = ofsp_dat,
+                  family = binomial,
+                  control =  glmerControl(optimizer = "Nelder_Mead"))
+
+summary(ofsp_mod)
+
+#Creating predictions (pls work this keeps failing meee)
+ofsp_pred <- ggpredict(ofsp_mod, terms = c("age10 [3:22]", "terminal", "ageclass"))
+
+#Now lets summarize it:
+ofsp_summ <- ofsp_dat %>%
+  group_by(ageclass, terminal) %>%
+  summarise(
+    total = n(),
+    males = sum(pup_sex == 1),
+    male_prop = males / total,
+    se = sqrt((male_prop * (1 - male_prop)) / total),
+    .groups = "drop"
+  )
+
+
+
+#Figure:
+ggplot(ofsp_pred, aes(x = x, y = predicted)) +
+  geom_ribbon(aes(
+    ymin = conf.low, 
+    ymax = conf.high, 
+    fill = group
+  ), alpha = 0.2) +
+  geom_line(aes(
+    color = group, 
+    linetype = group
+  ), size = 1.2) +
+  
+  # Optional: Add observed summary points for flair (totally optional)
+  # geom_pointrange(data = your_summary_df, aes(x = age, y = male_prop, ...)) +
+  
+  # Add vertical line at maturity threshold
+  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +  
+  
+  # Theme and labels
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9", color = NA),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(
+    title = "Predicted Proportion of Male Offspring by Age",
+    x = "Mother's Age (Years)",
+    y = "Predicted Probability of Male Offspring",
+    color = "Group",
+    fill = "Group",
+    linetype = "Group"
+  ) +
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
 ```
 
 Just a plot to have full sample size:
