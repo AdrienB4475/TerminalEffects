@@ -439,6 +439,20 @@ ofsp_summ <- ofsp_dat %>%
     .groups = "drop"
   )
 
+#Actual data points:
+obs_summary <- ofsp_dat %>% 
+  ungroup() %>%  # Remove any existing grouping from previous operations
+  mutate(terminal_fct = factor(terminal, labels = c("Non-terminal", "Terminal"))) %>%  # Convert terminal to factor
+  group_by(age, terminal_fct, ageclass) %>%  # Group by age, terminal status, and age class
+  summarize(
+    n = n(),  # Total number of observations
+    male_count = sum(pup_sex == 1),  # Number of male offspring (1 for male, 0 for female)
+    prop_male = male_count / n(),  # Proportion of male offspring
+    se = sqrt((prop_male * (1 - prop_male)) / n()),  # Standard error of the proportion
+    .groups = "drop"
+  ) %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))  # Adjust age 
+
 
 
 #Figure:
@@ -452,13 +466,7 @@ ggplot(ofsp_pred, aes(x = x, y = predicted)) +
     color = group, 
     linetype = group
   ), size = 1.2) +
-  
-  # Optional: Add observed summary points for flair (totally optional)
-  # geom_pointrange(data = your_summary_df, aes(x = age, y = male_prop, ...)) +
-  
-  # Add vertical line at maturity threshold
   geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +  
-  
   # Theme and labels
   theme_minimal() +
   theme(
@@ -478,6 +486,52 @@ ggplot(ofsp_pred, aes(x = x, y = predicted)) +
   ) +
   scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
   scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+
+
+#Figure if that actual obs_summary code works finally...
+ggplot(obs_summary, aes(x = age, y = prop_male)) +
+  # Pointrange for observed data (prop_male with SE)
+  geom_pointrange(aes(
+    y = prop_male,
+    ymin = prop_male - se,
+    ymax = prop_male + se,
+    color = terminal_fct,
+    linetype = terminal_fct
+  ), size = 1.2) +
+  
+  # Line for the predicted data (smooth line connecting points)
+  geom_line(aes(
+    color = terminal_fct,
+    linetype = terminal_fct
+  ), size = 1.2) +
+  
+  # Optional vertical line at maturity threshold (age = 7)
+  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
+  
+  # Adjust theme for cleaner, more aesthetic look
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9", color = NA),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.position = "top"
+  ) +
+  
+  # Title, axis labels, and custom legend titles
+  labs(
+    title = "Proportion of Male Offspring by Age and Terminal Status",
+    x = "Mother's Age (Years)",
+    y = "Proportion of Male Offspring",
+    color = "Terminal Status",
+    linetype = "Terminal Status"
+  ) +
+  
+  # Custom color and fill for the groups (Terminal vs Non-terminal)
+  scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+  scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+  scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed"))
 ```
 
 Just a plot to have full sample size:
@@ -503,5 +557,58 @@ pop_breed <- bioseal %>%
   ) +
   scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
 
-plot_grid(pop_breed)
+
+#Eh thats cool but one more try: 
+# Combine the observed data points and predicted lines into one plot
+ggplot() +
+  # Plot the observed data points with confidence intervals
+  geom_pointrange(data = obs_summary, aes(
+    x = age, 
+    y = prop_male, 
+    ymin = prop_male - se, 
+    ymax = prop_male + se,
+    color = terminal_fct,
+    shape = terminal_fct
+  ), size = 1.2, show.legend = FALSE) + 
+  
+  # Plot the predicted values (lines) from the model
+  geom_line(data = ofsp_pred, aes(
+    x = x, 
+    y = predicted, 
+    color = group, 
+    linetype = group
+  ), size = 1.5) + 
+  
+  # Optional vertical line at maturity threshold (age = 7)
+  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
+  
+  # Adjust theme for aesthetic appearance
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9", color = NA),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text = element_text(color = "#7F8C8D", size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.position = "top"
+  ) +
+  
+  # Title, axis labels, and custom legend titles
+  labs(
+    title = "Proportion of Male Offspring by Age and Terminal Status",
+    x = "Mother's Age (Years)",
+    y = "Proportion of Male Offspring",
+    color = "Terminal Status",
+    linetype = "Terminal Status",
+    shape = "Terminal Status"
+  ) +
+  
+  # Custom color palette for Terminal vs Non-terminal groups
+  scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+  scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+  scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed")) +
+  
+  # Optional: Adjust axis limits or breaks if you need them
+  scale_x_continuous(breaks = seq(3, 22, 1)) +
+  scale_y_continuous(labels = scales::percent)
 ```
