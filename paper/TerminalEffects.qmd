@@ -184,7 +184,6 @@ ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
 
 ```{r}
 library(segmented)
-install.packages("lmerTest")
 library(lmerTest)
 
 #Wean Weight Time!
@@ -367,171 +366,234 @@ Now lets do offspring sex ratios: (below is just for the senior thesis class- ma
 
 ```{r}
 
-# NICER LOOKING GRAPH 
-off_summ <- wt_dat %>%
-  group_by(age, pupsex) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  mutate(prop = n / sum(n))  # Compute proportion for fill
-
-off_summ$pupsex <- as.factor(off_summ$pupsex)
-
-ggplot(data = off_summ, aes(x = age, y = prop)) + 
-  geom_col(aes(fill = pupsex), position = 'fill') +  # Set fill inside geom_col()
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") +
-  scale_x_continuous(breaks = 3:22) +
-  scale_y_continuous(labels = scales::percent_format(scale = 100)) +
-  labs(
-    title = "Sex Ratio of Offspring Linked to Age of Mother",
-    x = "Mother's Age (Years)",
-    y = "Sex Ratio (%)",
-    fill = "Pup Sex"
-  ) +
-  theme_minimal(base_size = 15) +
-  theme(
-    panel.grid.major = element_line(color = "pink", size = 0.3),  
-    panel.grid.minor = element_blank(),  
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),  
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
-    legend.title = element_text(size = 12, face = "bold", color = "purple"),
-    legend.text = element_text(size = 12, color = "purple")
-  ) +
-  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
+# # NICER LOOKING GRAPH 
+# off_summ <- wt_dat %>%
+#   group_by(age, pupsex) %>%
+#   summarise(n = n(), .groups = "drop") %>%
+#   mutate(prop = n / sum(n))  # Compute proportion for fill
+# 
+# off_summ$pupsex <- as.factor(off_summ$pupsex)
+# 
+# ggplot(data = off_summ, aes(x = age, y = prop)) + 
+#   geom_col(aes(fill = pupsex), position = 'fill') +  # Set fill inside geom_col()
+#   geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") +
+#   scale_x_continuous(breaks = 3:22) +
+#   scale_y_continuous(labels = scales::percent_format(scale = 100)) +
+#   labs(
+#     title = "Sex Ratio of Offspring Linked to Age of Mother",
+#     x = "Mother's Age (Years)",
+#     y = "Sex Ratio (%)",
+#     fill = "Pup Sex"
+#   ) +
+#   theme_minimal(base_size = 15) +
+#   theme(
+#     panel.grid.major = element_line(color = "pink", size = 0.3),  
+#     panel.grid.minor = element_blank(),  
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),  
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
+#     legend.title = element_text(size = 12, face = "bold", color = "purple"),
+#     legend.text = element_text(size = 12, color = "purple")
+#   ) +
+#   scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
 ```
 
 I would like to have a nicer one though using glmer so lets try here!:
 
 ```{r}
-library(lme4)
-library(ggeffects)
-library(ggplot2)
-#Make New df
-ofsp_dat <- bioseal %>%
-  dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
-  filter(!is.na(Wt))%>%
-  mutate(terminal = ifelse(bio_age == 0, 1, 0), 
-         ageclass = ifelse(age <= maturity, "young", "old"),
-         age10 = (age - maturity) / 10, 
-         year_fct = factor(year),
-         pup_sex = ifelse(pupsex == "M", 1, 0))
+# library(lme4)
+# library(ggeffects)
+# library(ggplot2)
+# #Make New df
+# ofsp_dat <- bioseal %>%
+#   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+#   filter(!is.na(Wt))%>%
+#   mutate(terminal = ifelse(bio_age == 0, 1, 0), 
+#          ageclass = ifelse(age <= maturity, "young", "old"),
+#          age10 = (age - maturity) / 10, 
+#          year_fct = factor(year),
+#          pup_sex = ifelse(pupsex == "M", 1, 0))
+# 
+# #Calculations for creating our model - optimizer bobyqa didn't work 
+# ofsp_mod <- glmer(pup_sex ~ age10 + terminal:ageclass + (1|animalID) + (1|year),
+#                   data = ofsp_dat,
+#                   family = binomial,
+#                   control =  glmerControl(optimizer = "Nelder_Mead"))
+# 
+# summary(ofsp_mod)
+# 
+# #Creating predictions (pls work this keeps failing meee)
+# ofsp_pred <- ggpredict(ofsp_mod, terms = c("age10 [3:22]", "terminal", "ageclass"))
+# 
+# 
+# #Now lets summarize it:
+# ofsp_summ <- ofsp_dat %>%
+#   group_by(ageclass, terminal) %>%
+#   summarise(
+#     total = n(),
+#     males = sum(pup_sex == 1),
+#     male_prop = males / total,
+#     se = sqrt((male_prop * (1 - male_prop)) / total),
+#     .groups = "drop"
+#   )
+# 
+# #Actual data points:
+# obs_summary <- ofsp_dat %>% 
+#   ungroup() %>%  # Remove any existing grouping from previous operations
+#   mutate(terminal_fct = factor(terminal, labels = c("Non-terminal", "Terminal"))) %>%  # Convert terminal to factor
+#   group_by(age, terminal_fct, ageclass) %>%  # Group by age, terminal status, and age class
+#   summarize(
+#     n = n(),  # Total number of observations
+#     male_count = sum(pup_sex == 1),  # Number of male offspring (1 for male, 0 for female)
+#     prop_male = male_count / n(),  # Proportion of male offspring
+#     se = sqrt((prop_male * (1 - prop_male)) / n()),  # Standard error of the proportion
+#     .groups = "drop"
+#   ) %>% 
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))  # Adjust age 
+# 
+# 
+# 
+# #Figure:
+# ggplot(ofsp_pred, aes(x = x, y = predicted)) +
+#   geom_ribbon(aes(
+#     ymin = conf.low, 
+#     ymax = conf.high, 
+#     fill = group
+#   ), alpha = 0.2) +
+#   geom_line(aes(
+#     color = group, 
+#     linetype = group
+#   ), size = 1.2) +
+#   geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +  
+#   # Theme and labels
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9", color = NA),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text = element_text(color = "#7F8C8D", size = 12),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+#   ) +
+#   labs(
+#     title = "Male Offspring Sex Ratio",
+#     x = "Mother's Age (Years)",
+#     y = "Predicted Probability of Male Offspring",
+#     color = "Group",
+#     fill = "Group",
+#     linetype = "Group"
+#   ) +
+#   scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+#   scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+# 
+# 
+# #Figure if that actual obs_summary code works finally...
+# ggplot(obs_summary, aes(x = age, y = prop_male)) +
+#   # Pointrange for observed data (prop_male with SE)
+#   geom_pointrange(aes(
+#     y = prop_male,
+#     ymin = prop_male - se,
+#     ymax = prop_male + se,
+#     color = terminal_fct,
+#     linetype = terminal_fct
+#   ), size = 1.2) +
+#   
+#   # Line for the predicted data (smooth line connecting points)
+#   geom_line(aes(
+#     color = terminal_fct,
+#     linetype = terminal_fct
+#   ), size = 1.2) +
+#   
+#   # Vertical line at maturity threshold (age = 7)
+#   geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
+#   
+#   # Adjust theme for cleaner, more aesthetic look
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9", color = NA),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text = element_text(color = "#7F8C8D", size = 12),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+#     legend.position = "top"
+#   ) +
+#   
+#   # Title, axis labels, and custom legend titles
+#   labs(
+#     title = "Male Offspring Sex Ratio",
+#     x = "Mother's Age (Years)",
+#     y = "Proportion of Male Offspring",
+#     color = "Terminal Status",
+#     linetype = "Terminal Status"
+#   ) +
+#   
+#   # Custom color and fill for the groups (Terminal vs Non-terminal)
+#   scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+#   scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+#   scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed"))
+# 
+# 
+# 
+# #Eh thats cool but im gonna do one more try: 
+# # Combine the observed data points and predicted lines into one plot
+# ggplot() +
+#   # Plot the observed data points with confidence intervals
+#   geom_pointrange(data = obs_summary, aes(
+#     x = age, 
+#     y = prop_male, 
+#     ymin = prop_male - se, 
+#     ymax = prop_male + se,
+#     color = terminal_fct,
+#     shape = terminal_fct
+#   ), size = 1.2, show.legend = FALSE) + 
+#   
+#   # Plot the predicted values (lines) from the model
+#   geom_line(data = ofsp_pred, aes(
+#     x = x, 
+#     y = predicted, 
+#     color = group, 
+#     linetype = group
+#   ), size = 1.5) + 
+#   
+#   # vertical line at maturity threshold (age = 7)
+#   geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
+#   
+#   # Adjust theme for aesthetic appearance
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9", color = NA),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text = element_text(color = "#7F8C8D", size = 12),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+#     legend.position = "top"
+#   ) +
+#   
+#   # Title, axis labels, and custom legend titles
+#   labs(
+#     title = "Male Offspring Sex Ratio",
+#     x = "Mother's Age (Years)",
+#     y = "Proportion of Male Offspring",
+#     color = "Terminal Status",
+#     linetype = "Terminal Status",
+#     shape = "Terminal Status"
+#   ) +
+#   
+#   # My cute custom color palette for Terminal vs Non-terminal groups
+#   scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+#   scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
+#   scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed")) +
+#   
+# #For axis breaks 
+#   scale_x_continuous(breaks = seq(3, 22, 1)) +
+#   scale_y_continuous(labels = scales::percent)
+# 
+# 
+# 
+# 
+# 
 
-#Calculations for creating our model - optimizer bobyqa didn't work 
-ofsp_mod <- glmer(pup_sex ~ age10 + terminal:ageclass + (1|animalID) + (1|year),
-                  data = ofsp_dat,
-                  family = binomial,
-                  control =  glmerControl(optimizer = "Nelder_Mead"))
-
-summary(ofsp_mod)
-
-#Creating predictions (pls work this keeps failing meee)
-ofsp_pred <- ggpredict(ofsp_mod, terms = c("age10 [3:22]", "terminal", "ageclass"))
-
-#Now lets summarize it:
-ofsp_summ <- ofsp_dat %>%
-  group_by(ageclass, terminal) %>%
-  summarise(
-    total = n(),
-    males = sum(pup_sex == 1),
-    male_prop = males / total,
-    se = sqrt((male_prop * (1 - male_prop)) / total),
-    .groups = "drop"
-  )
-
-#Actual data points:
-obs_summary <- ofsp_dat %>% 
-  ungroup() %>%  # Remove any existing grouping from previous operations
-  mutate(terminal_fct = factor(terminal, labels = c("Non-terminal", "Terminal"))) %>%  # Convert terminal to factor
-  group_by(age, terminal_fct, ageclass) %>%  # Group by age, terminal status, and age class
-  summarize(
-    n = n(),  # Total number of observations
-    male_count = sum(pup_sex == 1),  # Number of male offspring (1 for male, 0 for female)
-    prop_male = male_count / n(),  # Proportion of male offspring
-    se = sqrt((prop_male * (1 - prop_male)) / n()),  # Standard error of the proportion
-    .groups = "drop"
-  ) %>% 
-  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))  # Adjust age 
-
-
-
-#Figure:
-ggplot(ofsp_pred, aes(x = x, y = predicted)) +
-  geom_ribbon(aes(
-    ymin = conf.low, 
-    ymax = conf.high, 
-    fill = group
-  ), alpha = 0.2) +
-  geom_line(aes(
-    color = group, 
-    linetype = group
-  ), size = 1.2) +
-  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +  
-  # Theme and labels
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9", color = NA),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
-  ) +
-  labs(
-    title = "Predicted Proportion of Male Offspring by Age",
-    x = "Mother's Age (Years)",
-    y = "Predicted Probability of Male Offspring",
-    color = "Group",
-    fill = "Group",
-    linetype = "Group"
-  ) +
-  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
-  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
-
-
-#Figure if that actual obs_summary code works finally...
-ggplot(obs_summary, aes(x = age, y = prop_male)) +
-  # Pointrange for observed data (prop_male with SE)
-  geom_pointrange(aes(
-    y = prop_male,
-    ymin = prop_male - se,
-    ymax = prop_male + se,
-    color = terminal_fct,
-    linetype = terminal_fct
-  ), size = 1.2) +
-  
-  # Line for the predicted data (smooth line connecting points)
-  geom_line(aes(
-    color = terminal_fct,
-    linetype = terminal_fct
-  ), size = 1.2) +
-  
-  # Optional vertical line at maturity threshold (age = 7)
-  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
-  
-  # Adjust theme for cleaner, more aesthetic look
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9", color = NA),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
-    legend.position = "top"
-  ) +
-  
-  # Title, axis labels, and custom legend titles
-  labs(
-    title = "Proportion of Male Offspring by Age and Terminal Status",
-    x = "Mother's Age (Years)",
-    y = "Proportion of Male Offspring",
-    color = "Terminal Status",
-    linetype = "Terminal Status"
-  ) +
-  
-  # Custom color and fill for the groups (Terminal vs Non-terminal)
-  scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
-  scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
-  scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed"))
 ```
 
 Just a plot to have full sample size:
@@ -558,57 +620,102 @@ pop_breed <- bioseal %>%
   scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
 
 
-#Eh thats cool but one more try: 
-# Combine the observed data points and predicted lines into one plot
-ggplot() +
-  # Plot the observed data points with confidence intervals
-  geom_pointrange(data = obs_summary, aes(
-    x = age, 
+```
+
+```{r}
+#We gon try one last GREAT attempt: 
+sex_dat <- bioseal %>%
+  dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
+  filter(!is.na(pupsex)) %>%
+  mutate(
+    is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
+    terminal = ifelse(bio_age == 0, 1, 0), 
+    ageclass = ifelse(age <= maturity, "young", "old"),
+    age10 = (age - maturity) / 10, 
+    year_fct = factor(year)
+  )
+
+
+#Run our model: 
+sex_mod <- glmer(
+  is_male ~ age10 + terminal:ageclass + (1 | year_fct) + (1 | animalID),
+  family = binomial,
+  data = sex_dat
+)
+summary(sex_mod)
+
+#Now the grid ofc (this is what I forgot for previous lines)
+sex_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1
+) %>% 
+  mutate(
+    age10 = (age - maturity) / 10, 
+    ageclass = ifelse(age <= maturity, "young", "old")
+  )
+
+
+#Better predicted values:
+sex_pred_pop <- sex_grid %>%
+  mutate(
+    predicted_prob_male = predict(
+      sex_mod, 
+      newdata = sex_grid, 
+      re.form = NA, 
+      type = "response"
+    ),
+    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+  )
+
+#Now summarize all this GOOD data
+sex_summ <- sex_dat %>%
+  ungroup() %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  group_by(age, terminal_fct, ageclass) %>%
+  summarize(
+    prop_male = mean(is_male, na.rm = TRUE),
+    se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
+    .groups = "drop"
+  ) %>%
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#And... magic plot?!??!
+ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
+  geom_pointrange(aes(
     y = prop_male, 
-    ymin = prop_male - se, 
-    ymax = prop_male + se,
-    color = terminal_fct,
-    shape = terminal_fct
-  ), size = 1.2, show.legend = FALSE) + 
+    ymin = prop_male - 1.96 * se_prop, 
+    ymax = prop_male + 1.96 * se_prop, 
+    linetype = terminal_fct,   
+    color = ageclass
+  ), sex_summ) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass            
+  ), linewidth = 1.2) +     
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
   
-  # Plot the predicted values (lines) from the model
-  geom_line(data = ofsp_pred, aes(
-    x = x, 
-    y = predicted, 
-    color = group, 
-    linetype = group
-  ), size = 1.5) + 
-  
-  # Optional vertical line at maturity threshold (age = 7)
-  geom_vline(xintercept = 7, linetype = "dashed", color = "#9B59B6") +
-  
-  # Adjust theme for aesthetic appearance
   theme_minimal() +
   theme(
-    panel.background = element_rect(fill = "#F9F9F9", color = NA),
+    panel.background = element_rect(fill = "#F9F9F9"),
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
-    legend.position = "top"
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
   ) +
-  
-  # Title, axis labels, and custom legend titles
   labs(
-    title = "Proportion of Male Offspring by Age and Terminal Status",
-    x = "Mother's Age (Years)",
-    y = "Proportion of Male Offspring",
-    color = "Terminal Status",
-    linetype = "Terminal Status",
-    shape = "Terminal Status"
+    title = "Offspring Sex Ratio by Maternal Age", 
+    subtitle = "Terminal vs Non-Terminal Mothers",
+    x = "Mother's Age (Years)", 
+    y = "Probability Offspring is Male"
   ) +
-  
-  # Custom color palette for Terminal vs Non-terminal groups
-  scale_color_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
-  scale_fill_manual(values = c("Non-terminal" = "#66B2B2", "Terminal" = "#9B59B6")) +
-  scale_linetype_manual(values = c("Non-terminal" = "solid", "Terminal" = "dashed")) +
-  
-  # Optional: Adjust axis limits or breaks if you need them
-  scale_x_continuous(breaks = seq(3, 22, 1)) +
-  scale_y_continuous(labels = scales::percent)
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+
+
+#YIPPIEE 
+
+
 ```
