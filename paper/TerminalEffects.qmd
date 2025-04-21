@@ -16,17 +16,11 @@ editor: visual
 
 \tex A major question in ecology and evolution is why animals exhibit different forms of reproductive strategies. Some prioritize survival and future reproductive success, while others invest all they have at the cost of their own life. The terminal investment hypothesis states that animals in their last year of life, or no expectation of future reproduction, should invest significantly more into their current offspring (Williams 1966; Clutton-Brock 1984). When the chances of survival are low, the terminal investment strategy appears to be optimal as it increases the chance of reproductive success. However, when a female is in her reproductive prime, she should limit how much she invests in current offspring in order to conserve resources needed for future reproduction. (Hoffman 2010).
 
-	In nature, animals exhibit different reproductive investment strategies. Cory’s shearwaters tend to exhibit a fixed investment strategy where regardless of age or injury, they invest the same level into offspring. (Navarro 2007) Poison dart frogs exhibit a flexible investment pattern, with females adjusting their parental effort based on whether or not a male is present or absent. When a male is absent, females would compensate by investing more in order to ensure offspring survival (Ringler 2015). Rhesus macaques experience senescence in reproduction where the quality of offspring produced decreases as they age due to deteriorating body condition. Older females produced infants with lower body masses and survival rates. Older mothers also spent more time with their infants during the first month postpartum indicating terminal investment may be present, although this increased investment did not correlate to infant fitness or survival in the end. (Hoffman 2010)
+In nature, animals exhibit different reproductive investment strategies. Cory’s shearwaters tend to exhibit a fixed investment strategy where regardless of age or injury, they invest the same level into offspring. (Navarro 2007) Poison dart frogs exhibit a flexible investment pattern, with females adjusting their parental effort based on whether or not a male is present or absent. When a male is absent, females would compensate by investing more in order to ensure offspring survival (Ringler 2015). Rhesus macaques experience senescence in reproduction where the quality of offspring produced decreases as they age due to deteriorating body condition. Older females produced infants with lower body masses and survival rates. Older mothers also spent more time with their infants during the first month postpartum indicating terminal investment may be present, although this increased investment did not correlate to infant fitness or survival in the end. (Hoffman 2010)
 
-	Evidence for the terminal investment strategy is only beginning to be fully understood for mammals, and even less is known for marine mammals. Terminal investment refers to a strategy where individuals, typically in their later/last years of life, increase reproductive effort due to the reduced probability of future reproduction. This strategy can vary depending on the species’ life history. For instance, older Nile lechwe (Kobus megaceros) produce more male offspring than females, even though males generally incur higher reproductive costs (Bercovitch et al. 2009). In red deer (Cervus elaphus), maternal age is positively correlated with birth weight and offspring survival rates, demonstrating how aging impacts investment strategies (Clutton-Brock 1984). Additionally, nutritional constraints in older mothers can influence the size and survival of offspring, with well-nourished older mothers tending to produce heavier offspring and influencing whether or not terminal investment occurs (LaSharr et al. 2025). On the other hand, terminal investment for (insert species) was only seen in younger animals compared to older animals. To effectively study terminal investment, long-term data sets can be important, as they allow researchers to track the life history of individuals over time and measure changes in maternal investment across their lifespan.
+Evidence for the terminal investment strategy is only beginning to be fully understood for mammals, and even less is known for marine mammals. Terminal investment refers to a strategy where individuals, typically in their later/last years of life, increase reproductive effort due to the reduced probability of future reproduction. This strategy can vary depending on the species’ life history. For instance, older Nile lechwe (Kobus megaceros) produce more male offspring than females, even though males generally incur higher reproductive costs (Bercovitch et al. 2009). In red deer (Cervus elaphus), maternal age is positively correlated with birth weight and offspring survival rates, demonstrating how aging impacts investment strategies (Clutton-Brock 1984). Additionally, nutritional constraints in older mothers can influence the size and survival of offspring, with well-nourished older mothers tending to produce heavier offspring and influencing whether or not terminal investment occurs (LaSharr et al. 2025). On the other hand, terminal investment for (insert species) was only seen in younger animals compared to older animals. To effectively study terminal investment, long-term data sets can be important, as they allow researchers to track the life history of individuals over time and measure changes in maternal investment across their lifespan.
 
-\
-
-	When terminal investment is not shown, animals tend to experience terminal effects, which are similar to the reproductive restraints or senescence that come with aging. As an animal approaches the end of its life, the trade-offs between reproduction and survival can become too high of a cost. These trade-offs may result in death or decreased reproductive performance in the last year of life, as resources are increasingly devoted to survival rather than reproduction. In some cases, this can lead to complete cessation of reproductive efforts, as the organism no longer has the capacity to invest in offspring. Additionally, these terminal effects may vary across species depending on life history strategies, with some animals exhibiting terminal investment to maximize reproductive output before death, while others may experience a rapid decline in fertility and overall health.  
-
- ![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXeqZhXzGzyN6q_syuGLkQmbxii4xQWzFDzZXMRER3Xin86H9hLFJKGRD7wKq25FF-Whhuq0MlwaUe3VUxiFxI_5-B_ECHvkVDwaVMXH7N7mtYqt0htFJZb_PD_B7bVtH11-nMKk4g?key=82qYbtj45H1vnpUIQYawirzM)
-
-(Figure 1: Differential parental investment patterns across species as they age. Cory’s shearwaters in the pink line represent a fixed investment pattern. Poison dart frogs represented in the green line show a flexible investment pattern as they approach their last year of life. Rhesus macaques show a senescent decline, in the red line, where reproduction decreases with age. Lastly, red deer represented by the blue line where due to terminal investment, their last offspring experiences the most investment. The seal in black is to represent where elephant seals fall in this graph.) 
+When terminal investment is not shown, animals tend to experience terminal effects, which are similar to the reproductive restraints or senescence that come with aging. As an animal approaches the end of its life, the trade-offs between reproduction and survival can become too high of a cost. These trade-offs may result in death or decreased reproductive performance in the last year of life, as resources are increasingly devoted to survival rather than reproduction. In some cases, this can lead to complete cessation of reproductive efforts, as the organism no longer has the capacity to invest in offspring. Additionally, these terminal effects may vary across species depending on life history strategies, with some animals exhibiting terminal investment to maximize reproductive output before death, while others may experience a rapid decline in fertility and overall health.
 
 Northern elephant seals are a marine predator (Condit et al., 2013) that inhabit the Western Pacific Ocean. Their species range spans along the west coast of Northern America, ranging from Baja California to Alaska (Le Boeuf & Laws 1994). These sexually dimorphic marine mammals experienced a near-extinction event due to over-hunting more than 100 years ago, presumed to be extinct in 1892 (Stewart et al., 1994), and have rebounded to a population of over 220,000 in the US and Mexico (Lowry et al., 2014). This species spends \~ 75% of their life at sea and comes to shore two times per year. The first haulout is the breeding season during mid-December to March and the second haul out is the molting season during mid-April to early July (Le Boeuf et al., 2019). Northern elephant seals typically come back to the same beach they were born every year. Researchers are able to track individual seals from birth to their last years of life, while also knowing a life history of the pup’s mother. 
 
@@ -742,4 +736,199 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
 #YIPPIEE 
 
 
+```
+
+Ok.. now heres the BIG cool challenge I want to take on next..
+
+Did offspring of terminal moms have higher chance of survival???
+
+```{r}
+#I think i have to reuse sealdat.. havent touched this dat set in a MINNNN.. so lets modify her a lil
+surv_seal <- sealdat %>%
+  group_by(animalID) %>%
+  mutate(age = year - yearborn,
+         max_age = max(age, na.rm = TRUE),
+         bio_age = max_age - age) %>%
+  ungroup()
+
+#my stomach hurts. please work:
+surv_dat <- surv_seal %>%
+  dplyr::select(animalID, pupID, bio_age, year, pupsex, age) %>%  
+  mutate(
+    is_survive = as.integer(pupID %in% animalID),  # Did the pup survive? 1 if yes, 0 if no
+    terminal = ifelse(bio_age == 0, 1, 0),         
+    ageclass = ifelse(age <= maturity, "young", "old"),  
+    age10 = (age - maturity) / 10,                
+    year_fct = factor(year)                       
+  )
+
+#first lets make yet another new dataframe 
+ofsp_surv <- surv_dat
+
+#Did seal survive??
+ofsp_surv$is_survive <- as.integer(ofsp_surv$pupID %in% ofsp_surv$animalID)
+
+#clean our data again then: 
+surv_dat <- ofsp_surv %>%
+  dplyr::select(animalID, pupID, bio_age, year, pupsex, age, is_survive) %>%
+  filter(!is.na(is_survive)) %>%
+  mutate(
+    terminal = ifelse(bio_age == 0, 1, 0),
+    ageclass = ifelse(age <= maturity, "young", "old"),
+    age10    = (age - maturity) / 10,
+    year_fct = factor(year)
+  )
+
+#Model time using glmer: i actuallt give up i think?? im going um INSANE
+surv_mod <- glmer(
+  is_survive ~ terminal * ageclass + (1 | animalID), 
+  family = binomial,
+  data = surv_dat,
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+)
+summary(surv_mod)
+
+
+#grid ofc
+surv_grid <- expand_grid(
+  age = 3:22,  # range of ages for prediction
+  terminal = 0:1  # terminal status (0 = nonterminal, 1 = terminal)
+) %>%
+  mutate(
+    age10 = (age - maturity) / 10,  # scale age
+    ageclass = ifelse(age <= maturity, "young", "old")
+  )
+
+#And then ofc we make our pred after the grid right??
+surv_pred_pop <- surv_grid %>%
+  mutate(
+    predicted_prob_survival = predict(
+      surv_mod, 
+      newdata = surv_grid, 
+      re.form = NA, 
+      type = "response"
+    ),
+    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+  )
+
+#Heres where everything falls apart ofc.. or not??
+surv_summ <- surv_dat %>%
+  ungroup() %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  group_by(age, terminal_fct, ageclass) %>%
+  summarize(
+    prop_surv = mean(is_survive, na.rm = TRUE),
+    se_prop = sqrt((prop_surv * (1 - prop_surv)) / n()), 
+    .groups = "drop"
+  ) %>%
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#If we lucky we plot!
+ggplot(surv_pred_pop, aes(x = age, y = predicted_prob_survival)) +
+  geom_pointrange(aes(
+    y = prop_surv, 
+    ymin = prop_surv - 1.96 * se_prop, 
+    ymax = prop_surv + 1.96 * se_prop, 
+    linetype = terminal_fct,   
+    color = ageclass
+  ), surv_summ) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass            
+  ), linewidth = 1.2) +     
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(
+    title = "Pup Survival Probability by Maternal Age", 
+    subtitle = "Terminal vs Non-Terminal Mothers",
+    x = "Mother's Age (Years)", 
+    y = "Probability of Pup Survival"
+  ) +
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+
+
+#anddd.. something off cause no way pup survival that low for both.. UGHHHH 
+
+
+
+#i wonder if its the kind of glmer model.. new???
+surv_mod_quasi <- glmer(
+  is_survive ~ terminal * ageclass + (1 | year_fct) + (1 | animalID),
+  family = binomial(link = "logit"),
+  data = surv_dat
+)
+summary(surv_mod_quasi)
+
+surv_pred_pop_quasi <- surv_grid %>%
+  mutate(
+    predicted_prob_survival = predict(
+      surv_mod_quasi, 
+      newdata = surv_grid, 
+      type = "response",  
+      re.form = NA        
+    ),
+    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+  )
+
+#Quasi summary incoming:
+surv_summ_quasi <- surv_dat %>%
+  ungroup() %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  group_by(age, terminal_fct, ageclass) %>%
+  summarize(
+    prop_surv = mean(is_survive, na.rm = TRUE),
+    se_prop = sqrt((prop_surv * (1 - prop_surv)) / n()), 
+    .groups = "drop"
+  ) %>%
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#New plot??
+ggplot(surv_pred_pop_quasi, aes(x = age, y = predicted_prob_survival)) +
+  geom_pointrange(aes(
+    y = prop_surv, 
+    ymin = prop_surv - 1.96 * se_prop, 
+    ymax = prop_surv + 1.96 * se_prop, 
+    linetype = terminal_fct,   
+    color = ageclass
+  ), surv_summ_quasi) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass            
+  ), linewidth = 1.2) +     
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(
+    title = "Pup Survival Probability by Maternal Age", 
+    subtitle = "Terminal vs Non-Terminal Mothers",
+    x = "Mother's Age (Years)", 
+    y = "Probability of Pup Survival"
+  ) +
+  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+
+
+#and i give up.. sorryyy JK I CAUGHT ANOTHER WIND??
 ```
