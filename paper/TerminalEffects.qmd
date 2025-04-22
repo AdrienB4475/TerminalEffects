@@ -350,6 +350,126 @@ ggplot(wt_dat, aes(x = age, y = Wt)) +
 
 ```
 
+#Wean Weight 2:
+
+Were going to attempt trying to create a new wean weight dataset to incorporate three breakpoints:
+
+```{r}
+#First.. lets change the dataset so we have 3 ageclasses: 
+wt_dat <- wt_dat %>%
+  mutate(
+    terminal = ifelse(bio_age == 0, 1, 0), 
+    ageclass3 = case_when(
+      age >= 3 & age <= 6 ~ "young",
+      age >= 7 & age <= 13 ~ "prime",
+      age >= 14 ~ "old",
+      TRUE ~ NA_character_
+    ),
+    ageclass3 = factor(ageclass3, levels = c("young", "prime", "old")),
+    age10 = (age - maturity) / 10, 
+    year_fct = factor(year)
+  )
+
+#New model/updated:
+wt_mod <- lmer(
+  Wt ~ age10 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
+  data = wt_dat,
+  )
+summary(wt_mod)
+
+
+#Then recreate our grid with all three age classes: 
+wt_grid <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1
+) %>%
+  mutate(
+    age10 = (age - maturity) / 10,
+    ageclass3 = case_when(
+      age >= 3 & age <= 6 ~ "young",
+      age >= 7 & age <= 13 ~ "prime",
+      age >= 14 ~ "old"
+    ),
+    ageclass3 = factor(ageclass3, levels = c("young", "prime", "old"))
+  )
+
+#Update predictions:
+wt_pred_pop <- wt_grid %>% 
+  mutate(predicted = predict(wt_mod,  
+                             newdata = wt_grid, 
+                             re.form = NA,    
+                             type = "response"),
+         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+
+#Now summary:
+wt_summ <- wt_dat %>% 
+  ungroup() %>% 
+  mutate(
+    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+  ) %>% 
+  group_by(age, terminal_fct, ageclass3) %>% 
+  summarize(
+    mean_wt = mean(Wt, na.rm = TRUE),
+    se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  ) %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#And figure:??
+wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+  
+  # Error bars and points from summary
+  geom_pointrange(aes(
+    y = mean_wt,
+    ymin = mean_wt - 1.96 * se_wt,
+    ymax = mean_wt + 1.96 * se_wt,
+    linetype = terminal_fct,
+    color = ageclass3
+  ), data = wt_summ) +
+  
+  # Model prediction lines
+  geom_line(aes(
+    linetype = terminal_fct,
+    color = ageclass3
+  ), linewidth = 1.2) +
+  
+  # Vertical lines at maturity (age 6) and new threshold (age 11)
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  # Maturity
+  geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +  # New threshold
+  
+  # Theme and aesthetic styling
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  
+  # Labels
+  labs(
+    title = "Impact of Age on Wean Weight",
+    subtitle = "Terminal vs Non-Terminal Mothers",
+    x = "Mother's Age (Years)",
+    y = "Wean Weight (kg)",
+    color = "Age Class",
+    linetype = "Terminal Status"
+  ) +
+
+  # Color palette
+  scale_color_manual(values = c(
+    "young" = "#D5A6F6",
+    "prime" = "#6DD5B3",
+    "old" = "#9B59B6"
+  ))
+
+print(wt_fig)
+```
+
 #Sex Ratios fig:
 
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
