@@ -14,21 +14,7 @@ editor: visual
 
 #Introduction
 
-\tex A major question in ecology and evolution is why animals exhibit different forms of reproductive strategies. Some prioritize survival and future reproductive success, while others invest all they have at the cost of their own life. The terminal investment hypothesis states that animals in their last year of life, or no expectation of future reproduction, should invest significantly more into their current offspring (Williams 1966; Clutton-Brock 1984). When the chances of survival are low, the terminal investment strategy appears to be optimal as it increases the chance of reproductive success. However, when a female is in her reproductive prime, she should limit how much she invests in current offspring in order to conserve resources needed for future reproduction. (Hoffman 2010).
-
-In nature, animals exhibit different reproductive investment strategies. Cory’s shearwaters tend to exhibit a fixed investment strategy where regardless of age or injury, they invest the same level into offspring. (Navarro 2007) Poison dart frogs exhibit a flexible investment pattern, with females adjusting their parental effort based on whether or not a male is present or absent. When a male is absent, females would compensate by investing more in order to ensure offspring survival (Ringler 2015). Rhesus macaques experience senescence in reproduction where the quality of offspring produced decreases as they age due to deteriorating body condition. Older females produced infants with lower body masses and survival rates. Older mothers also spent more time with their infants during the first month postpartum indicating terminal investment may be present, although this increased investment did not correlate to infant fitness or survival in the end. (Hoffman 2010)
-
-Evidence for the terminal investment strategy is only beginning to be fully understood for mammals, and even less is known for marine mammals. Terminal investment refers to a strategy where individuals, typically in their later/last years of life, increase reproductive effort due to the reduced probability of future reproduction. This strategy can vary depending on the species’ life history. For instance, older Nile lechwe (Kobus megaceros) produce more male offspring than females, even though males generally incur higher reproductive costs (Bercovitch et al. 2009). In red deer (Cervus elaphus), maternal age is positively correlated with birth weight and offspring survival rates, demonstrating how aging impacts investment strategies (Clutton-Brock 1984). Additionally, nutritional constraints in older mothers can influence the size and survival of offspring, with well-nourished older mothers tending to produce heavier offspring and influencing whether or not terminal investment occurs (LaSharr et al. 2025). On the other hand, terminal investment for (insert species) was only seen in younger animals compared to older animals. To effectively study terminal investment, long-term data sets can be important, as they allow researchers to track the life history of individuals over time and measure changes in maternal investment across their lifespan.
-
-When terminal investment is not shown, animals tend to experience terminal effects, which are similar to the reproductive restraints or senescence that come with aging. As an animal approaches the end of its life, the trade-offs between reproduction and survival can become too high of a cost. These trade-offs may result in death or decreased reproductive performance in the last year of life, as resources are increasingly devoted to survival rather than reproduction. In some cases, this can lead to complete cessation of reproductive efforts, as the organism no longer has the capacity to invest in offspring. Additionally, these terminal effects may vary across species depending on life history strategies, with some animals exhibiting terminal investment to maximize reproductive output before death, while others may experience a rapid decline in fertility and overall health.
-
-Northern elephant seals are a marine predator (Condit et al., 2013) that inhabit the Western Pacific Ocean. Their species range spans along the west coast of Northern America, ranging from Baja California to Alaska (Le Boeuf & Laws 1994). These sexually dimorphic marine mammals experienced a near-extinction event due to over-hunting more than 100 years ago, presumed to be extinct in 1892 (Stewart et al., 1994), and have rebounded to a population of over 220,000 in the US and Mexico (Lowry et al., 2014). This species spends \~ 75% of their life at sea and comes to shore two times per year. The first haulout is the breeding season during mid-December to March and the second haul out is the molting season during mid-April to early July (Le Boeuf et al., 2019). Northern elephant seals typically come back to the same beach they were born every year. Researchers are able to track individual seals from birth to their last years of life, while also knowing a life history of the pup’s mother. 
-
-Elephant seals produce a pup once a year, with the exception of some “skipping” a year. Additionally, they are capital breeders that rely purely on fat reserves to sustain their fast while on the beach, but also to nurse their pups. (Crocker et al. 2001). Because they are not eating while nursing, we can measure how well a mom did at sea, in terms of foraging, by measuring data such as pup mass at birth and at weaning (Le Boeuf 2019). One of the challenges for Northern elephant seals is that as a capital breeder, they experience high costs of reproduction. As a result, they may decrease in reproductive performance as they age (Clutton-Brock 1984, Payne 2024). This makes it hard to measure terminal investment when in combination with factors such as senescence. When investment decreases at older ages, it may indicate the presence of senescence, where the individual’s biological functions deteriorate with age. In contrast, if investment increases during their last year of life, regardless of reproductive experience, this pattern correlates with the terminal investment hypothesis, suggesting that individuals prioritize reproduction as the chance of future reproduction decreases or is unlikely. (Weladji et al. 2010). These differing patterns provide insights into how aging affects reproductive strategies and overall fitness.
-
-Elephant seals are an ideal candidate to study the terminal investment hypothesis due to having a long term data set on animals tracking them from birth to death. Additionally, we are able to have thousands of known mom-pup pairs in our database allowing us to measure maternal investment across years and generations. The goal of this study is to determine whether or not Northern Elephant seals exhibit terminal investment, or experience terminal effects where they have decreased reproductive success and chance of survival. Using the long-term data set as part of the UC Santa Cruz elephant seal program, we can look into factors such as weight, lactation duration, and offspring sex ratios as well to create an image of what may have been the reason the mom died in her last year. Northern Elephant seals begin reproducing around 3 years old and can produce a pup every year until death, under the right conditions. This allows us to look at some individuals that may have produced over 10 pups in their lifetime and see how their last pup was born compared to previous pups. 
-
-We examined terminal investment by using data on the pup weight after being weaned, lactation duration, offspring sex ratios, and arrival times on the beach from mom. We predicted that if terminal investment was happening 1) lactation duration would be longer as a result of mom increasing her investment 2) the pup would be heavier in comparison to other pups, and 3) pup sex would have a higher chance of being male- given that it is the more costly sex to produce. Secondly, if terminal investment was exhibited, we examined whether or not it worked. If the mom did invest more in her last year of life and her pup survived the first year of life, this would mean terminal investment worked. We also propose that while senescence is recorded in NES (Payne 2024), terminal investment may be happening in their last year of life. We hypothesize that younger moms would experience terminal investment whereas older moms would experience terminal effects. Our study aims to help us understand how different maternal investment strategies may influence survival and reproductive success in long lived species. 
+\tex length(unique(yourdata\$year))
 
 #Downloading the Data
 
@@ -88,7 +74,7 @@ pop_breed <- bioseal %>%
   group_by(age) %>% 
   count(age) %>% 
   ggplot(aes(x = age, y = n,)) + 
-   geom_col(fill = "#66B2B2")  +
+   geom_col(fill = "#6DD5B3")  +
   labs(x = "Age", y = "Number of Individuals")+ 
   theme_minimal(base_size = 15) +
   theme(
@@ -102,7 +88,7 @@ pop_breed <- bioseal %>%
     legend.title = element_text(size = 12, face = "bold", color = "purple"),
     legend.text = element_text(size = 12, color = "purple")
   ) +
-  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#66B2B2"))  
+  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#6DD5B3"))  
 
 print(pop_breed)
 ```
@@ -147,7 +133,7 @@ lact_dat <- bioseal %>%
   filter(lactation_duration > 0 & lactation_duration < 45) %>% 
   select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
   mutate(terminal = ifelse(bio_age == 0, 1, 0), 
-         ageclass = ifelse(age <= maturity, "young", "old"),
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
          age10 = (age - maturity) / 10, 
          year_fct = factor(year))
 
@@ -167,7 +153,7 @@ lac_grid <- expand_grid(
   age = 3:22, 
   terminal = 0:1) %>% 
   mutate(age10 = (age - maturity) / 10, 
-         ageclass = ifelse(age <= maturity, "young", "old"))
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"))
 
 
 lac_years <- count(lact_dat, year_fct)
@@ -225,8 +211,8 @@ lac_plot <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
        y = "Lactation Duration (days)") +
   
   # Custom color palette for lines and points
-  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
-  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 
 print(lac_plot)
 ```
@@ -242,7 +228,7 @@ wt_dat <- bioseal %>%
   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
   filter(!is.na(Wt))%>%
   mutate(terminal = ifelse(bio_age == 0, 1, 0), 
-         ageclass = ifelse(age <= maturity, "young", "old"),
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
          age10 = (age - maturity) / 10, 
          year_fct = factor(year))
 
@@ -258,7 +244,7 @@ wt_grid <- expand_grid(
   age = 3:22, 
   terminal = 0:1) %>% 
   mutate(age10 = (age - maturity) / 10, 
-         ageclass = ifelse(age <= maturity, "young", "old"))
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"))
 
 
 
@@ -314,8 +300,8 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
        y = "Wean Weight(kg)") +
   
   # Custom color palette for lines and points
-  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
-  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 
 
 
@@ -346,7 +332,7 @@ ggplot(wt_dat, aes(x = age, y = Wt)) +
     legend.title = element_text(size = 12, face = "bold", color = "purple"),
     legend.text = element_text(size = 12, color = "purple")
   ) +
-  scale_color_manual(values = c("#D5A6F6", "#66B2B2"))  
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3"))  
 
 ```
 
@@ -360,12 +346,12 @@ wt_dat <- wt_dat %>%
   mutate(
     terminal = ifelse(bio_age == 0, 1, 0), 
     ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "young",
+      age >= 3 & age <= 6 ~ "inexperienced",
       age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "old",
+      age >= 14 ~ "experienced",
       TRUE ~ NA_character_
     ),
-    ageclass3 = factor(ageclass3, levels = c("young", "prime", "old")),
+    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
     age10 = (age - maturity) / 10, 
     year_fct = factor(year)
   )
@@ -386,11 +372,11 @@ wt_grid <- expand_grid(
   mutate(
     age10 = (age - maturity) / 10,
     ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "young",
+      age >= 3 & age <= 6 ~ "inexperienced",
       age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "old"
+      age >= 14 ~ "experienced"
     ),
-    ageclass3 = factor(ageclass3, levels = c("young", "prime", "old"))
+    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
   )
 
 #Update predictions:
@@ -462,9 +448,9 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
 
   # Color palette
   scale_color_manual(values = c(
-    "young" = "#D5A6F6",
-    "prime" = "#6DD5B3",
-    "old" = "#9B59B6"
+    "inexperienced" = "#6DD5B3",
+    "prime" = "#9B59B6",
+    "experienced" = "#D5A6F6"
   ))
 
 print(wt_fig)
@@ -482,7 +468,7 @@ sex_dat <- bioseal %>%
   mutate(
     is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
     terminal = ifelse(bio_age == 0, 1, 0), 
-    ageclass = ifelse(age <= maturity, "young", "old"),
+    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
     age10 = (age - maturity) / 10, 
     year_fct = factor(year)
   )
@@ -503,7 +489,7 @@ sex_grid <- expand_grid(
 ) %>% 
   mutate(
     age10 = (age - maturity) / 10, 
-    ageclass = ifelse(age <= maturity, "young", "old")
+    ageclass = ifelse(age <= maturity, "inexperienced", "experienced")
   )
 
 
@@ -563,13 +549,123 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
     x = "Mother's Age (Years)", 
     y = "Probability Offspring is Male"
   ) +
-  scale_color_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3")) +
-  scale_fill_manual(values = c("#D5A6F6", "#66B2B2", "#9B59B6", "#6DD5B3"))
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 
 
 #YIPPIEE 
 
 
+```
+
+Now I'm just going to change it all to 3 classes to see how that changes things..
+
+```{r}
+#First lets's start with the offspring sex ratio 3 classes part: 
+#We gon try one last GREAT attempt: 
+sex_dat2 <- bioseal %>%
+  dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
+  filter(!is.na(pupsex)) %>%
+  mutate(
+    is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
+    terminal = ifelse(bio_age == 0, 1, 0), 
+    ageclass3 = case_when(
+      age >= 3 & age <= 6 ~ "inexperienced",
+      age >= 7 & age <= 13 ~ "prime",
+      age >= 14 ~ "experienced",
+      TRUE ~ NA_character_
+    ),
+    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
+    age10 = (age - maturity) / 10, 
+    year_fct = factor(year)
+  )
+
+
+#Run our model: 
+sex_mod2 <- glmer(
+  is_male ~ age10 + terminal:ageclass3 + (1 | year_fct) + (1 | animalID),
+  family = binomial,
+  data = sex_dat2
+)
+summary(sex_mod2)
+
+#Now the grid ofc (this is what I forgot for previous lines)
+sex_grid2 <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1
+) %>% 
+  mutate(
+    age10 = (age - maturity) / 10, 
+    ageclass3 = case_when(
+      age >= 3 & age <= 6 ~ "inexperienced",
+      age >= 7 & age <= 13 ~ "prime",
+      age >= 14 ~ "experienced"
+    ),
+    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
+  )
+
+
+#Better predicted values:
+sex_pred_pop2 <- sex_grid2 %>%
+  mutate(
+    predicted_prob_male = predict(
+      sex_mod2, 
+      newdata = sex_grid2, 
+      re.form = NA, 
+      type = "response"
+    ),
+    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+  )
+
+#Now summarize all this GOOD data
+sex_summ2 <- sex_dat2 %>%
+  ungroup() %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  group_by(age, terminal_fct, ageclass3) %>%
+  summarize(
+    prop_male = mean(is_male, na.rm = TRUE),
+    se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
+    .groups = "drop"
+  ) %>%
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#And... magic plot?!??!
+ggplot(sex_pred_pop2, aes(x = age, y = predicted_prob_male)) +
+  geom_pointrange(aes(
+    y = prop_male, 
+    ymin = prop_male - 1.96 * se_prop, 
+    ymax = prop_male + 1.96 * se_prop, 
+    linetype = terminal_fct,   
+    color = ageclass3
+  ), sex_summ2) +
+  geom_line(aes(
+    linetype = terminal_fct,    
+    color = ageclass3            
+  ), linewidth = 1.2) +     
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+  geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +
+  
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y = element_text(color = "#7F8C8D", size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+  ) +
+  labs(
+    title = "Offspring Sex Ratio by Maternal Age", 
+    subtitle = "Terminal vs Non-Terminal Mothers",
+    x = "Mother's Age (Years)", 
+    y = "Probability Offspring is Male"
+  ) +
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+
+#didn't seem significant 
 ```
 
 Ok.. now heres the BIG cool challenge I want to take on next..
