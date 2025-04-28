@@ -27,13 +27,15 @@ library(ggplot2)
 library(lme4)
 library(cowplot)
 library(car)
-sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
-cleanseal <- sealdat %>% filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
 
-#Calculating lactation duration, can i make this cleaner somehow? 
-cleanseal$firstobsbreed <- as.Date(cleanseal$firstobsbreed, format = "%Y-%m-%d")
-cleanseal$lastobsbreed <- as.Date(cleanseal$lastobsbreed, format = "%Y-%m-%d")
-cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, cleanseal$firstobsbreed, units = "days"))
+sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
+# cleanseal <- sealdat %>% 
+#   filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
+# 
+# #Calculating lactation duration, can i make this cleaner somehow? 
+# cleanseal$firstobsbreed <- as.Date(cleanseal$firstobsbreed, format = "%Y-%m-%d")
+# cleanseal$lastobsbreed <- as.Date(cleanseal$lastobsbreed, format = "%Y-%m-%d")
+# cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, cleanseal$firstobsbreed, units = "days"))
 
 
 ```
@@ -45,23 +47,28 @@ cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, clea
 head(sealdat)
 # sealdat$animalID
 
+#practice
 sealdat %>% filter(animalID == 170, observed == 1) %>% 
   mutate(age = year - yearborn, 
          max_age = max(age), 
          bio_age = max_age - age) %>% view()
+
 #Bioage clean
 bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
   group_by(animalID) %>%
   mutate(age = year - yearborn, 
          max_age = max(age), 
-         bio_age = max_age - age) %>%
+         bio_age = max_age - age, 
+         firstobsbreed = as.Date(firstobsbreed, format = "%Y-%m-%d"), 
+         lastobsbreed = as.Date(lastobsbreed, format = "%Y-%m-%d"), 
+         lactation_duration = as.numeric(difftime(lastobsbreed, firstobsbreed, units = "days"))) %>%
   filter(age > 2)
 
 
-#Calculate Lactation Duration
-bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
-bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
-bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
+# #Calculate Lactation Duration
+# bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
+# bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
+# bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
 
 
 
@@ -78,7 +85,7 @@ pop_breed <- bioseal %>%
   labs(x = "Age", y = "Number of Individuals")+ 
   theme_minimal(base_size = 15) +
   theme(
-    panel.grid.major = element_line(color = "pink", size = 0.3),  
+    panel.grid.major = element_line(color = "pink", linewidth = 0.3),  
     panel.grid.minor = element_blank(),  
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  
     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
@@ -98,10 +105,10 @@ print(pop_breed)
 ```{r}
 lact_dat <- bioseal %>%
   filter(lactation_duration > 0) %>%
-  select(animalID,
-         bio_age,
-         lactation_duration,
-         year)
+  dplyr::select(animalID,
+                    bio_age,
+                    lactation_duration,
+                    year)
 
 ```
 
@@ -131,7 +138,7 @@ In order to graph this we will look at L \~ Gamma(mean, sd)... mean = overall me
 maturity <- 6
 lact_dat <- bioseal %>% 
   filter(lactation_duration > 0 & lactation_duration < 45) %>% 
-  select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
+  dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>% 
   mutate(terminal = ifelse(bio_age == 0, 1, 0), 
          ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
          age10 = (age - maturity) / 10, 
@@ -140,7 +147,7 @@ lact_dat <- bioseal %>%
 #So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
 #Negative Binomial model
 lac_mod <- glmer.nb(
-  lactation_duration ~ age10 + terminal:ageclass + (1 | year) ,
+  lactation_duration ~ age10 + age10:ageclass + terminal:ageclass + (1 | year) ,
   data = lact_dat
 )
 
@@ -234,7 +241,7 @@ wt_dat <- bioseal %>%
 
 #Hist was evenly distributed: using glmer because of this:
 wt_mod <- lmer(
-  Wt ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID), 
+  Wt ~ age10 + age10:ageclass + terminal:ageclass + (1 | year) + (1 | animalID), 
   data = wt_dat,
   )
 summary(wt_mod)
@@ -358,7 +365,7 @@ wt_dat <- wt_dat %>%
 
 #New model/updated:
 wt_mod <- lmer(
-  Wt ~ age10 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
+  Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
   data = wt_dat,
   )
 summary(wt_mod)
@@ -476,7 +483,7 @@ sex_dat <- bioseal %>%
 
 #Run our model: 
 sex_mod <- glmer(
-  is_male ~ age10 + terminal:ageclass + (1 | year_fct) + (1 | animalID),
+  is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | year_fct),
   family = binomial,
   data = sex_dat
 )
