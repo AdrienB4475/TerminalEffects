@@ -315,31 +315,31 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
 
 
 
-#Keeping this code here to show that some moms did produce super weans 
-ggplot(wt_dat, aes(x = age, y = Wt)) +
-  geom_point(aes(color = pupsex), alpha = 0.7, size = 4, shape = 16) +
-  geom_smooth(method = "loess", se = TRUE, color = "#9B59B6", fill = "pink", alpha = 0.2, linetype = "solid") +
-  
-  labs(
-    title = "Pup Weight at Weaning",
-    subtitle = "Impacted by Mom's age",
-    x = "Mom's Age (Years)",
-    y = "Pup weight (kg)"
-  ) +
-  theme_minimal(base_size = 15) +
-  theme(
-    panel.grid.major = element_line(color = "pink", size = 0.3),  
-    panel.grid.minor = element_blank(),  
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  # Purple title color
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),  
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),  
-    legend.title = element_text(size = 12, face = "bold", color = "purple"),
-    legend.text = element_text(size = 12, color = "purple")
-  ) +
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3"))  
+# #Keeping this code here to show that some moms did produce super weans 
+# ggplot(wt_dat, aes(x = age, y = Wt)) +
+#   geom_point(aes(color = pupsex), alpha = 0.7, size = 4, shape = 16) +
+#   geom_smooth(method = "loess", se = TRUE, color = "#9B59B6", fill = "pink", alpha = 0.2, linetype = "solid") +
+#   
+#   labs(
+#     title = "Pup Weight at Weaning",
+#     subtitle = "Impacted by Mom's age",
+#     x = "Mom's Age (Years)",
+#     y = "Pup weight (kg)"
+#   ) +
+#   theme_minimal(base_size = 15) +
+#   theme(
+#     panel.grid.major = element_line(color = "pink", size = 0.3),  
+#     panel.grid.minor = element_blank(),  
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  # Purple title color
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),  
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),  
+#     legend.title = element_text(size = 12, face = "bold", color = "purple"),
+#     legend.text = element_text(size = 12, color = "purple")
+#   ) +
+#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3"))  
 
 ```
 
@@ -348,7 +348,7 @@ ggplot(wt_dat, aes(x = age, y = Wt)) +
 Were going to attempt trying to create a new wean weight dataset to incorporate three breakpoints:
 
 ```{r}
-#First.. lets change the dataset so we have 3 ageclasses: 
+#First.. lets change the dataset so we have 3 ageclasses: Leaving here so that i remember to edit using bayesian stats for summer 
 wt_dat <- wt_dat %>%
   mutate(
     terminal = ifelse(bio_age == 0, 1, 0), 
@@ -568,111 +568,111 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
 Now I'm just going to change it all to 3 classes to see how that changes things..
 
 ```{r}
-#First lets's start with the offspring sex ratio 3 classes part: 
-#We gon try one last GREAT attempt: 
-sex_dat2 <- bioseal %>%
-  dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
-  filter(!is.na(pupsex)) %>%
-  mutate(
-    is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
-    terminal = ifelse(bio_age == 0, 1, 0), 
-    ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "inexperienced",
-      age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "experienced",
-      TRUE ~ NA_character_
-    ),
-    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
-    age10 = (age - maturity) / 10, 
-    year_fct = factor(year)
-  )
-
-
-#Run our model: 
-sex_mod2 <- glmer(
-  is_male ~ age10 + terminal:ageclass3 + (1 | year_fct) + (1 | animalID),
-  family = binomial,
-  data = sex_dat2
-)
-summary(sex_mod2)
-
-#Now the grid ofc (this is what I forgot for previous lines)
-sex_grid2 <- expand_grid(
-  age = 3:22, 
-  terminal = 0:1
-) %>% 
-  mutate(
-    age10 = (age - maturity) / 10, 
-    ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "inexperienced",
-      age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "experienced"
-    ),
-    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
-  )
-
-
-#Better predicted values:
-sex_pred_pop2 <- sex_grid2 %>%
-  mutate(
-    predicted_prob_male = predict(
-      sex_mod2, 
-      newdata = sex_grid2, 
-      re.form = NA, 
-      type = "response"
-    ),
-    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
-  )
-
-#Now summarize all this GOOD data
-sex_summ2 <- sex_dat2 %>%
-  ungroup() %>%
-  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-  group_by(age, terminal_fct, ageclass3) %>%
-  summarize(
-    prop_male = mean(is_male, na.rm = TRUE),
-    se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
-    .groups = "drop"
-  ) %>%
-  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-
-
-#And... magic plot?!??!
-ggplot(sex_pred_pop2, aes(x = age, y = predicted_prob_male)) +
-  geom_pointrange(aes(
-    y = prop_male, 
-    ymin = prop_male - 1.96 * se_prop, 
-    ymax = prop_male + 1.96 * se_prop, 
-    linetype = terminal_fct,   
-    color = ageclass3
-  ), sex_summ2) +
-  geom_line(aes(
-    linetype = terminal_fct,    
-    color = ageclass3            
-  ), linewidth = 1.2) +     
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
-  geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +
-  
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9"),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
-  ) +
-  labs(
-    title = "Offspring Sex Ratio by Maternal Age", 
-    subtitle = "Terminal vs Non-Terminal Mothers",
-    x = "Mother's Age (Years)", 
-    y = "Probability Offspring is Male"
-  ) +
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
-  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
-
-#didn't seem significant sooo onto the next iggg 
+# #First lets's start with the offspring sex ratio 3 classes part: 
+# #We gon try one last GREAT attempt: 
+# sex_dat2 <- bioseal %>%
+#   dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
+#   filter(!is.na(pupsex)) %>%
+#   mutate(
+#     is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
+#     terminal = ifelse(bio_age == 0, 1, 0), 
+#     ageclass3 = case_when(
+#       age >= 3 & age <= 6 ~ "inexperienced",
+#       age >= 7 & age <= 13 ~ "prime",
+#       age >= 14 ~ "experienced",
+#       TRUE ~ NA_character_
+#     ),
+#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
+#     age10 = (age - maturity) / 10, 
+#     year_fct = factor(year)
+#   )
+# 
+# 
+# #Run our model: 
+# sex_mod2 <- glmer(
+#   is_male ~ age10 + terminal:ageclass3 + (1 | year_fct) + (1 | animalID),
+#   family = binomial,
+#   data = sex_dat2
+# )
+# summary(sex_mod2)
+# 
+# #Now the grid ofc (this is what I forgot for previous lines)
+# sex_grid2 <- expand_grid(
+#   age = 3:22, 
+#   terminal = 0:1
+# ) %>% 
+#   mutate(
+#     age10 = (age - maturity) / 10, 
+#     ageclass3 = case_when(
+#       age >= 3 & age <= 6 ~ "inexperienced",
+#       age >= 7 & age <= 13 ~ "prime",
+#       age >= 14 ~ "experienced"
+#     ),
+#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
+#   )
+# 
+# 
+# #Better predicted values:
+# sex_pred_pop2 <- sex_grid2 %>%
+#   mutate(
+#     predicted_prob_male = predict(
+#       sex_mod2, 
+#       newdata = sex_grid2, 
+#       re.form = NA, 
+#       type = "response"
+#     ),
+#     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+#   )
+# 
+# #Now summarize all this GOOD data
+# sex_summ2 <- sex_dat2 %>%
+#   ungroup() %>%
+#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+#   group_by(age, terminal_fct, ageclass3) %>%
+#   summarize(
+#     prop_male = mean(is_male, na.rm = TRUE),
+#     se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
+#     .groups = "drop"
+#   ) %>%
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# 
+# 
+# #And... magic plot?!??!
+# ggplot(sex_pred_pop2, aes(x = age, y = predicted_prob_male)) +
+#   geom_pointrange(aes(
+#     y = prop_male, 
+#     ymin = prop_male - 1.96 * se_prop, 
+#     ymax = prop_male + 1.96 * se_prop, 
+#     linetype = terminal_fct,   
+#     color = ageclass3
+#   ), sex_summ2) +
+#   geom_line(aes(
+#     linetype = terminal_fct,    
+#     color = ageclass3            
+#   ), linewidth = 1.2) +     
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+#   geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +
+#   
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9"),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+#   ) +
+#   labs(
+#     title = "Offspring Sex Ratio by Maternal Age", 
+#     subtitle = "Terminal vs Non-Terminal Mothers",
+#     x = "Mother's Age (Years)", 
+#     y = "Probability Offspring is Male"
+#   ) +
+#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+#   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+# 
+# #didn't seem significant sooo onto the next iggg 
 ```
 
 Ok.. now heres the BIG cool challenge I want to take on next..
@@ -686,115 +686,115 @@ Did offspring of terminal moms have higher chance of survival???
 #This aint work
 
 
-# Clean and mutate the data
-surv_seal <- cleanseal %>%
-  group_by(animalID) %>%
-  mutate(age = year - yearborn,
-         max_age = max(age, na.rm = TRUE),
-         bio_age = max_age - age) %>%
-  ungroup()
-
-#Then apply select
-surv_dat <- surv_seal %>%
-  dplyr::select(animalID, pupID, bio_age, year, pupsex, age) %>%  
-  filter(!is.na(pupsex)) %>%  
-  mutate(
-    is_survive = as.integer(pupID %in% animalID), 
-    terminal = ifelse(bio_age == 0, 1, 0),  
-    ageclass = case_when(
-      age <= maturity ~ "young",
-      age > maturity ~ "old",
-      TRUE ~ NA_character_
-    ),
-    ageclass = factor(ageclass, levels = c("young", "old")),  
-    age10 = (age - maturity) / 10,  
-    year_fct = factor(year)  
-  )
-
-#Lets buff up our data maybe..
-surv_dat_balanced <- surv_dat %>%
-  bind_rows(surv_dat %>% filter(is_survive == 1) %>% sample_n(1472 - 55, replace = TRUE))  # Upsample the survived pups
-
-surv_dat_balanced <- surv_dat %>%
-  mutate(weight = ifelse(is_survive == 1, 1472 / 55, 1))
-
-
-# Model using glmer
-surv_mod <- glmer(
-  is_survive ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID),
-  family = binomial,
-  data = surv_dat_balanced,
-  weights = weight,
-  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 5e5))
-)
-summary(surv_mod)
-
-# Create a grid of age and terminal status combinations
-surv_grid <- expand_grid(
-  age = 3:22,  
-  terminal = 0:1  
-) %>%
-  mutate(
-    age10 = (age - maturity) / 10,  
-    ageclass = ifelse(age <= maturity, "young", "old")  
-  )
-
-# Generate predictions using the weighted model
-surv_pred_pop <- surv_grid %>%
-  mutate(
-    predicted_prob_survival = predict(
-      surv_mod, 
-      newdata = surv_grid, 
-      re.form = NA,  
-      type = "response"
-    ),
-    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
-  )
-
-#Summarize all this ^^
-surv_summ <- surv_dat_balanced %>%
-  ungroup() %>%
-  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-  group_by(age, terminal_fct, ageclass) %>%
-  summarize(
-    prop_surv = mean(is_survive, na.rm = TRUE),  # Proportion of survival
-    se_prop = sqrt((prop_surv * (1 - prop_surv)) / n()),  # Standard error of the proportion
-    .groups = "drop"
-  ) %>%
-  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))  
-
-
-#And please work??
-ggplot(surv_pred_pop, aes(x = age, y = predicted_prob_survival)) +
-  geom_pointrange(aes(
-    y = prop_surv, 
-    ymin = prop_surv - 1.96 * se_prop, 
-    ymax = prop_surv + 1.96 * se_prop, 
-    linetype = terminal_fct,   
-    color = ageclass
-  ), surv_summ) +
-  geom_line(aes(
-    linetype = terminal_fct,    
-    color = ageclass            
-  ), linewidth = 1.2) +     
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
-
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9"),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
-  ) +
-  labs(
-    title = "Pup Survival Probability by Maternal Age", 
-    subtitle = "Terminal vs Non-Terminal Mothers",
-    x = "Mother's Age (Years)", 
-    y = "Probability of Pup Survival"
-  ) +
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
-  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+# # Clean and mutate the data
+# surv_seal <- cleanseal %>%
+#   group_by(animalID) %>%
+#   mutate(age = year - yearborn,
+#          max_age = max(age, na.rm = TRUE),
+#          bio_age = max_age - age) %>%
+#   ungroup()
+# 
+# #Then apply select
+# surv_dat <- surv_seal %>%
+#   dplyr::select(animalID, pupID, bio_age, year, pupsex, age) %>%  
+#   filter(!is.na(pupsex)) %>%  
+#   mutate(
+#     is_survive = as.integer(pupID %in% animalID), 
+#     terminal = ifelse(bio_age == 0, 1, 0),  
+#     ageclass = case_when(
+#       age <= maturity ~ "young",
+#       age > maturity ~ "old",
+#       TRUE ~ NA_character_
+#     ),
+#     ageclass = factor(ageclass, levels = c("young", "old")),  
+#     age10 = (age - maturity) / 10,  
+#     year_fct = factor(year)  
+#   )
+# 
+# #Lets buff up our data maybe..
+# surv_dat_balanced <- surv_dat %>%
+#   bind_rows(surv_dat %>% filter(is_survive == 1) %>% sample_n(1472 - 55, replace = TRUE))  # Upsample the survived pups
+# 
+# surv_dat_balanced <- surv_dat %>%
+#   mutate(weight = ifelse(is_survive == 1, 1472 / 55, 1))
+# 
+# 
+# # Model using glmer
+# surv_mod <- glmer(
+#   is_survive ~ age10 + terminal:ageclass + (1 | year) + (1 | animalID),
+#   family = binomial,
+#   data = surv_dat_balanced,
+#   weights = weight,
+#   control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 5e5))
+# )
+# summary(surv_mod)
+# 
+# # Create a grid of age and terminal status combinations
+# surv_grid <- expand_grid(
+#   age = 3:22,  
+#   terminal = 0:1  
+# ) %>%
+#   mutate(
+#     age10 = (age - maturity) / 10,  
+#     ageclass = ifelse(age <= maturity, "young", "old")  
+#   )
+# 
+# # Generate predictions using the weighted model
+# surv_pred_pop <- surv_grid %>%
+#   mutate(
+#     predicted_prob_survival = predict(
+#       surv_mod, 
+#       newdata = surv_grid, 
+#       re.form = NA,  
+#       type = "response"
+#     ),
+#     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+#   )
+# 
+# #Summarize all this ^^
+# surv_summ <- surv_dat_balanced %>%
+#   ungroup() %>%
+#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+#   group_by(age, terminal_fct, ageclass) %>%
+#   summarize(
+#     prop_surv = mean(is_survive, na.rm = TRUE),  # Proportion of survival
+#     se_prop = sqrt((prop_surv * (1 - prop_surv)) / n()),  # Standard error of the proportion
+#     .groups = "drop"
+#   ) %>%
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))  
+# 
+# 
+# #And please work??
+# ggplot(surv_pred_pop, aes(x = age, y = predicted_prob_survival)) +
+#   geom_pointrange(aes(
+#     y = prop_surv, 
+#     ymin = prop_surv - 1.96 * se_prop, 
+#     ymax = prop_surv + 1.96 * se_prop, 
+#     linetype = terminal_fct,   
+#     color = ageclass
+#   ), surv_summ) +
+#   geom_line(aes(
+#     linetype = terminal_fct,    
+#     color = ageclass            
+#   ), linewidth = 1.2) +     
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+# 
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9"),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+#   ) +
+#   labs(
+#     title = "Pup Survival Probability by Maternal Age",
+#     subtitle = "Terminal vs Non-Terminal Mothers",
+#     x = "Mother's Age (Years)",
+#     y = "Probability of Pup Survival"
+#   ) +
+#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+#   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
