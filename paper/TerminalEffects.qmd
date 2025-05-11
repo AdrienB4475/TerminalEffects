@@ -59,6 +59,7 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
   mutate(age = year - yearborn, 
          max_age = max(age), 
          bio_age = max_age - age, 
+         terminal = ifelse(bio_age == 0, 1, 0),
          firstobsbreed = as.Date(firstobsbreed, format = "%Y-%m-%d"), 
          lastobsbreed = as.Date(lastobsbreed, format = "%Y-%m-%d"), 
          lactation_duration = as.numeric(difftime(lastobsbreed, firstobsbreed, units = "days"))) %>%
@@ -77,12 +78,21 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
 #Adult female population fig:
 
 ```{r}
-pop_breed <- bioseal %>% 
-  group_by(age) %>% 
-  count(age) %>% 
-  ggplot(aes(x = age, y = n,)) + 
-   geom_col(fill = "#6DD5B3")  +
-  labs(x = "Age", y = "Number of Individuals")+ 
+#Create terminal to be a factor here 
+pop_breed <- bioseal %>%
+  group_by(age, terminal) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+
+#Figure with age distribution with terminal as a factor to create a stacked barplot
+pop_fig <- ggplot(pop_breed, aes(x = factor(age), y = n, fill = terminal_fct)) +
+  geom_col() +
+  labs(
+    x = "Age",
+    y = "Number of Individuals",
+    fill = "Terminal Status",
+    title = "# of Adult Females by Terminal Status"
+  ) +
   theme_minimal(base_size = 15) +
   theme(
     panel.grid.major = element_line(color = "pink", linewidth = 0.3),  
@@ -95,9 +105,9 @@ pop_breed <- bioseal %>%
     legend.title = element_text(size = 12, face = "bold", color = "purple"),
     legend.text = element_text(size = 12, color = "purple")
   ) +
-  scale_fill_manual(values = c("F" = "#D5A6F6", "M" = "#6DD5B3"))  
+  scale_fill_manual(values = c("Nonterminal" = "#6DD5B3", "Terminal" = "#D5A6F6"))
 
-print(pop_breed)
+print(pop_fig)
 ```
 
 #Lactation Duration data set
@@ -189,38 +199,53 @@ lact_summ <- lact_dat %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
 
 
+#Fixed Figure to make key clearer
 lac_plot <- ggplot(lac_pred_pop, aes(x = age, y = predicted)) +
-  geom_pointrange(aes(
-    y = mean_lact, 
-    ymin = mean_lact - 1.96 * se_lact, 
-    ymax = mean_lact + 1.96 * se_lact, 
-    linetype = terminal_fct,   
-    color = ageclass
-  ), lact_summ) +
-  geom_line(aes(
-    linetype = terminal_fct,    
-    color = ageclass            
-  ), linewidth = 1.2) + 
-    geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
   
-  # Adjust the theme for aesthetic girl cute appearance
+  # Pointrange with dashed error bars by terminal status (but no legend entry)
+  geom_pointrange(
+    data = lact_summ,
+    aes(
+      y = mean_lact,
+      ymin = mean_lact - 1.96 * se_lact,
+      ymax = mean_lact + 1.96 * se_lact,
+      color = ageclass,
+      linetype = terminal_fct
+    ),
+    show.legend = FALSE  # prevents cluttering the legend
+  ) +
+  geom_line(aes(
+    linetype = terminal_fct,
+    color = ageclass
+  ), linewidth = 1.2) +
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+
+  # Aesthetic styling
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+    axis.text.x  = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y  = element_text(color = "#7F8C8D", size = 12),
+    plot.title   = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.title = element_text(size = 13, face = "bold"),
+    legend.text  = element_text(size = 11)
   ) +
-  labs(title = "Effect of Age on Lactation Duration", 
-       x = "Mother's Age (Years)", 
-       y = "Lactation Duration (days)") +
-  
-  # Custom color palette for lines and points
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
-  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 
+  # Axis and legend labels
+  labs(
+    title = "Effect of Age on Lactation Duration",
+    x = "Mother's Age (Years)",
+    y = "Lactation Duration (days)",
+    color = "Age Class",
+    linetype = "Terminal Status"
+  ) +
+
+  # Distinct linetypes and color palette
+  scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#9B59B6", "#66B2B2"))
 print(lac_plot)
 ```
 
@@ -276,21 +301,27 @@ wt_summ <- wt_dat %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
 
 #Figure time! 
-ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
-  geom_pointrange(aes(
-    y = mean_wt, 
-    ymin = mean_wt - 1.96 * se_wt, 
-    ymax = mean_wt + 1.96 * se_wt, 
-    linetype = terminal_fct,   
-    color = ageclass
-  ), wt_summ) +
-  geom_line(aes(
-    linetype = terminal_fct,    
-    color = ageclass            
-  ), linewidth = 1.2) +     
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
+wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   
-  # Adjust the theme for aesthetic girl cute appearance
+  # Pointrange with dashed error bars based on terminal status
+  geom_pointrange(
+    data = wt_summ,
+    aes(
+      y = mean_wt, 
+      ymin = mean_wt - 1.96 * se_wt, 
+      ymax = mean_wt + 1.96 * se_wt, 
+      linetype = terminal_fct,
+      color = ageclass
+    ),
+    show.legend = FALSE  
+  ) +
+  geom_line(aes(
+    linetype = terminal_fct,
+    color = ageclass
+  ), linewidth = 1.2) +
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+
+  # Theme 
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
@@ -299,17 +330,26 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
     axis.text.x = element_text(color = "#7F8C8D", size = 12),
     axis.text.y = element_text(color = "#7F8C8D", size = 12),
     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.title = element_text(size = 13, face = "bold"),
+    legend.text = element_text(size = 11)
   ) +
-  labs(title = "Impact of Age on Wean Weight", 
-       subtitle = "Terminal vs Non-Terminal",
-       x = "Mother's Age (Years)", 
-       y = "Wean Weight(kg)") +
-  
-  # Custom color palette for lines and points
+
+  # Axis labels and legends
+  labs(
+    title = "Impact of Age on Wean Weight", 
+    subtitle = "Terminal vs Non-Terminal",
+    x = "Mother's Age (Years)", 
+    y = "Wean Weight (kg)",
+    color = "Age Class",
+    linetype = "Terminal Status"
+  ) +
+
+  # My custom palette styling for lines and fill
+  scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
-
+print(wt_fig)
 
 
 
@@ -349,7 +389,13 @@ Were going to attempt trying to create a new wean weight dataset to incorporate 
 
 ```{r}
 #First.. lets change the dataset so we have 3 ageclasses: Leaving here so that i remember to edit using bayesian stats for summer 
-wt_dat <- wt_dat %>%
+
+#I think we want to do Bayesian stats for the future which meansss lets do:
+# library(brms)
+# library(StanHeaders)
+# library(rstan)
+#We can probably keep the same dat
+wt_dat2 <- wt_dat %>%
   mutate(
     terminal = ifelse(bio_age == 0, 1, 0), 
     ageclass3 = case_when(
@@ -364,15 +410,14 @@ wt_dat <- wt_dat %>%
   )
 
 #New model/updated:
-wt_mod <- lmer(
+wt_mod2 <- lmer(
   Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
-  data = wt_dat,
+  data = wt_dat2,
   )
-summary(wt_mod)
-
+summary(wt_mod2)
 
 #Then recreate our grid with all three age classes: 
-wt_grid <- expand_grid(
+wt_grid2 <- expand_grid(
   age = 3:22, 
   terminal = 0:1
 ) %>%
@@ -387,15 +432,15 @@ wt_grid <- expand_grid(
   )
 
 #Update predictions:
-wt_pred_pop <- wt_grid %>% 
-  mutate(predicted = predict(wt_mod,  
-                             newdata = wt_grid, 
+wt_pred_pop2 <- wt_grid2 %>% 
+  mutate(predicted = predict(wt_mod2,  
+                             newdata = wt_grid2, 
                              re.form = NA,    
                              type = "response"),
          terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
 
 #Now summary:
-wt_summ <- wt_dat %>% 
+wt_summ2 <- wt_dat2 %>% 
   ungroup() %>% 
   mutate(
     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
@@ -410,7 +455,7 @@ wt_summ <- wt_dat %>%
 
 
 #And figure:??
-wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+wt_fig <- ggplot(wt_pred_pop2, aes(x = age, y = predicted)) +
   
   # Error bars and points from summary
   geom_pointrange(aes(
@@ -419,7 +464,7 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
     ymax = mean_wt + 1.96 * se_wt,
     linetype = terminal_fct,
     color = ageclass3
-  ), data = wt_summ) +
+  ), data = wt_summ2) +
   
   # Model prediction lines
   geom_line(aes(
@@ -461,6 +506,18 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   ))
 
 print(wt_fig)
+
+
+#For our model though... we want 
+# wt_mod_bayes <- brm(
+#   Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
+#   data = wt_dat2,
+#   family = gaussian(),
+#   chains = 4,
+#   cores = 4,
+#   iter = 2000,
+#   seed = 123
+# )
 ```
 
 #Sex Ratios fig:
@@ -527,19 +584,26 @@ sex_summ <- sex_dat %>%
 
 #And... magic plot?!??!
 ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
-  geom_pointrange(aes(
-    y = prop_male, 
-    ymin = prop_male - 1.96 * se_prop, 
-    ymax = prop_male + 1.96 * se_prop, 
-    linetype = terminal_fct,   
-    color = ageclass
-  ), sex_summ) +
-  geom_line(aes(
-    linetype = terminal_fct,    
-    color = ageclass            
-  ), linewidth = 1.2) +     
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
   
+  # Dashed SE bars by terminal status (hidden from legend)
+  geom_pointrange(
+    data = sex_summ,
+    aes(
+      y = prop_male, 
+      ymin = prop_male - 1.96 * se_prop, 
+      ymax = prop_male + 1.96 * se_prop, 
+      linetype = terminal_fct,
+      color = ageclass
+    ),
+    show.legend = FALSE
+  ) +
+  geom_line(aes(
+    linetype = terminal_fct,
+    color = ageclass
+  ), linewidth = 1.2) +
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+
+  # Theme
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
@@ -548,14 +612,22 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
     axis.text.x = element_text(color = "#7F8C8D", size = 12),
     axis.text.y = element_text(color = "#7F8C8D", size = 12),
     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.title = element_text(size = 13, face = "bold"),
+    legend.text = element_text(size = 11)
   ) +
+
   labs(
     title = "Offspring Sex Ratio by Maternal Age", 
     subtitle = "Terminal vs Non-Terminal Mothers",
     x = "Mother's Age (Years)", 
-    y = "Probability Offspring is Male"
+    y = "Probability Offspring is Male",
+    color = "Age Class",
+    linetype = "Terminal Status"
   ) +
+
+  # Custom line types and colors
+  scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 
