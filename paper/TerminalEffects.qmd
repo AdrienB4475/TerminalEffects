@@ -14,8 +14,6 @@ editor: visual
 
 #Introduction
 
-\tex length(unique(bioseal\$year))
-
 #Downloading the Data
 
 ```{r}
@@ -29,29 +27,17 @@ library(cowplot)
 library(car)
 
 sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
-# cleanseal <- sealdat %>% 
-#   filter(!is.na(animalID), !is.na(year), !is.na(observed), !is.na(tagsex), !is.na(firstobsbreed), !is.na(lastobsbreed), !is.na(calyear), !is.na(firstobsbreeddoy), !is.na(pupID), !is.na(pupsex), !is.na(yearborn), !is.na(age), !is.na(Wt)) #Clears out all the NA's from the sealdat set to have easier to understand data... less intimidating
-# 
-# #Calculating lactation duration, can i make this cleaner somehow? 
-# cleanseal$firstobsbreed <- as.Date(cleanseal$firstobsbreed, format = "%Y-%m-%d")
-# cleanseal$lastobsbreed <- as.Date(cleanseal$lastobsbreed, format = "%Y-%m-%d")
-# cleanseal$lactation_duration <- as.numeric(difftime(cleanseal$lastobsbreed, cleanseal$firstobsbreed, units = "days"))
-
 
 ```
 
 #Modified data:
 
 ```{r}
-#Calculating Bio age
-head(sealdat)
-# sealdat$animalID
-
-#practice
-sealdat %>% filter(animalID == 170, observed == 1) %>% 
-  mutate(age = year - yearborn, 
-         max_age = max(age), 
-         bio_age = max_age - age) %>% view()
+# #practice
+# sealdat %>% filter(animalID == 170, observed == 1) %>% 
+#   mutate(age = year - yearborn, 
+#          max_age = max(age), 
+#          bio_age = max_age - age) %>% view()
 
 #Bioage clean
 bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
@@ -64,14 +50,6 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
          lastobsbreed = as.Date(lastobsbreed, format = "%Y-%m-%d"), 
          lactation_duration = as.numeric(difftime(lastobsbreed, firstobsbreed, units = "days"))) %>%
   filter(age > 2)
-
-
-# #Calculate Lactation Duration
-# bioseal$firstobsbreed <- as.Date(bioseal$firstobsbreed, format = "%Y-%m-%d")
-# bioseal$lastobsbreed <- as.Date(bioseal$lastobsbreed, format = "%Y-%m-%d")
-# bioseal$lactation_duration <- as.numeric(difftime(bioseal$lastobsbreed, bioseal$firstobsbreed, units = "days"))
-
-
 
 ```
 
@@ -154,7 +132,6 @@ lact_dat <- bioseal %>%
          age10 = (age - maturity) / 10, 
          year_fct = factor(year))
 
-#So now we can...do stuff.. starting with Gamma vs negative binomial distribution 
 #Negative Binomial model
 lac_mod <- glmer.nb(
   lactation_duration ~ age10 + age10:ageclass + terminal:ageclass + (1 | year) ,
@@ -188,7 +165,7 @@ lac_pred_pop <- lac_grid %>%
 #Lactation Duration fig:
 
 ```{r}
-# # Predictions vs Raw Data Plot
+# Predictions vs Raw Data Plot
 lact_summ <- lact_dat %>% 
   ungroup() %>% 
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
@@ -282,9 +259,9 @@ wt_grid <- expand_grid(
 
 #create population predictions 
 wt_pred_pop <- wt_grid %>% 
-  mutate(predicted = predict(wt_mod,  # Use the model object here
+  mutate(predicted = predict(wt_mod,  
                              newdata = wt_grid, 
-                             re.form = NA,    # If you're using glmer or similar
+                             re.form = NA,    
                              type = "response"),
          terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
 
@@ -294,7 +271,7 @@ wt_summ <- wt_dat %>%
   ungroup() %>% 
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
   group_by(age, terminal_fct, ageclass) %>% 
-  summarize(mean_wt = mean(Wt, na.rm = TRUE),  #should i remove Na value for weight? 
+  summarize(mean_wt = mean(Wt, na.rm = TRUE),  
     se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),  
     .groups = "drop"
   ) %>% 
@@ -352,35 +329,6 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
 print(wt_fig)
 
 
-
-
-
-# #Keeping this code here to show that some moms did produce super weans 
-# ggplot(wt_dat, aes(x = age, y = Wt)) +
-#   geom_point(aes(color = pupsex), alpha = 0.7, size = 4, shape = 16) +
-#   geom_smooth(method = "loess", se = TRUE, color = "#9B59B6", fill = "pink", alpha = 0.2, linetype = "solid") +
-#   
-#   labs(
-#     title = "Pup Weight at Weaning",
-#     subtitle = "Impacted by Mom's age",
-#     x = "Mom's Age (Years)",
-#     y = "Pup weight (kg)"
-#   ) +
-#   theme_minimal(base_size = 15) +
-#   theme(
-#     panel.grid.major = element_line(color = "pink", size = 0.3),  
-#     panel.grid.minor = element_blank(),  
-#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),  # Purple title color
-#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-#     axis.text.x = element_text(color = "#7F8C8D", size = 12),  
-#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
-#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "purple"),  
-#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),  
-#     legend.title = element_text(size = 12, face = "bold", color = "purple"),
-#     legend.text = element_text(size = 12, color = "purple")
-#   ) +
-#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3"))  
-
 ```
 
 #Wean Weight 2:
@@ -388,136 +336,136 @@ print(wt_fig)
 Were going to attempt trying to create a new wean weight dataset to incorporate three breakpoints:
 
 ```{r}
-#First.. lets change the dataset so we have 3 ageclasses: Leaving here so that i remember to edit using bayesian stats for summer 
-
-#I think we want to do Bayesian stats for the future which meansss lets do:
-# library(brms)
-# library(StanHeaders)
-# library(rstan)
-#We can probably keep the same dat
-wt_dat2 <- wt_dat %>%
-  mutate(
-    terminal = ifelse(bio_age == 0, 1, 0), 
-    ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "inexperienced",
-      age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "experienced",
-      TRUE ~ NA_character_
-    ),
-    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
-    age10 = (age - maturity) / 10, 
-    year_fct = factor(year)
-  )
-
-#New model/updated:
-wt_mod2 <- lmer(
-  Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
-  data = wt_dat2,
-  )
-summary(wt_mod2)
-
-#Then recreate our grid with all three age classes: 
-wt_grid2 <- expand_grid(
-  age = 3:22, 
-  terminal = 0:1
-) %>%
-  mutate(
-    age10 = (age - maturity) / 10,
-    ageclass3 = case_when(
-      age >= 3 & age <= 6 ~ "inexperienced",
-      age >= 7 & age <= 13 ~ "prime",
-      age >= 14 ~ "experienced"
-    ),
-    ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
-  )
-
-#Update predictions:
-wt_pred_pop2 <- wt_grid2 %>% 
-  mutate(predicted = predict(wt_mod2,  
-                             newdata = wt_grid2, 
-                             re.form = NA,    
-                             type = "response"),
-         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
-
-#Now summary:
-wt_summ2 <- wt_dat2 %>% 
-  ungroup() %>% 
-  mutate(
-    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
-  ) %>% 
-  group_by(age, terminal_fct, ageclass3) %>% 
-  summarize(
-    mean_wt = mean(Wt, na.rm = TRUE),
-    se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),
-    .groups = "drop"
-  ) %>% 
-  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-
-
-#And figure:??
-wt_fig <- ggplot(wt_pred_pop2, aes(x = age, y = predicted)) +
-  
-  # Error bars and points from summary
-  geom_pointrange(aes(
-    y = mean_wt,
-    ymin = mean_wt - 1.96 * se_wt,
-    ymax = mean_wt + 1.96 * se_wt,
-    linetype = terminal_fct,
-    color = ageclass3
-  ), data = wt_summ2) +
-  
-  # Model prediction lines
-  geom_line(aes(
-    linetype = terminal_fct,
-    color = ageclass3
-  ), linewidth = 1.2) +
-  
-  # Vertical lines at maturity (age 6) and new threshold (age 11)
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  # Maturity
-  geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +  # New threshold
-  
-  # Theme and aesthetic styling
-  theme_minimal() +
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9"),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
-  ) +
-  
-  # Labels
-  labs(
-    title = "Impact of Age on Wean Weight",
-    subtitle = "Terminal vs Non-Terminal Mothers",
-    x = "Mother's Age (Years)",
-    y = "Wean Weight (kg)",
-    color = "Age Class",
-    linetype = "Terminal Status"
-  ) +
-
-  # Color palette
-  scale_color_manual(values = c(
-    "inexperienced" = "#6DD5B3",
-    "prime" = "#9B59B6",
-    "experienced" = "#D5A6F6"
-  ))
-
-print(wt_fig)
-
-
-#For our model though... we want 
-# wt_mod_bayes <- brm(
-#   Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
+# #First.. lets change the dataset so we have 3 ageclasses: Leaving here so that i remember to edit using bayesian stats for summer 
+# 
+# #I think we want to do Bayesian stats for the future which meansss lets do:
+# # library(brms)
+# # library(StanHeaders)
+# # library(rstan)
+# #We can probably keep the same dat
+# wt_dat2 <- wt_dat %>%
+#   mutate(
+#     terminal = ifelse(bio_age == 0, 1, 0), 
+#     ageclass3 = case_when(
+#       age >= 3 & age <= 6 ~ "inexperienced",
+#       age >= 7 & age <= 13 ~ "prime",
+#       age >= 14 ~ "experienced",
+#       TRUE ~ NA_character_
+#     ),
+#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
+#     age10 = (age - maturity) / 10, 
+#     year_fct = factor(year)
+#   )
+# 
+# #New model/updated:
+# wt_mod2 <- lmer(
+#   Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID), 
 #   data = wt_dat2,
-#   family = gaussian(),
-#   chains = 4,
-#   cores = 4,
-#   iter = 2000,
-#   seed = 123
-# )
+#   )
+# summary(wt_mod2)
+# 
+# #Then recreate our grid with all three age classes: 
+# wt_grid2 <- expand_grid(
+#   age = 3:22, 
+#   terminal = 0:1
+# ) %>%
+#   mutate(
+#     age10 = (age - maturity) / 10,
+#     ageclass3 = case_when(
+#       age >= 3 & age <= 6 ~ "inexperienced",
+#       age >= 7 & age <= 13 ~ "prime",
+#       age >= 14 ~ "experienced"
+#     ),
+#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
+#   )
+# 
+# #Update predictions:
+# wt_pred_pop2 <- wt_grid2 %>% 
+#   mutate(predicted = predict(wt_mod2,  
+#                              newdata = wt_grid2, 
+#                              re.form = NA,    
+#                              type = "response"),
+#          terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+# 
+# #Now summary:
+# wt_summ2 <- wt_dat2 %>% 
+#   ungroup() %>% 
+#   mutate(
+#     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
+#   ) %>% 
+#   group_by(age, terminal_fct, ageclass3) %>% 
+#   summarize(
+#     mean_wt = mean(Wt, na.rm = TRUE),
+#     se_wt = sd(Wt, na.rm = TRUE) / sqrt(n()),
+#     .groups = "drop"
+#   ) %>% 
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# 
+# 
+# #And figure:??
+# wt_fig <- ggplot(wt_pred_pop2, aes(x = age, y = predicted)) +
+#   
+#   # Error bars and points from summary
+#   geom_pointrange(aes(
+#     y = mean_wt,
+#     ymin = mean_wt - 1.96 * se_wt,
+#     ymax = mean_wt + 1.96 * se_wt,
+#     linetype = terminal_fct,
+#     color = ageclass3
+#   ), data = wt_summ2) +
+#   
+#   # Model prediction lines
+#   geom_line(aes(
+#     linetype = terminal_fct,
+#     color = ageclass3
+#   ), linewidth = 1.2) +
+#   
+#   # Vertical lines at maturity (age 6) and new threshold (age 11)
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  # Maturity
+#   geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +  # New threshold
+#   
+#   # Theme and aesthetic styling
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9"),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
+#   ) +
+#   
+#   # Labels
+#   labs(
+#     title = "Impact of Age on Wean Weight",
+#     subtitle = "Terminal vs Non-Terminal Mothers",
+#     x = "Mother's Age (Years)",
+#     y = "Wean Weight (kg)",
+#     color = "Age Class",
+#     linetype = "Terminal Status"
+#   ) +
+# 
+#   # Color palette
+#   scale_color_manual(values = c(
+#     "inexperienced" = "#6DD5B3",
+#     "prime" = "#9B59B6",
+#     "experienced" = "#D5A6F6"
+#   ))
+# 
+# print(wt_fig)
+# 
+# 
+# #For our model though... we want 
+# # wt_mod_bayes <- brm(
+# #   Wt ~ age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
+# #   data = wt_dat2,
+# #   family = gaussian(),
+# #   chains = 4,
+# #   cores = 4,
+# #   iter = 2000,
+# #   seed = 123
+# # )
 ```
 
 #Sex Ratios fig:
@@ -525,7 +473,7 @@ print(wt_fig)
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
 
 ```{r}
-#We gon try one last GREAT attempt: 
+#Offspring sex ratio dataset
 sex_dat <- bioseal %>%
   dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
   filter(!is.na(pupsex)) %>%
@@ -546,7 +494,7 @@ sex_mod <- glmer(
 )
 summary(sex_mod)
 
-#Now the grid ofc (this is what I forgot for previous lines)
+#Now the grid 
 sex_grid <- expand_grid(
   age = 3:22, 
   terminal = 0:1
@@ -569,7 +517,7 @@ sex_pred_pop <- sex_grid %>%
     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
   )
 
-#Now summarize all this GOOD data
+#Now summarize all this data
 sex_summ <- sex_dat %>%
   ungroup() %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
@@ -638,114 +586,6 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
 ```
 
 Now I'm just going to change it all to 3 classes to see how that changes things..
-
-```{r}
-# #First lets's start with the offspring sex ratio 3 classes part: 
-# #We gon try one last GREAT attempt: 
-# sex_dat2 <- bioseal %>%
-#   dplyr::select(animalID, bio_age, pupsex, age, year) %>% 
-#   filter(!is.na(pupsex)) %>%
-#   mutate(
-#     is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
-#     terminal = ifelse(bio_age == 0, 1, 0), 
-#     ageclass3 = case_when(
-#       age >= 3 & age <= 6 ~ "inexperienced",
-#       age >= 7 & age <= 13 ~ "prime",
-#       age >= 14 ~ "experienced",
-#       TRUE ~ NA_character_
-#     ),
-#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced")),
-#     age10 = (age - maturity) / 10, 
-#     year_fct = factor(year)
-#   )
-# 
-# 
-# #Run our model: 
-# sex_mod2 <- glmer(
-#   is_male ~ age10 + terminal:ageclass3 + (1 | year_fct) + (1 | animalID),
-#   family = binomial,
-#   data = sex_dat2
-# )
-# summary(sex_mod2)
-# 
-# #Now the grid ofc (this is what I forgot for previous lines)
-# sex_grid2 <- expand_grid(
-#   age = 3:22, 
-#   terminal = 0:1
-# ) %>% 
-#   mutate(
-#     age10 = (age - maturity) / 10, 
-#     ageclass3 = case_when(
-#       age >= 3 & age <= 6 ~ "inexperienced",
-#       age >= 7 & age <= 13 ~ "prime",
-#       age >= 14 ~ "experienced"
-#     ),
-#     ageclass3 = factor(ageclass3, levels = c("inexperienced", "prime", "experienced"))
-#   )
-# 
-# 
-# #Better predicted values:
-# sex_pred_pop2 <- sex_grid2 %>%
-#   mutate(
-#     predicted_prob_male = predict(
-#       sex_mod2, 
-#       newdata = sex_grid2, 
-#       re.form = NA, 
-#       type = "response"
-#     ),
-#     terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
-#   )
-# 
-# #Now summarize all this GOOD data
-# sex_summ2 <- sex_dat2 %>%
-#   ungroup() %>%
-#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-#   group_by(age, terminal_fct, ageclass3) %>%
-#   summarize(
-#     prop_male = mean(is_male, na.rm = TRUE),
-#     se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
-#     .groups = "drop"
-#   ) %>%
-#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-# 
-# 
-# #And... magic plot?!??!
-# ggplot(sex_pred_pop2, aes(x = age, y = predicted_prob_male)) +
-#   geom_pointrange(aes(
-#     y = prop_male, 
-#     ymin = prop_male - 1.96 * se_prop, 
-#     ymax = prop_male + 1.96 * se_prop, 
-#     linetype = terminal_fct,   
-#     color = ageclass3
-#   ), sex_summ2) +
-#   geom_line(aes(
-#     linetype = terminal_fct,    
-#     color = ageclass3            
-#   ), linewidth = 1.2) +     
-#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +  
-#   geom_vline(xintercept = 14, linetype = "dashed", color = "#9B59B6") +
-#   
-#   theme_minimal() +
-#   theme(
-#     panel.background = element_rect(fill = "#F9F9F9"),
-#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-#     axis.text.x = element_text(color = "#7F8C8D", size = 12),
-#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
-#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD")
-#   ) +
-#   labs(
-#     title = "Offspring Sex Ratio by Maternal Age", 
-#     subtitle = "Terminal vs Non-Terminal Mothers",
-#     x = "Mother's Age (Years)", 
-#     y = "Probability Offspring is Male"
-#   ) +
-#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
-#   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
-# 
-# #didn't seem significant sooo onto the next iggg 
-```
 
 Ok.. now heres the BIG cool challenge I want to take on next..
 
