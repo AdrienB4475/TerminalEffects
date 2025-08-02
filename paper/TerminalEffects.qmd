@@ -25,6 +25,8 @@ library(ggplot2)
 library(lme4)
 library(cowplot)
 library(car)
+library(ggeffects)
+library(brms)
 
 sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
 
@@ -709,4 +711,347 @@ Did offspring of terminal moms have higher chance of survival???
 #   ) +
 #   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
 #   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+```
+
+New Data set for pup survival:
+
+```{r}
+#Data Set 
+sealdat2 <- read_csv(here::here("data/raw/128L pull 2023_12_05.csv"), 
+                    show_col_types = FALSE) %>% 
+  mutate(observed = if_else(observed == "B", "Breeder", "Non-breeder"), 
+         observed_int = if_else(observed == "Breeder", 1, 0), 
+         pup_survived = pupseeneveragain > 0) %>% 
+  filter(age > 3, 
+         year > 1987) %>% 
+  mutate(animalID = factor(animalID),
+         year_fct = factor(year),
+         age10 = (age - maturity) / 10,
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced")) %>% 
+  group_by(animalID) %>% 
+  mutate(
+         lastobs = ifelse(max(year) < 2020, max(age), NA),
+         #Adding in biological age and assigning terminal status here
+         bio_age = lastobs - age,
+    terminal = ifelse(bio_age == 0, 1, 0)) %>% 
+  ungroup()
+
+
+
+#Modify to be used for survival
+# Isolate pup survival/recruitment 
+surv_recr_data <- sealdat2 %>% 
+  drop_na(pupID) %>% 
+  # Only pups born 2016 or earlier (otherwise survival biased)
+  filter(pupyearborn <= 2016) %>% 
+  filter(age < 20) %>% 
+  mutate(pup_surv_int = as.integer(pup_survived),
+         pup_recr_int = as.integer(puprecruited)) 
+
+
+
+```
+
+Now that we have our data sets we can try to run our first lines of code for generating a model
+
+```{r}
+#Model attempt 1:
+# Fit pup *survival* model
+pup_surv_mod <- glmer(
+  # pup_surv_int ~ age10 + age10:ageclass + terminal:ageclass + (1 | year_fct) + (1 | animalID),
+   pup_surv_int ~ age10:ageclass + terminal:ageclass + (1 | year_fct) + (1 | animalID),
+  surv_recr_data,
+  family = "binomial",
+  control = glmerControl(optimizer = "bobyqa")
+)
+summary(pup_surv_mod)
+#Add our survival summary:
+surv_summ <- surv_recr_data %>%
+  filter(age <= 19) %>%
+  group_by(age) %>%
+  summarize(
+    n_pups = n(),
+    n_surv = sum(pup_surv_int),
+    perc_surv = n_surv / n_pups,
+    surv_lwr = binom.test(n_surv, n_pups)$conf.int[1],
+    surv_upr = binom.test(n_surv, n_pups)$conf.int[2],
+    .groups = "drop"
+  )
+
+
+#Create prediction grid:
+surv_grid <- expand_grid(
+  age = 3:19,
+  terminal = 0:1,
+  year_fct = factor(1988:2016)
+) %>%
+  mutate(
+    age10 = (age - maturity) / 10,
+    ageclass = ifelse(age <= maturity, "inexperienced", "experienced")
+  )
+
+#Ask allison importance HEREEEE:
+n_surv <- surv_recr_data %>% 
+  filter(age <= 19) %>% 
+  count(age)
+surv_years <- count(surv_recr_data, year_fct)
+
+#year to year predictions:
+surv_pred_years <- ggpredict(
+  pup_surv_mod,
+  # terms = c("age10 [all]", "ageclass", "year_fct [all]"),
+    terms = c("age10:ageclass", "ageclass", "year_fct [all]"),
+  type = "random",
+  interval = "confidence"
+) %>%
+  as_tibble() %>%
+  rename(age10 = x) %>%
+  mutate(
+    ageclass = tolower(group),
+    year_fct = factor(facet)
+  ) %>%
+  filter(
+    (ageclass == "inexperienced" & age10 <= (maturity / 10)) |
+    (ageclass == "experienced" & age10 > (maturity / 10))
+  )
+
+
+
+#for intervals using geom_ribbon
+surv_pred_wgt <- surv_pred_years %>%
+  left_join(surv_years, by = "year_fct") %>%
+  group_by(age10, ageclass) %>%
+  summarize(
+    predicted = weighted.mean(predicted, n),
+    conf_lo = weighted.mean(conf.low, n),
+    conf_hi = weighted.mean(conf.high, n),
+    .groups = "drop"
+  )
+
+```
+
+Now if this all worked.. I should be able to plot??
+
+```{r}
+fig_surv <- ggplot(surv_pred_wgt, aes(x = age10, y = predicted)) +
+  
+  # Thin gray per-year lines
+  geom_line(
+    data = surv_pred_years,
+    aes(x = age10, y = predicted, group = interaction(ageclass, year_fct)),
+    color = "gray60",
+    alpha = 0.1,
+    inherit.aes = FALSE
+  ) +
+  
+  # CI ribbon
+  geom_ribbon(
+    aes(ymin = conf_lo, ymax = conf_hi, fill = ageclass),
+    alpha = 0.2
+  ) +
+  
+  # Weighted mean line
+  geom_line(
+    aes(color = ageclass, linetype = ageclass),
+    linewidth = 1.2
+  ) +
+  
+  # Vertical maturity threshold in age10
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed",
+    color = "#9B59B6"
+  ) +
+  
+  # Scales
+  scale_y_continuous(
+    name = "Offspring survival probability",
+    labels = scales::percent,
+    limits = c(0, 0.6)
+  ) +
+  scale_color_manual(
+    values = c("inexperienced" = "#7fbc41", "experienced" = "#de77ae")
+  ) +
+  scale_fill_manual(
+    values = c("inexperienced" = "#7fbc41", "experienced" = "#de77ae")
+  ) +
+  scale_linetype_manual(
+    values = c("inexperienced" = "dashed", "experienced" = "solid")
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    legend.title = element_text(size = 13, face = "bold"),
+    legend.text = element_text(size = 11)
+  ) +
+  labs(
+    x = "Scaled Age (age10)",
+    color = "Age Class",
+    linetype = "Age Class",
+    fill = "Age Class",
+    title = "Offspring Survival by Scaled Maternal Age",
+    subtitle = "Weighted model predictions across breeding years"
+  )
+
+print(fig_surv)
+```
+
+I think Lactation Duration calculation might be too hard actually.. so ima restart here!
+
+My plan for this is to attempt to calculate lactation duration using the whole database by
+
+1.) Modify the data set to only contain females so when "obssex" = "F" during the breeding season so when timeofyear = breeding
+
+2.) Then contain only adult females observed with a pup
+
+3.) Then calculation lactation duration using earliest date when "withpup" = 1 and then latest date when "withpup" = 1
+
+```{r}
+resight <- read_csv(here::here("data/raw/fullresights.csv"))
+
+
+resight2 <- 
+  subset(resight, 
+         obssex == "F" & timeofyear == "Breeding")
+
+names(resight2)[names(resight2) == "calyear"] <- "year"
+
+resight2 <- resight2 %>%
+  group_by(animalID) %>%
+  mutate(
+    age = year - yearborn,
+    max_age = max(age, na.rm = TRUE),
+    bio_age = max_age - age,
+    terminal = ifelse(bio_age == 0, 1, 0)
+  ) %>%
+  filter(age > 2) %>%
+  ungroup()
+
+
+#To create lactation duration were gonna just make another object in the environment:
+lact_info <- resight2 %>%
+  filter(withpup == 1) %>%
+  group_by(animalID, season) %>%
+  summarise(
+    lact_start = min(date, na.rm = TRUE),
+    lact_end = max(date, na.rm = TRUE), 
+    lact_dur = as.numeric(lact_end - lact_start),
+    .groups = "drop"
+  )
+
+resight2 <- lact_info %>%
+  left_join(resight2, by = c("animalID", "season"))
+```
+
+Now that we have lactation duration more accurately calculated I think.. we can start to analyze the data again!
+
+```{r}
+maturity <- 6
+lact_dat2 <- resight2 %>% 
+  filter(lact_dur > 0 & lact_dur < 45) %>% 
+  dplyr::select(animalID, bio_age, lact_dur, season, year, terminal, age) %>% 
+  mutate( 
+    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
+    age10 = (age - maturity) / 10, 
+    year_fct = factor(year))
+
+
+#For some reason there is so many duplicates so we will remove those!
+resight2 <- resight2 %>% 
+  distinct(animalID, season, .keep_all = TRUE)
+
+lact_dat2 <- lact_dat2 %>% 
+  distinct(animalID, season, .keep_all = TRUE)
+
+#Negative Binomial model
+lac_mod2 <- glmer.nb(
+  lact_dur ~ age10 + age10:ageclass + terminal:ageclass + (1 | year) ,
+  data = lact_dat2
+)
+
+summary(lac_mod2)
+summary(lac_mod2)$coefficients
+
+
+#creating prediction grid (so that we can use confidence intervals later)
+lac_grid2 <- expand_grid(
+  age = 3:22, 
+  terminal = 0:1) %>% 
+  mutate(age10 = (age - maturity) / 10, 
+         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"))
+
+
+lac_years2 <- count(lact_dat2, year_fct)
+
+#create population predictions 
+lac_pred_pop2 <- lac_grid2 %>% 
+  mutate(predicted = predict(lac_mod2, 
+                             newdata = lac_grid2, 
+                             re.form = NA,
+                             type = "response"),
+         terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal")))
+
+
+
+
+# Predictions vs Raw Data Plot
+lact_summ2 <- lact_dat2 %>% 
+  ungroup() %>% 
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>% 
+  group_by(age, terminal_fct, ageclass) %>% 
+  summarize(mean_lact = mean(lact_dur),
+            se_lact = sd(lact_dur) / sqrt(n()),
+            .groups = "drop") %>% 
+  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+
+
+#Fixed Figure to make key clearer
+lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
+  
+  # Pointrange with dashed error bars by terminal status (but no legend entry)
+  geom_pointrange(
+    data = lact_summ,
+    aes(
+      y = mean_lact,
+      ymin = mean_lact - 1.96 * se_lact,
+      ymax = mean_lact + 1.96 * se_lact,
+      color = ageclass,
+      linetype = terminal_fct
+    ),
+    show.legend = FALSE  # prevents cluttering the legend
+  ) +
+  geom_line(aes(
+    linetype = terminal_fct,
+    color = ageclass
+  ), linewidth = 1.2) +
+  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+
+  # Aesthetic styling
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "#F9F9F9"),
+    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x  = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y  = element_text(color = "#7F8C8D", size = 12),
+    plot.title   = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+    legend.title = element_text(size = 13, face = "bold"),
+    legend.text  = element_text(size = 11)
+  ) +
+
+  # Axis and legend labels
+  labs(
+    title = "Effect of Age on Lactation Duration",
+    x = "Mother's Age (Years)",
+    y = "Lactation Duration (days)",
+    color = "Age Class",
+    linetype = "Terminal Status"
+  ) +
+
+  # Distinct linetypes and color palette
+  scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
+  scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
+  scale_fill_manual(values = c("#D5A6F6", "#9B59B6", "#66B2B2"))
+print(lac_plot2)
 ```
