@@ -12,12 +12,14 @@ format:
 editor: visual
 ---
 
-#Downloading the Data and installing packages
+# Downloading the Data and Libraries
 
 ```{r}
 #| label: setup
+
 #Libraries: 
-library (tidyverse, dplyr)
+library (tidyverse)
+library (dplyr)
 library (ggplot2)
 library (lme4)
 library (brms)
@@ -26,11 +28,11 @@ library (tidybayes)
 library (rstan)
 
 #Initial Data Pull
-sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"))
+sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"), show_col_types = FALSE)
 
 ```
 
-#Modified data:
+# Modified Datasets
 
 ```{r}
 #Bioage clean
@@ -47,7 +49,7 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
 
 ```
 
-#Adult female population fig:
+# Adult Female Population Figure
 
 ```{r}
 #Create terminal to be a factor here 
@@ -84,7 +86,7 @@ print(pop_fig)
 
 In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
 
-#Lactation Duration Model and figure
+# Lactation Duration Model and Figures
 
 My plan for this is to attempt to calculate lactation duration using the whole database by
 
@@ -133,10 +135,9 @@ lact_dat2 <- lact_info %>%
 lact_dat2 <- lact_dat2 %>% 
   distinct(animalID, season, .keep_all = TRUE)
 
-
 ```
 
-Lactation duration model to incorporate bayesian statistics here:
+## Lactation Duration Model with Bayesian Stats
 
 ```{r}
 
@@ -148,8 +149,8 @@ lac_brm <- brm(
 )
 
 summary(lac_brm)
-
-# Prediction grid
+# 
+# # Prediction grid
 lac_grid2 <- tidyr::expand_grid(
   age = 3:22,
   terminal = 0:1
@@ -160,8 +161,8 @@ lac_grid2 <- tidyr::expand_grid(
     ageclass = factor(ageclass, levels = c("inexperienced","experienced")),
     terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))
   )
-
-# Population-level predictions (exclude random effects), with 95% CrI
+# 
+# # Population-level predictions (exclude random effects), with 95% CrI
 pred_df <- fitted(
   lac_brm,
   newdata    = lac_grid2,
@@ -177,8 +178,7 @@ lac_pred_pop2 <- bind_cols(lac_grid2, pred_df) %>%
     upr       = Q97.5
   )
 
-
-# Raw-data summaries 
+# # Raw-data summaries 
 lact_summ2 <- lact_dat2 %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))) %>%
   group_by(age, terminal_fct, ageclass) %>%
@@ -188,8 +188,8 @@ lact_summ2 <- lact_dat2 %>%
     .groups   = "drop"
   ) %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-
-#  Full plot (posterior mean + 95% CrI ribbon) (hopefully..)
+# 
+# #  Full plot (posterior mean + 95% CrI ribbon) (hopefully..)
 lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   geom_ribbon(
     aes(ymin = lwr, ymax = upr,
@@ -238,11 +238,11 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
   scale_fill_manual(values  = c("#D5A6F6", "#6DD5B3"))
-
-print(lac_plot2)
+# 
+# print(lac_plot2)
 ```
 
-#Wean Weight model and figure:
+# Wean Weight Model and Figure
 
 ```{r}
 library(segmented)
@@ -347,7 +347,7 @@ print(wt_fig)
 
 ```
 
-#Sex Ratios Model and Figure:
+# Sex Ratios Model and Figure
 
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
 
@@ -465,126 +465,235 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
 ```
 
 ```{r}
-#First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +
-prime_max <- 14
-# Creating third age calss as a function 
-ageclass3_fun <- function(a, mat = maturity, prime_hi = prime_max) {
-  dplyr::case_when(
-    a <= mat      ~ "inexperienced",
-    a <= prime_hi ~ "prime",
-    TRUE          ~ "experienced"
-  )
-}
+# #First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +
+# prime_max <- 14
+# # Creating third age calss as a function 
+# ageclass3_fun <- function(a, mat = maturity, prime_hi = prime_max) {
+#   dplyr::case_when(
+#     a <= mat      ~ "inexperienced",
+#     a <= prime_hi ~ "prime",
+#     TRUE          ~ "experienced"
+#   )
+# }
+# 
+# #Data Prep
+# wt_dat <- bioseal %>%
+#   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>%
+#   filter(!is.na(Wt), !is.na(age)) %>%
+#   mutate(
+#     terminal   = as.integer(ifelse(bio_age == 0, 1, 0)),  # clean 0/1
+#     terminal_fct = factor(terminal, levels = c(0,1),
+#                           labels = c("Nonterminal","Terminal")),
+#     age10      = (age - maturity) / 10,
+#     ageclass3  = factor(ageclass3_fun(age),
+#                         levels = c("inexperienced","prime","experienced")),
+#     year       = factor(year),
+#     animalID   = factor(animalID)
+#   )
+# 
+# # Bayesian Model
+# wt_brm <- brm(
+#   Wt ~ age10 + age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
+#   data   = wt_dat,
+#   family = gaussian()
+# )
+# 
+# summary(wt_brm)
+# pp_check(wt_brm)
+# 
+# # ----- 3) Prediction grid -----
+# wt_grid <- tidyr::expand_grid(
+#   age = 3:22,
+#   terminal = 0:1
+# ) %>%
+#   mutate(
+#     age10       = (age - maturity) / 10,
+#     ageclass3   = factor(ageclass3_fun(age),
+#                          levels = c("inexperienced","prime","experienced")),
+#     terminal_fct = factor(terminal, levels = c(0,1),
+#                           labels = c("Nonterminal","Terminal"))
+#   )
+# 
+# wt_pred <- fitted(
+#   wt_brm,
+#   newdata    = wt_grid,
+#   re_formula = NA,
+#   summary    = TRUE,
+#   probs      = c(0.025, 0.975)
+# ) %>% as_tibble()
+# 
+# wt_pred_pop <- bind_cols(wt_grid, wt_pred) %>%
+#   rename(predicted = Estimate, lwr = Q2.5, upr = Q97.5) %>%
+#   arrange(age)
+# 
+# # Data Summary
+# wt_summ <- wt_dat %>%
+#   group_by(age, terminal_fct, ageclass3) %>%
+#   summarize(
+#     mean_wt = mean(Wt, na.rm = TRUE),
+#     se_wt   = sd(Wt,   na.rm = TRUE) / sqrt(n()),
+#     .groups = "drop"
+#   ) %>%
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# 
+# # Figure plot 
+# wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+#   geom_ribbon(
+#     aes(ymin = lwr, ymax = upr, fill = ageclass3,
+#         group = interaction(ageclass3, terminal_fct)),
+#     alpha = 0.20
+#   ) +
+#   geom_line(
+#     aes(linetype = terminal_fct, color = ageclass3,
+#         group = interaction(ageclass3, terminal_fct)),
+#     linewidth = 1.2
+#   ) +
+#   geom_pointrange(
+#     data = wt_summ,
+#     aes(y = mean_wt,
+#         ymin = mean_wt - 1.96 * se_wt,
+#         ymax = mean_wt + 1.96 * se_wt,
+#         color = ageclass3,
+#         linetype = terminal_fct),
+#     show.legend = FALSE
+#   ) +
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+#   geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
+#   # My Theme 
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9"),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x = element_text(color = "#7F8C8D", size = 12),
+#     axis.text.y = element_text(color = "#7F8C8D", size = 12),
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+#     legend.title = element_text(size = 13, face = "bold"),
+#     legend.text = element_text(size = 11)
+#   ) +
+# 
+#   # Axis labels and legends
+#   labs(
+#     title = "Impact of Age on Wean Weight", 
+#     subtitle = "Terminal vs Non-Terminal",
+#     x = "Mother's Age (Years)", 
+#     y = "Wean Weight (kg)",
+#     color = "Age Class",
+#     linetype = "Terminal Status"
+#   ) +
+# 
+#   # My custom palette styling for lines and fill
+#   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
+#   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+#   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+# print(wt_fig)
+```
 
-#Data Prep
-wt_dat <- bioseal %>%
-  dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>%
-  filter(!is.na(Wt), !is.na(age)) %>%
-  mutate(
-    terminal   = as.integer(ifelse(bio_age == 0, 1, 0)),  # clean 0/1
-    terminal_fct = factor(terminal, levels = c(0,1),
-                          labels = c("Nonterminal","Terminal")),
-    age10      = (age - maturity) / 10,
-    ageclass3  = factor(ageclass3_fun(age),
-                        levels = c("inexperienced","prime","experienced")),
-    year       = factor(year),
-    animalID   = factor(animalID)
-  )
+# Attempting Brms Wean Weight
 
-# Bayesian Model
-wt_brm <- brm(
-  Wt ~ age10 + age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
-  data   = wt_dat,
-  family = gaussian()
-)
-
-summary(wt_brm)
-pp_check(wt_brm)
-
-# ----- 3) Prediction grid -----
-wt_grid <- tidyr::expand_grid(
-  age = 3:22,
-  terminal = 0:1
-) %>%
-  mutate(
-    age10       = (age - maturity) / 10,
-    ageclass3   = factor(ageclass3_fun(age),
-                         levels = c("inexperienced","prime","experienced")),
-    terminal_fct = factor(terminal, levels = c(0,1),
-                          labels = c("Nonterminal","Terminal"))
-  )
-
-wt_pred <- fitted(
-  wt_brm,
-  newdata    = wt_grid,
-  re_formula = NA,
-  summary    = TRUE,
-  probs      = c(0.025, 0.975)
-) %>% as_tibble()
-
-wt_pred_pop <- bind_cols(wt_grid, wt_pred) %>%
-  rename(predicted = Estimate, lwr = Q2.5, upr = Q97.5) %>%
-  arrange(age)
-
-# Data Summary
-wt_summ <- wt_dat %>%
-  group_by(age, terminal_fct, ageclass3) %>%
-  summarize(
-    mean_wt = mean(Wt, na.rm = TRUE),
-    se_wt   = sd(Wt,   na.rm = TRUE) / sqrt(n()),
-    .groups = "drop"
-  ) %>%
-  mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-
-# Figure plot 
-wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
-  geom_ribbon(
-    aes(ymin = lwr, ymax = upr, fill = ageclass3,
-        group = interaction(ageclass3, terminal_fct)),
-    alpha = 0.20
-  ) +
-  geom_line(
-    aes(linetype = terminal_fct, color = ageclass3,
-        group = interaction(ageclass3, terminal_fct)),
-    linewidth = 1.2
-  ) +
-  geom_pointrange(
-    data = wt_summ,
-    aes(y = mean_wt,
-        ymin = mean_wt - 1.96 * se_wt,
-        ymax = mean_wt + 1.96 * se_wt,
-        color = ageclass3,
-        linetype = terminal_fct),
-    show.legend = FALSE
-  ) +
-  geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
-  geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
-  # My Theme 
-  theme(
-    panel.background = element_rect(fill = "#F9F9F9"),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y = element_text(color = "#7F8C8D", size = 12),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
-    plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
-    legend.title = element_text(size = 13, face = "bold"),
-    legend.text = element_text(size = 11)
-  ) +
-
-  # Axis labels and legends
-  labs(
-    title = "Impact of Age on Wean Weight", 
-    subtitle = "Terminal vs Non-Terminal",
-    x = "Mother's Age (Years)", 
-    y = "Wean Weight (kg)",
-    color = "Age Class",
-    linetype = "Terminal Status"
-  ) +
-
-  # My custom palette styling for lines and fill
-  scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
-  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
-print(wt_fig)
+```{r}
+# # Data prep
+# wt_dat <- bioseal %>%
+#   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>%
+#   filter(!is.na(Wt), !is.na(age)) %>%
+#   mutate(
+#     terminal   = ifelse(bio_age == 0, 1, 0),
+#     year_fct   = factor(year),
+#     age10      = (age - maturity) / 10,
+#     ageclass3  = if ("ageclass3" %in% names(.)) ageclass3 else case_when(
+#       age <  maturity                  ~ "inexperienced",
+#       age >= maturity & age <= maturity + 5 ~ "prime",
+#       TRUE                             ~ "experienced"
+#     ),
+#     ageclass3  = factor(ageclass3, levels = c("inexperienced","prime","experienced"))
+#   )
+# 
+# # Bayesian model (defaults for priors)
+# wt_brm <- brm(
+#   Wt ~ age10*ageclass3 + terminal*ageclass3 + (1 | year_fct) + (1 | animalID),
+#   data   = wt_dat,
+#   family = gaussian(),
+#   chains = 4, iter = 4000, warmup = 1000, seed = 123,
+#   control = list(adapt_delta = 0.95)
+# )
+# 
+# summary(wt_brm)        # check Rhat ~ 1, effective sample sizes
+# 
+# # Prediction grid — population-level
+# wt_grid <- tidyr::expand_grid(
+#   age = 3:22,
+#   terminal = 0:1,
+#   ageclass3 = levels(wt_dat$ageclass3)
+# ) %>%
+#   mutate(
+#     age10 = (age - maturity) / 10,
+#     terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))
+#   )
+# 
+# pred <- fitted(wt_brm, newdata = wt_grid, re_formula = NA, summary = TRUE)
+# wt_pred_pop <- bind_cols(wt_grid, as_tibble(pred)) %>%
+#   rename(predicted = Estimate, lo = Q2.5, hi = Q97.5)
+# 
+# # Empirical summary (points + SE like your original)
+# wt_summ <- wt_dat %>%
+#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))) %>%
+#   group_by(age, terminal_fct, ageclass3) %>%
+#   summarize(
+#     mean_wt = mean(Wt, na.rm = TRUE),
+#     se_wt   = sd(Wt, na.rm = TRUE) / sqrt(n()),
+#     .groups = "drop"
+#   ) %>%
+#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
+# 
+# # Figure (same style, with Bayesian CI ribbon)
+# wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+#   geom_ribbon(aes(ymin = lo, ymax = hi, fill = ageclass3), alpha = 0.15, show.legend = FALSE) +
+#   geom_pointrange(
+#     data = wt_summ,
+#     aes(y = mean_wt,
+#         ymin = mean_wt - 1.96 * se_wt,
+#         ymax = mean_wt + 1.96 * se_wt,
+#         linetype = terminal_fct,
+#         color = ageclass3),
+#     show.legend = FALSE
+#   ) +
+#   geom_line(aes(linetype = terminal_fct, color = ageclass3), linewidth = 1.2) +
+#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+#   theme_minimal() +
+#   theme(
+#     panel.background = element_rect(fill = "#F9F9F9"),
+#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
+#     axis.text.x  = element_text(color = "#7F8C8D", size = 12),
+#     axis.text.y  = element_text(color = "#7F8C8D", size = 12),
+#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),
+#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
+#     legend.title = element_text(size = 13, face = "bold"),
+#     legend.text  = element_text(size = 11)
+#   ) +
+#   labs(
+#     title = "Impact of Age on Wean Weight",
+#     subtitle = "Bayesian population mean with 95% credible intervals\nTerminal vs Nonterminal across three age classes",
+#     x = "Mother's Age (Years)",
+#     y = "Wean Weight (kg)",
+#     color = "Age Class",
+#     linetype = "Terminal Status"
+#   ) +
+#   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
+#   scale_color_manual(values = c(
+#     "inexperienced" = "#D5A6F6",
+#     "prime"         = "#6DD5B3",
+#     "experienced"   = "#66B2B2"
+#   )) +
+#   scale_fill_manual(values = c(
+#     "inexperienced" = "#D5A6F6",
+#     "prime"         = "#6DD5B3",
+#     "experienced"   = "#66B2B2"
+#   ))
+# 
+# print(wt_fig)
+# 
+# # Optional quick checks
+# pp_check(wt_brm)   # posterior predictive check
+# loo(wt_brm)        # model fit comparison if you try alternatives
 ```
