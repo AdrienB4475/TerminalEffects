@@ -1,1 +1,1 @@
-Terminal Effects figures visible [here](TerminalEffects.html)
+Terminal Effects figures visible [here](Terminal_Effects_Clean.html)
