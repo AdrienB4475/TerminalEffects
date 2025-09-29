@@ -12,7 +12,11 @@ format:
 editor: visual
 ---
 
+
+
 # Downloading the Data and Libraries
+
+
 
 ```{r}
 #| label: setup
@@ -32,7 +36,11 @@ sealdat <- read_csv(here::here("data/Adrien Data Pull 2024_12_06.csv"), show_col
 
 ```
 
+
+
 # Modified Datasets
+
+
 
 ```{r}
 #Bioage clean
@@ -49,7 +57,11 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
 
 ```
 
+
+
 # Adult Female Population Figure
+
+
 
 ```{r}
 #Create terminal to be a factor here 
@@ -84,6 +96,8 @@ pop_fig <- ggplot(pop_breed, aes(x = factor(age), y = n, fill = terminal_fct)) +
 print(pop_fig)
 ```
 
+
+
 In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
 
 # Lactation Duration Model and Figures
@@ -95,6 +109,8 @@ My plan for this is to attempt to calculate lactation duration using the whole d
 2.) Then contain only adult females observed with a pup
 
 3.) Then calculation lactation duration using earliest date when "withpup" = 1 and then latest date when "withpup" = 1
+
+
 
 ```{r}
 resight <- read_csv(here::here("data/raw/fullresights.csv")) %>%
@@ -137,7 +153,11 @@ lact_dat2 <- lact_dat2 %>%
 
 ```
 
+
+
 ## Lactation Duration Model with Bayesian Stats
+
+
 
 ```{r}
 
@@ -242,9 +262,13 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
 print(lac_plot2)
 ```
 
+
+
 # Sex Ratios Model and Figure
 
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
+
+
 
 ```{r}
 # Offspring sex ratio dataset 
@@ -358,7 +382,11 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
 
+
+
 # Wean Weight Model 
+
+
 
 ```{r}
 # #First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +
@@ -484,3 +512,4 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 print(wt_fig)
 ```
+
