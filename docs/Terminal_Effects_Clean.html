@@ -86,9 +86,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#lactation-duration-model-with-bayesian-stats" id="toc-lactation-duration-model-with-bayesian-stats" class="nav-link" data-scroll-target="#lactation-duration-model-with-bayesian-stats">Lactation Duration Model with Bayesian Stats</a></li>
   </ul></li>
-  <li><a href="#wean-weight-model-and-figure" id="toc-wean-weight-model-and-figure" class="nav-link" data-scroll-target="#wean-weight-model-and-figure">Wean Weight Model and Figure</a></li>
   <li><a href="#sex-ratios-model-and-figure" id="toc-sex-ratios-model-and-figure" class="nav-link" data-scroll-target="#sex-ratios-model-and-figure">Sex Ratios Model and Figure</a></li>
-  <li><a href="#attempting-brms-wean-weight" id="toc-attempting-brms-wean-weight" class="nav-link" data-scroll-target="#attempting-brms-wean-weight">Attempting Brms Wean Weight</a></li>
+  <li><a href="#wean-weight-model" id="toc-wean-weight-model" class="nav-link" data-scroll-target="#wean-weight-model">Wean Weight Model</a></li>
   </ul>
 </nav>
 </div>
@@ -156,8 +155,8 @@ make: *** [foo.o] Error 1
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000464 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.64 seconds.
+Chain 1: Gradient evaluation took 0.00043 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.3 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -174,15 +173,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 12.238 seconds (Warm-up)
-Chain 1:                4.152 seconds (Sampling)
-Chain 1:                16.39 seconds (Total)
+Chain 1:  Elapsed Time: 12.983 seconds (Warm-up)
+Chain 1:                4.03 seconds (Sampling)
+Chain 1:                17.013 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000289 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 2.89 seconds.
+Chain 2: Gradient evaluation took 0.000304 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 3.04 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -199,15 +198,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 12.755 seconds (Warm-up)
-Chain 2:                4.098 seconds (Sampling)
-Chain 2:                16.853 seconds (Total)
+Chain 2:  Elapsed Time: 12.188 seconds (Warm-up)
+Chain 2:                4.008 seconds (Sampling)
+Chain 2:                16.196 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000292 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 2.92 seconds.
+Chain 3: Gradient evaluation took 0.00028 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 2.8 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -224,15 +223,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 13.065 seconds (Warm-up)
-Chain 3:                4.122 seconds (Sampling)
-Chain 3:                17.187 seconds (Total)
+Chain 3:  Elapsed Time: 12.542 seconds (Warm-up)
+Chain 3:                4.004 seconds (Sampling)
+Chain 3:                16.546 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 0.000283 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 2.83 seconds.
+Chain 4: Gradient evaluation took 0.000339 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 3.39 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -249,9 +248,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 13.676 seconds (Warm-up)
-Chain 4:                4.246 seconds (Sampling)
-Chain 4:                17.922 seconds (Total)
+Chain 4:  Elapsed Time: 13.003 seconds (Warm-up)
+Chain 4:                4.016 seconds (Sampling)
+Chain 4:                17.019 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -265,25 +264,25 @@ Formula: lact_dur ~ age10 + age10:ageclass + terminal:ageclass + (1 | season)
 Multilevel Hyperparameters:
 ~season (Number of levels: 47) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     0.11      0.02     0.08     0.15 1.00     1404     1742
+sd(Intercept)     0.11      0.02     0.08     0.15 1.00     1298     2142
 
 Regression Coefficients:
                                Estimate Est.Error l-95% CI u-95% CI Rhat
 Intercept                          2.97      0.02     2.92     3.01 1.00
 age10                              0.02      0.03    -0.04     0.09 1.00
 age10:ageclassinexperienced        0.09      0.11    -0.13     0.31 1.00
-ageclassexperienced:terminal      -0.06      0.02    -0.10    -0.01 1.00
+ageclassexperienced:terminal      -0.06      0.02    -0.11    -0.01 1.00
 ageclassinexperienced:terminal    -0.02      0.02    -0.07     0.03 1.00
                                Bulk_ESS Tail_ESS
-Intercept                          1386     2282
-age10                              5726     2934
-age10:ageclassinexperienced        5984     2759
-ageclassexperienced:terminal       7898     3093
-ageclassinexperienced:terminal     8285     2712
+Intercept                          1411     2354
+age10                              5476     2930
+age10:ageclassinexperienced        5778     3355
+ageclassexperienced:terminal       6731     2970
+ageclassinexperienced:terminal     9184     2926
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-shape     7.43      0.27     6.92     7.99 1.00     7935     2716
+shape     7.44      0.27     6.93     7.98 1.00     8799     2739
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -299,51 +298,57 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </section>
 </section>
-<section id="wean-weight-model-and-figure" class="level1">
-<h1>Wean Weight Model and Figure</h1>
+<section id="sex-ratios-model-and-figure" class="level1">
+<h1>Sex Ratios Model and Figure</h1>
+<p>We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-lmerModLmerTest]
-Formula: Wt ~ age10 + age10:ageclass + terminal:ageclass + (1 | year) +  
-    (1 | animalID)
-   Data: wt_dat
+<pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/opt/R/arm64/include   -fPIC  -falign-functions=64 -Wall -g -O2  -c foo.c -o foo.o
+In file included from &lt;built-in&gt;:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22:
+In file included from /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppEigen/include/Eigen/Core:19:
+/Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: 'cmath' file not found
+#include &lt;cmath&gt;
+         ^~~~~~~
+1 error generated.
+make: *** [foo.o] Error 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: bernoulli 
+  Links: mu = logit 
+Formula: is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct) 
+   Data: sex_dat (Number of observations: 2208) 
+  Draws: 4 chains, each with iter = 4000; warmup = 2000; thin = 1;
+         total post-warmup draws = 8000
 
-REML criterion at convergence: 13704.5
+Multilevel Hyperparameters:
+~animalID (Number of levels: 943) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.17      0.11     0.01     0.41 1.00     1183     2821
 
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--5.8214 -0.4607  0.0286  0.5082  4.6978 
+~year_fct (Number of levels: 47) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.17      0.08     0.02     0.33 1.00     1784     2216
 
-Random effects:
- Groups   Name        Variance Std.Dev.
- animalID (Intercept)  95.44    9.769  
- year     (Intercept)  52.67    7.257  
- Residual             230.00   15.166  
-Number of obs: 1595, groups:  animalID, 779; year, 42
+Regression Coefficients:
+                               Estimate Est.Error l-95% CI u-95% CI Rhat
+Intercept                          0.02      0.08    -0.14     0.18 1.00
+age10                              0.30      0.58    -0.83     1.44 1.00
+age10:ageclassexperienced         -0.17      0.68    -1.51     1.15 1.00
+ageclassinexperienced:terminal     0.23      0.15    -0.08     0.54 1.00
+ageclassexperienced:terminal       0.40      0.14     0.12     0.67 1.00
+                               Bulk_ESS Tail_ESS
+Intercept                          9309     5664
+age10                              8615     5741
+age10:ageclassexperienced          8599     5265
+ageclassinexperienced:terminal    18598     5643
+ageclassexperienced:terminal      15952     5491
 
-Fixed effects:
-                               Estimate Std. Error       df t value Pr(&gt;|t|)
-(Intercept)                     122.173      1.465   47.188  83.390  &lt; 2e-16
-age10                             5.900      2.031 1565.862   2.905  0.00372
-age10:ageclassinexperienced     104.626      6.697 1521.741  15.622  &lt; 2e-16
-ageclassexperienced:terminal      1.138      1.547 1483.894   0.736  0.46197
-ageclassinexperienced:terminal   -2.123      1.601 1515.312  -1.327  0.18485
-                                  
-(Intercept)                    ***
-age10                          ** 
-age10:ageclassinexperienced    ***
-ageclassexperienced:terminal      
-ageclassinexperienced:terminal    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Correlation of Fixed Effects:
-            (Intr) age10  ag10:g agclssx:
-age10       -0.285                       
-ag10:gclssn  0.386 -0.606                
-agclssxprn: -0.074 -0.297  0.020         
-agclssnxpr: -0.153  0.122 -0.001  0.032  </code></pre>
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -354,54 +359,8 @@ agclssnxpr: -0.153  0.122 -0.001  0.032  </code></pre>
 </div>
 </div>
 </section>
-<section id="sex-ratios-model-and-figure" class="level1">
-<h1>Sex Ratios Model and Figure</h1>
-<p>We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>Generalized linear mixed model fit by maximum likelihood (Laplace
-  Approximation) [glmerMod]
- Family: binomial  ( logit )
-Formula: is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | year_fct)
-   Data: sex_dat
-
-     AIC      BIC   logLik deviance df.resid 
-  3053.7   3087.9  -1520.8   3041.7     2202 
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--1.4117 -1.0123  0.7786  0.9713  1.1167 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- year_fct (Intercept) 0.02627  0.1621  
-Number of obs: 2208, groups:  year_fct, 47
-
-Fixed effects:
-                               Estimate Std. Error z value Pr(&gt;|z|)   
-(Intercept)                     0.01497    0.07956   0.188  0.85078   
-age10                           0.12900    0.18759   0.688  0.49166   
-age10:ageclassinexperienced     0.16058    0.66737   0.241  0.80986   
-ageclassexperienced:terminal    0.38735    0.14318   2.705  0.00682 **
-ageclassinexperienced:terminal  0.22486    0.15190   1.480  0.13879   
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Correlation of Fixed Effects:
-            (Intr) age10  ag10:g agclssx:
-age10       -0.598                       
-ag10:gclssn  0.676 -0.619                
-agclssxprn: -0.176 -0.210 -0.039         
-agclssnxpr: -0.219  0.145  0.049  0.060  </code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Terminal_Effects_Clean_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="wean-weight-model" class="level1">
+<h1>Wean Weight Model</h1>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
@@ -418,8 +377,8 @@ make: *** [foo.o] Error 1
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000167 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.67 seconds.
+Chain 1: Gradient evaluation took 0.000209 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.09 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -436,15 +395,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 4.478 seconds (Warm-up)
-Chain 1:                2.908 seconds (Sampling)
-Chain 1:                7.386 seconds (Total)
+Chain 1:  Elapsed Time: 4.064 seconds (Warm-up)
+Chain 1:                290.786 seconds (Sampling)
+Chain 1:                294.85 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 9.4e-05 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.94 seconds.
+Chain 2: Gradient evaluation took 8.6e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.86 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -461,15 +420,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 4.208 seconds (Warm-up)
-Chain 2:                2.896 seconds (Sampling)
-Chain 2:                7.104 seconds (Total)
+Chain 2:  Elapsed Time: 4.742 seconds (Warm-up)
+Chain 2:                2.835 seconds (Sampling)
+Chain 2:                7.577 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 9.4e-05 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.94 seconds.
+Chain 3: Gradient evaluation took 9e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.9 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -486,15 +445,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 6.508 seconds (Warm-up)
-Chain 3:                2.925 seconds (Sampling)
-Chain 3:                9.433 seconds (Total)
+Chain 3:  Elapsed Time: 4.563 seconds (Warm-up)
+Chain 3:                2.792 seconds (Sampling)
+Chain 3:                7.355 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 9e-05 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.9 seconds.
+Chain 4: Gradient evaluation took 8.6e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.86 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -511,9 +470,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 4.226 seconds (Warm-up)
-Chain 4:                3.008 seconds (Sampling)
-Chain 4:                7.234 seconds (Total)
+Chain 4:  Elapsed Time: 4.123 seconds (Warm-up)
+Chain 4:                2.803 seconds (Sampling)
+Chain 4:                6.926 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -527,33 +486,33 @@ Formula: Wt ~ age10 + age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | a
 Multilevel Hyperparameters:
 ~animalID (Number of levels: 779) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     9.76      0.62     8.53    10.98 1.00     1375     2089
+sd(Intercept)     9.78      0.64     8.51    11.03 1.00     1210     2444
 
 ~year (Number of levels: 42) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     7.73      1.24     5.55    10.36 1.00     1372     2506
+sd(Intercept)     7.77      1.25     5.62    10.41 1.00     1147     2087
 
 Regression Coefficients:
                                 Estimate Est.Error l-95% CI u-95% CI Rhat
-Intercept                         120.83      1.57   117.76   123.78 1.00
-age10                             104.93      5.71    93.59   115.96 1.00
-age10:ageclass3prime              -91.24      7.13  -104.70   -76.99 1.00
-age10:ageclass3experienced       -104.86      6.82  -118.30   -91.60 1.00
-ageclass3inexperienced:terminal    -1.43      1.62    -4.61     1.70 1.00
-ageclass3prime:terminal             1.13      1.58    -1.98     4.24 1.00
-ageclass3experienced:terminal      -1.97      5.01   -11.47     7.92 1.00
+Intercept                         120.87      1.54   117.92   123.94 1.00
+age10                             104.92      5.72    93.54   116.42 1.00
+age10:ageclass3prime              -91.19      7.10  -104.98   -77.28 1.00
+age10:ageclass3experienced       -104.74      6.76  -118.02   -91.38 1.00
+ageclass3inexperienced:terminal    -1.45      1.63    -4.72     1.72 1.00
+ageclass3prime:terminal             1.11      1.62    -2.05     4.32 1.00
+ageclass3experienced:terminal      -2.12      5.10   -11.97     7.71 1.00
                                 Bulk_ESS Tail_ESS
-Intercept                           1314     2101
-age10                               2946     2798
-age10:ageclass3prime                2978     3115
-age10:ageclass3experienced          3005     2774
-ageclass3inexperienced:terminal     6399     3508
-ageclass3prime:terminal             6114     3163
-ageclass3experienced:terminal       7006     3179
+Intercept                           1284     1831
+age10                               2944     2731
+age10:ageclass3prime                3073     2998
+age10:ageclass3experienced          3102     2990
+ageclass3inexperienced:terminal     6597     3690
+ageclass3prime:terminal             6818     3446
+ageclass3experienced:terminal       7768     3212
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    15.03      0.37    14.33    15.78 1.00     2240     2858
+sigma    15.04      0.37    14.33    15.76 1.00     2003     2555
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -562,21 +521,18 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Terminal_Effects_Clean_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Terminal_Effects_Clean_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Terminal_Effects_Clean_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Terminal_Effects_Clean_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-</section>
-<section id="attempting-brms-wean-weight" class="level1">
-<h1>Attempting Brms Wean Weight</h1>
 <!-- -->
 
 </section>
@@ -1297,461 +1253,248 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb7-251"><a href="#cb7-251" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(lac_plot2)</span>
 <span id="cb7-252"><a href="#cb7-252" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb7-253"><a href="#cb7-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-254"><a href="#cb7-254" aria-hidden="true" tabindex="-1"></a><span class="fu"># Wean Weight Model and Figure</span></span>
+<span id="cb7-254"><a href="#cb7-254" aria-hidden="true" tabindex="-1"></a><span class="fu"># Sex Ratios Model and Figure</span></span>
 <span id="cb7-255"><a href="#cb7-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-258"><a href="#cb7-258" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-259"><a href="#cb7-259" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(segmented)</span>
-<span id="cb7-260"><a href="#cb7-260" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmerTest)</span>
-<span id="cb7-261"><a href="#cb7-261" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-262"><a href="#cb7-262" aria-hidden="true" tabindex="-1"></a><span class="co">#Wean Weight Time!</span></span>
-<span id="cb7-263"><a href="#cb7-263" aria-hidden="true" tabindex="-1"></a>wt_dat <span class="ot">&lt;-</span> bioseal <span class="sc">%&gt;%</span></span>
-<span id="cb7-264"><a href="#cb7-264" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-265"><a href="#cb7-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Wt))<span class="sc">%&gt;%</span></span>
-<span id="cb7-266"><a href="#cb7-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">terminal =</span> <span class="fu">ifelse</span>(bio_age <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
-<span id="cb7-267"><a href="#cb7-267" aria-hidden="true" tabindex="-1"></a>         <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>),</span>
-<span id="cb7-268"><a href="#cb7-268" aria-hidden="true" tabindex="-1"></a>         <span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
-<span id="cb7-269"><a href="#cb7-269" aria-hidden="true" tabindex="-1"></a>         <span class="at">year_fct =</span> <span class="fu">factor</span>(year))</span>
-<span id="cb7-270"><a href="#cb7-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-271"><a href="#cb7-271" aria-hidden="true" tabindex="-1"></a><span class="co">#Hist was evenly distributed: using glmer because of this:</span></span>
-<span id="cb7-272"><a href="#cb7-272" aria-hidden="true" tabindex="-1"></a>wt_mod <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
-<span id="cb7-273"><a href="#cb7-273" aria-hidden="true" tabindex="-1"></a>  Wt <span class="sc">~</span> age10 <span class="sc">+</span> age10<span class="sc">:</span>ageclass <span class="sc">+</span> terminal<span class="sc">:</span>ageclass <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> year) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> animalID), </span>
-<span id="cb7-274"><a href="#cb7-274" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> wt_dat,</span>
-<span id="cb7-275"><a href="#cb7-275" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-276"><a href="#cb7-276" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wt_mod)</span>
-<span id="cb7-277"><a href="#cb7-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-278"><a href="#cb7-278" aria-hidden="true" tabindex="-1"></a><span class="co">#Create our grid for prediction metrics </span></span>
-<span id="cb7-279"><a href="#cb7-279" aria-hidden="true" tabindex="-1"></a>wt_grid <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
-<span id="cb7-280"><a href="#cb7-280" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">22</span>, </span>
-<span id="cb7-281"><a href="#cb7-281" aria-hidden="true" tabindex="-1"></a>  <span class="at">terminal =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-282"><a href="#cb7-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
-<span id="cb7-283"><a href="#cb7-283" aria-hidden="true" tabindex="-1"></a>         <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>))</span>
-<span id="cb7-284"><a href="#cb7-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-285"><a href="#cb7-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-256"><a href="#cb7-256" aria-hidden="true" tabindex="-1"></a>We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms</span>
+<span id="cb7-257"><a href="#cb7-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-260"><a href="#cb7-260" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb7-261"><a href="#cb7-261" aria-hidden="true" tabindex="-1"></a><span class="co"># Offspring sex ratio dataset </span></span>
+<span id="cb7-262"><a href="#cb7-262" aria-hidden="true" tabindex="-1"></a>sex_dat <span class="ot">&lt;-</span> bioseal <span class="sc">%&gt;%</span></span>
+<span id="cb7-263"><a href="#cb7-263" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(animalID, bio_age, pupsex, age, year) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-264"><a href="#cb7-264" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pupsex)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-265"><a href="#cb7-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-266"><a href="#cb7-266" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_male =</span> <span class="fu">ifelse</span>(pupsex <span class="sc">==</span> <span class="st">"M"</span>, <span class="dv">1</span>, <span class="dv">0</span>),  <span class="co"># 1 = male, 0 = female</span></span>
+<span id="cb7-267"><a href="#cb7-267" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal =</span> <span class="fu">ifelse</span>(bio_age <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
+<span id="cb7-268"><a href="#cb7-268" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>),</span>
+<span id="cb7-269"><a href="#cb7-269" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">factor</span>(ageclass, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>)),</span>
+<span id="cb7-270"><a href="#cb7-270" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
+<span id="cb7-271"><a href="#cb7-271" aria-hidden="true" tabindex="-1"></a>    <span class="at">year_fct =</span> <span class="fu">factor</span>(year)</span>
+<span id="cb7-272"><a href="#cb7-272" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-273"><a href="#cb7-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-274"><a href="#cb7-274" aria-hidden="true" tabindex="-1"></a><span class="co"># Brms Model </span></span>
+<span id="cb7-275"><a href="#cb7-275" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)<span class="co">#Ok so I believe this is to make it that the posteriors the brms model uses is the same each time??</span></span>
+<span id="cb7-276"><a href="#cb7-276" aria-hidden="true" tabindex="-1"></a>sex_mod <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb7-277"><a href="#cb7-277" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> is_male <span class="sc">~</span> age10 <span class="sc">+</span> age10<span class="sc">:</span>ageclass <span class="sc">+</span> terminal<span class="sc">:</span>ageclass <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> animalID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> year_fct),</span>
+<span id="cb7-278"><a href="#cb7-278" aria-hidden="true" tabindex="-1"></a>  <span class="at">data    =</span> sex_dat,</span>
+<span id="cb7-279"><a href="#cb7-279" aria-hidden="true" tabindex="-1"></a>  <span class="at">family  =</span> <span class="fu">bernoulli</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
+<span id="cb7-280"><a href="#cb7-280" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores   =</span> <span class="fu">max</span>(<span class="dv">1</span>, parallel<span class="sc">::</span><span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb7-281"><a href="#cb7-281" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter    =</span> <span class="dv">4000</span>,</span>
+<span id="cb7-282"><a href="#cb7-282" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">4</span>,</span>
+<span id="cb7-283"><a href="#cb7-283" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> <span class="st">"rstan"</span> <span class="co"># or "cmdstanr" if you use cmdstanr</span></span>
+<span id="cb7-284"><a href="#cb7-284" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-285"><a href="#cb7-285" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sex_mod)</span>
 <span id="cb7-286"><a href="#cb7-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-287"><a href="#cb7-287" aria-hidden="true" tabindex="-1"></a><span class="co">#create population predictions </span></span>
-<span id="cb7-288"><a href="#cb7-288" aria-hidden="true" tabindex="-1"></a>wt_pred_pop <span class="ot">&lt;-</span> wt_grid <span class="sc">%&gt;%</span> </span>
-<span id="cb7-289"><a href="#cb7-289" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">predicted =</span> <span class="fu">predict</span>(wt_mod,  </span>
-<span id="cb7-290"><a href="#cb7-290" aria-hidden="true" tabindex="-1"></a>                             <span class="at">newdata =</span> wt_grid, </span>
-<span id="cb7-291"><a href="#cb7-291" aria-hidden="true" tabindex="-1"></a>                             <span class="at">re.form =</span> <span class="cn">NA</span>,    </span>
-<span id="cb7-292"><a href="#cb7-292" aria-hidden="true" tabindex="-1"></a>                             <span class="at">type =</span> <span class="st">"response"</span>),</span>
-<span id="cb7-293"><a href="#cb7-293" aria-hidden="true" tabindex="-1"></a>         <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>)))</span>
-<span id="cb7-294"><a href="#cb7-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-295"><a href="#cb7-295" aria-hidden="true" tabindex="-1"></a><span class="co">#Now summary</span></span>
-<span id="cb7-296"><a href="#cb7-296" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-297"><a href="#cb7-297" aria-hidden="true" tabindex="-1"></a>wt_summ <span class="ot">&lt;-</span> wt_dat <span class="sc">%&gt;%</span> </span>
-<span id="cb7-298"><a href="#cb7-298" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb7-299"><a href="#cb7-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-300"><a href="#cb7-300" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age, terminal_fct, ageclass) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-301"><a href="#cb7-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_wt =</span> <span class="fu">mean</span>(Wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),  </span>
-<span id="cb7-302"><a href="#cb7-302" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_wt =</span> <span class="fu">sd</span>(Wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">n</span>()),  </span>
-<span id="cb7-303"><a href="#cb7-303" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb7-304"><a href="#cb7-304" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-305"><a href="#cb7-305" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> age <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> <span class="fu">ifelse</span>(terminal_fct <span class="sc">==</span> <span class="st">"Terminal"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb7-306"><a href="#cb7-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-307"><a href="#cb7-307" aria-hidden="true" tabindex="-1"></a><span class="co">#Figure time! </span></span>
-<span id="cb7-308"><a href="#cb7-308" aria-hidden="true" tabindex="-1"></a>wt_fig <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(wt_pred_pop, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> predicted)) <span class="sc">+</span></span>
-<span id="cb7-309"><a href="#cb7-309" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-310"><a href="#cb7-310" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Pointrange with dashed error bars based on terminal status</span></span>
-<span id="cb7-311"><a href="#cb7-311" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(</span>
-<span id="cb7-312"><a href="#cb7-312" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> wt_summ,</span>
-<span id="cb7-313"><a href="#cb7-313" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
-<span id="cb7-314"><a href="#cb7-314" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> mean_wt, </span>
-<span id="cb7-315"><a href="#cb7-315" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymin =</span> mean_wt <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt, </span>
-<span id="cb7-316"><a href="#cb7-316" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymax =</span> mean_wt <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt, </span>
-<span id="cb7-317"><a href="#cb7-317" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> terminal_fct,</span>
-<span id="cb7-318"><a href="#cb7-318" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> ageclass</span>
-<span id="cb7-319"><a href="#cb7-319" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb7-320"><a href="#cb7-320" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span>  </span>
-<span id="cb7-321"><a href="#cb7-321" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-322"><a href="#cb7-322" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(</span>
-<span id="cb7-323"><a href="#cb7-323" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> terminal_fct,</span>
-<span id="cb7-324"><a href="#cb7-324" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> ageclass</span>
-<span id="cb7-325"><a href="#cb7-325" aria-hidden="true" tabindex="-1"></a>  ), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb7-326"><a href="#cb7-326" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> maturity <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
-<span id="cb7-327"><a href="#cb7-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-328"><a href="#cb7-328" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Theme </span></span>
-<span id="cb7-329"><a href="#cb7-329" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb7-330"><a href="#cb7-330" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb7-331"><a href="#cb7-331" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#F9F9F9"</span>),</span>
-<span id="cb7-332"><a href="#cb7-332" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-333"><a href="#cb7-333" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-334"><a href="#cb7-334" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-335"><a href="#cb7-335" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-336"><a href="#cb7-336" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"purple"</span>),</span>
-<span id="cb7-337"><a href="#cb7-337" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">color =</span> <span class="st">"#8E44AD"</span>),</span>
-<span id="cb7-338"><a href="#cb7-338" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-339"><a href="#cb7-339" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
-<span id="cb7-340"><a href="#cb7-340" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-341"><a href="#cb7-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-342"><a href="#cb7-342" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Axis labels and legends</span></span>
-<span id="cb7-343"><a href="#cb7-343" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb7-344"><a href="#cb7-344" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Impact of Age on Wean Weight"</span>, </span>
-<span id="cb7-345"><a href="#cb7-345" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Terminal vs Non-Terminal"</span>,</span>
-<span id="cb7-346"><a href="#cb7-346" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mother's Age (Years)"</span>, </span>
-<span id="cb7-347"><a href="#cb7-347" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Wean Weight (kg)"</span>,</span>
-<span id="cb7-348"><a href="#cb7-348" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Age Class"</span>,</span>
-<span id="cb7-349"><a href="#cb7-349" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Terminal Status"</span></span>
-<span id="cb7-350"><a href="#cb7-350" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-351"><a href="#cb7-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-352"><a href="#cb7-352" aria-hidden="true" tabindex="-1"></a>  <span class="co"># My custom palette styling for lines and fill</span></span>
-<span id="cb7-353"><a href="#cb7-353" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Terminal"</span> <span class="ot">=</span> <span class="st">"dotdash"</span>)) <span class="sc">+</span></span>
-<span id="cb7-354"><a href="#cb7-354" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>)) <span class="sc">+</span></span>
-<span id="cb7-355"><a href="#cb7-355" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>))</span>
-<span id="cb7-356"><a href="#cb7-356" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(wt_fig)</span>
-<span id="cb7-357"><a href="#cb7-357" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-358"><a href="#cb7-358" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-359"><a href="#cb7-359" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-360"><a href="#cb7-360" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-361"><a href="#cb7-361" aria-hidden="true" tabindex="-1"></a><span class="fu"># Sex Ratios Model and Figure</span></span>
-<span id="cb7-362"><a href="#cb7-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-363"><a href="#cb7-363" aria-hidden="true" tabindex="-1"></a>We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms</span>
-<span id="cb7-364"><a href="#cb7-364" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-367"><a href="#cb7-367" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-368"><a href="#cb7-368" aria-hidden="true" tabindex="-1"></a><span class="co">#Offspring sex ratio dataset</span></span>
-<span id="cb7-369"><a href="#cb7-369" aria-hidden="true" tabindex="-1"></a>sex_dat <span class="ot">&lt;-</span> bioseal <span class="sc">%&gt;%</span></span>
-<span id="cb7-370"><a href="#cb7-370" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(animalID, bio_age, pupsex, age, year) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-371"><a href="#cb7-371" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pupsex)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-372"><a href="#cb7-372" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-373"><a href="#cb7-373" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_male =</span> <span class="fu">ifelse</span>(pupsex <span class="sc">==</span> <span class="st">"M"</span>, <span class="dv">1</span>, <span class="dv">0</span>),  <span class="co"># 1 = male, 0 = female</span></span>
-<span id="cb7-374"><a href="#cb7-374" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal =</span> <span class="fu">ifelse</span>(bio_age <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
-<span id="cb7-375"><a href="#cb7-375" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>),</span>
-<span id="cb7-376"><a href="#cb7-376" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
-<span id="cb7-377"><a href="#cb7-377" aria-hidden="true" tabindex="-1"></a>    <span class="at">year_fct =</span> <span class="fu">factor</span>(year)</span>
-<span id="cb7-378"><a href="#cb7-378" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-379"><a href="#cb7-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-380"><a href="#cb7-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-381"><a href="#cb7-381" aria-hidden="true" tabindex="-1"></a><span class="co">#Run our model: </span></span>
-<span id="cb7-382"><a href="#cb7-382" aria-hidden="true" tabindex="-1"></a>sex_mod <span class="ot">&lt;-</span> <span class="fu">glmer</span>(</span>
-<span id="cb7-383"><a href="#cb7-383" aria-hidden="true" tabindex="-1"></a>  is_male <span class="sc">~</span> age10 <span class="sc">+</span> age10<span class="sc">:</span>ageclass <span class="sc">+</span> terminal<span class="sc">:</span>ageclass <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> year_fct),</span>
-<span id="cb7-384"><a href="#cb7-384" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> binomial,</span>
-<span id="cb7-385"><a href="#cb7-385" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> sex_dat</span>
-<span id="cb7-386"><a href="#cb7-386" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-387"><a href="#cb7-387" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sex_mod)</span>
-<span id="cb7-388"><a href="#cb7-388" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-389"><a href="#cb7-389" aria-hidden="true" tabindex="-1"></a><span class="co">#Now the grid </span></span>
-<span id="cb7-390"><a href="#cb7-390" aria-hidden="true" tabindex="-1"></a>sex_grid <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
-<span id="cb7-391"><a href="#cb7-391" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">22</span>, </span>
-<span id="cb7-392"><a href="#cb7-392" aria-hidden="true" tabindex="-1"></a>  <span class="at">terminal =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span>
-<span id="cb7-393"><a href="#cb7-393" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-394"><a href="#cb7-394" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-395"><a href="#cb7-395" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
-<span id="cb7-396"><a href="#cb7-396" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>)</span>
-<span id="cb7-397"><a href="#cb7-397" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-398"><a href="#cb7-398" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-399"><a href="#cb7-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-400"><a href="#cb7-400" aria-hidden="true" tabindex="-1"></a><span class="co">#Better predicted values:</span></span>
-<span id="cb7-401"><a href="#cb7-401" aria-hidden="true" tabindex="-1"></a>sex_pred_pop <span class="ot">&lt;-</span> sex_grid <span class="sc">%&gt;%</span></span>
-<span id="cb7-402"><a href="#cb7-402" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-403"><a href="#cb7-403" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicted_prob_male =</span> <span class="fu">predict</span>(</span>
-<span id="cb7-404"><a href="#cb7-404" aria-hidden="true" tabindex="-1"></a>      sex_mod, </span>
-<span id="cb7-405"><a href="#cb7-405" aria-hidden="true" tabindex="-1"></a>      <span class="at">newdata =</span> sex_grid, </span>
-<span id="cb7-406"><a href="#cb7-406" aria-hidden="true" tabindex="-1"></a>      <span class="at">re.form =</span> <span class="cn">NA</span>, </span>
-<span id="cb7-407"><a href="#cb7-407" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">"response"</span></span>
-<span id="cb7-408"><a href="#cb7-408" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb7-409"><a href="#cb7-409" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>))</span>
-<span id="cb7-410"><a href="#cb7-410" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-411"><a href="#cb7-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-412"><a href="#cb7-412" aria-hidden="true" tabindex="-1"></a><span class="co">#Now summarize all this data</span></span>
-<span id="cb7-413"><a href="#cb7-413" aria-hidden="true" tabindex="-1"></a>sex_summ <span class="ot">&lt;-</span> sex_dat <span class="sc">%&gt;%</span></span>
-<span id="cb7-414"><a href="#cb7-414" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-415"><a href="#cb7-415" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb7-416"><a href="#cb7-416" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age, terminal_fct, ageclass) <span class="sc">%&gt;%</span></span>
-<span id="cb7-417"><a href="#cb7-417" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb7-418"><a href="#cb7-418" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_male =</span> <span class="fu">mean</span>(is_male, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb7-419"><a href="#cb7-419" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_prop =</span> <span class="fu">sqrt</span>((prop_male <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> prop_male)) <span class="sc">/</span> <span class="fu">n</span>()), </span>
-<span id="cb7-420"><a href="#cb7-420" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb7-421"><a href="#cb7-421" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-422"><a href="#cb7-422" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> age <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> <span class="fu">ifelse</span>(terminal_fct <span class="sc">==</span> <span class="st">"Terminal"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb7-423"><a href="#cb7-423" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-424"><a href="#cb7-424" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-425"><a href="#cb7-425" aria-hidden="true" tabindex="-1"></a><span class="co">#And... magic plot?!??!</span></span>
-<span id="cb7-426"><a href="#cb7-426" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sex_pred_pop, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> predicted_prob_male)) <span class="sc">+</span></span>
-<span id="cb7-427"><a href="#cb7-427" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-428"><a href="#cb7-428" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Dashed SE bars by terminal status (hidden from legend)</span></span>
-<span id="cb7-429"><a href="#cb7-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(</span>
-<span id="cb7-430"><a href="#cb7-430" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> sex_summ,</span>
-<span id="cb7-431"><a href="#cb7-431" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
-<span id="cb7-432"><a href="#cb7-432" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> prop_male, </span>
-<span id="cb7-433"><a href="#cb7-433" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymin =</span> prop_male <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_prop, </span>
-<span id="cb7-434"><a href="#cb7-434" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymax =</span> prop_male <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_prop, </span>
-<span id="cb7-435"><a href="#cb7-435" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> terminal_fct,</span>
-<span id="cb7-436"><a href="#cb7-436" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> ageclass</span>
-<span id="cb7-437"><a href="#cb7-437" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb7-438"><a href="#cb7-438" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb7-439"><a href="#cb7-439" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-440"><a href="#cb7-440" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(</span>
-<span id="cb7-441"><a href="#cb7-441" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> terminal_fct,</span>
-<span id="cb7-442"><a href="#cb7-442" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> ageclass</span>
-<span id="cb7-443"><a href="#cb7-443" aria-hidden="true" tabindex="-1"></a>  ), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb7-444"><a href="#cb7-444" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> maturity <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
-<span id="cb7-445"><a href="#cb7-445" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-446"><a href="#cb7-446" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Theme</span></span>
-<span id="cb7-447"><a href="#cb7-447" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb7-448"><a href="#cb7-448" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb7-449"><a href="#cb7-449" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#F9F9F9"</span>),</span>
-<span id="cb7-450"><a href="#cb7-450" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-451"><a href="#cb7-451" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-452"><a href="#cb7-452" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-453"><a href="#cb7-453" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-454"><a href="#cb7-454" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"purple"</span>),</span>
-<span id="cb7-455"><a href="#cb7-455" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">color =</span> <span class="st">"#8E44AD"</span>),</span>
-<span id="cb7-456"><a href="#cb7-456" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-457"><a href="#cb7-457" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
-<span id="cb7-458"><a href="#cb7-458" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-459"><a href="#cb7-459" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-460"><a href="#cb7-460" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb7-461"><a href="#cb7-461" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Offspring Sex Ratio by Maternal Age"</span>, </span>
-<span id="cb7-462"><a href="#cb7-462" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Terminal vs Non-Terminal Mothers"</span>,</span>
-<span id="cb7-463"><a href="#cb7-463" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mother's Age (Years)"</span>, </span>
-<span id="cb7-464"><a href="#cb7-464" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Probability Offspring is Male"</span>,</span>
-<span id="cb7-465"><a href="#cb7-465" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Age Class"</span>,</span>
-<span id="cb7-466"><a href="#cb7-466" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Terminal Status"</span></span>
-<span id="cb7-467"><a href="#cb7-467" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-468"><a href="#cb7-468" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-469"><a href="#cb7-469" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Custom line types and colors</span></span>
-<span id="cb7-470"><a href="#cb7-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Terminal"</span> <span class="ot">=</span> <span class="st">"dotdash"</span>)) <span class="sc">+</span></span>
-<span id="cb7-471"><a href="#cb7-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>)) <span class="sc">+</span></span>
-<span id="cb7-472"><a href="#cb7-472" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>))</span>
-<span id="cb7-473"><a href="#cb7-473" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-474"><a href="#cb7-474" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-475"><a href="#cb7-475" aria-hidden="true" tabindex="-1"></a><span class="co">#YIPPIEE </span></span>
-<span id="cb7-476"><a href="#cb7-476" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-477"><a href="#cb7-477" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-478"><a href="#cb7-478" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-479"><a href="#cb7-479" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-482"><a href="#cb7-482" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-483"><a href="#cb7-483" aria-hidden="true" tabindex="-1"></a><span class="co"># #First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +</span></span>
-<span id="cb7-484"><a href="#cb7-484" aria-hidden="true" tabindex="-1"></a>prime_max <span class="ot">&lt;-</span> <span class="dv">14</span></span>
-<span id="cb7-485"><a href="#cb7-485" aria-hidden="true" tabindex="-1"></a><span class="co"># # Creating third age calss as a function </span></span>
-<span id="cb7-486"><a href="#cb7-486" aria-hidden="true" tabindex="-1"></a>ageclass3_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(a, <span class="at">mat =</span> maturity, <span class="at">prime_hi =</span> prime_max) {</span>
-<span id="cb7-487"><a href="#cb7-487" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb7-488"><a href="#cb7-488" aria-hidden="true" tabindex="-1"></a>    a <span class="sc">&lt;=</span> mat      <span class="sc">~</span> <span class="st">"inexperienced"</span>,</span>
-<span id="cb7-489"><a href="#cb7-489" aria-hidden="true" tabindex="-1"></a>    a <span class="sc">&lt;=</span> prime_hi <span class="sc">~</span> <span class="st">"prime"</span>,</span>
-<span id="cb7-490"><a href="#cb7-490" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span>          <span class="sc">~</span> <span class="st">"experienced"</span></span>
-<span id="cb7-491"><a href="#cb7-491" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-492"><a href="#cb7-492" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-493"><a href="#cb7-493" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-494"><a href="#cb7-494" aria-hidden="true" tabindex="-1"></a><span class="co"># #Data Prep</span></span>
-<span id="cb7-495"><a href="#cb7-495" aria-hidden="true" tabindex="-1"></a>wt_dat <span class="ot">&lt;-</span> bioseal <span class="sc">%&gt;%</span></span>
-<span id="cb7-496"><a href="#cb7-496" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) <span class="sc">%&gt;%</span></span>
-<span id="cb7-497"><a href="#cb7-497" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Wt), <span class="sc">!</span><span class="fu">is.na</span>(age)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-498"><a href="#cb7-498" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-499"><a href="#cb7-499" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal   =</span> <span class="fu">as.integer</span>(<span class="fu">ifelse</span>(bio_age <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)),  <span class="co"># clean 0/1</span></span>
-<span id="cb7-500"><a href="#cb7-500" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb7-501"><a href="#cb7-501" aria-hidden="true" tabindex="-1"></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>,<span class="st">"Terminal"</span>)),</span>
-<span id="cb7-502"><a href="#cb7-502" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10      =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>,</span>
-<span id="cb7-503"><a href="#cb7-503" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass3  =</span> <span class="fu">factor</span>(<span class="fu">ageclass3_fun</span>(age),</span>
-<span id="cb7-504"><a href="#cb7-504" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>,<span class="st">"prime"</span>,<span class="st">"experienced"</span>)),</span>
-<span id="cb7-505"><a href="#cb7-505" aria-hidden="true" tabindex="-1"></a>    <span class="at">year       =</span> <span class="fu">factor</span>(year),</span>
-<span id="cb7-506"><a href="#cb7-506" aria-hidden="true" tabindex="-1"></a>    <span class="at">animalID   =</span> <span class="fu">factor</span>(animalID)</span>
-<span id="cb7-507"><a href="#cb7-507" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-508"><a href="#cb7-508" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-509"><a href="#cb7-509" aria-hidden="true" tabindex="-1"></a><span class="co"># Bayesian Model</span></span>
-<span id="cb7-510"><a href="#cb7-510" aria-hidden="true" tabindex="-1"></a>wt_brm <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
-<span id="cb7-511"><a href="#cb7-511" aria-hidden="true" tabindex="-1"></a>  Wt <span class="sc">~</span> age10 <span class="sc">+</span> age10<span class="sc">:</span>ageclass3 <span class="sc">+</span> terminal<span class="sc">:</span>ageclass3 <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> year) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> animalID),</span>
-<span id="cb7-512"><a href="#cb7-512" aria-hidden="true" tabindex="-1"></a>  <span class="at">data   =</span> wt_dat,</span>
-<span id="cb7-513"><a href="#cb7-513" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()</span>
-<span id="cb7-514"><a href="#cb7-514" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-515"><a href="#cb7-515" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-516"><a href="#cb7-516" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wt_brm)</span>
-<span id="cb7-517"><a href="#cb7-517" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(wt_brm)</span>
-<span id="cb7-518"><a href="#cb7-518" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-519"><a href="#cb7-519" aria-hidden="true" tabindex="-1"></a><span class="co"># # ----- 3) Prediction grid -----</span></span>
-<span id="cb7-520"><a href="#cb7-520" aria-hidden="true" tabindex="-1"></a>wt_grid <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(</span>
-<span id="cb7-521"><a href="#cb7-521" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">22</span>,</span>
-<span id="cb7-522"><a href="#cb7-522" aria-hidden="true" tabindex="-1"></a>  <span class="at">terminal =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span>
-<span id="cb7-523"><a href="#cb7-523" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-524"><a href="#cb7-524" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-525"><a href="#cb7-525" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10       =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>,</span>
-<span id="cb7-526"><a href="#cb7-526" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass3   =</span> <span class="fu">factor</span>(<span class="fu">ageclass3_fun</span>(age),</span>
-<span id="cb7-527"><a href="#cb7-527" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>,<span class="st">"prime"</span>,<span class="st">"experienced"</span>)),</span>
-<span id="cb7-528"><a href="#cb7-528" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
-<span id="cb7-529"><a href="#cb7-529" aria-hidden="true" tabindex="-1"></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>,<span class="st">"Terminal"</span>))</span>
-<span id="cb7-530"><a href="#cb7-530" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-531"><a href="#cb7-531" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-532"><a href="#cb7-532" aria-hidden="true" tabindex="-1"></a>wt_pred <span class="ot">&lt;-</span> <span class="fu">fitted</span>(</span>
-<span id="cb7-533"><a href="#cb7-533" aria-hidden="true" tabindex="-1"></a>  wt_brm,</span>
-<span id="cb7-534"><a href="#cb7-534" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata    =</span> wt_grid,</span>
-<span id="cb7-535"><a href="#cb7-535" aria-hidden="true" tabindex="-1"></a>  <span class="at">re_formula =</span> <span class="cn">NA</span>,</span>
-<span id="cb7-536"><a href="#cb7-536" aria-hidden="true" tabindex="-1"></a>  <span class="at">summary    =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb7-537"><a href="#cb7-537" aria-hidden="true" tabindex="-1"></a>  <span class="at">probs      =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)</span>
-<span id="cb7-538"><a href="#cb7-538" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
-<span id="cb7-539"><a href="#cb7-539" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-540"><a href="#cb7-540" aria-hidden="true" tabindex="-1"></a>wt_pred_pop <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(wt_grid, wt_pred) <span class="sc">%&gt;%</span></span>
-<span id="cb7-541"><a href="#cb7-541" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">predicted =</span> Estimate, <span class="at">lwr =</span> Q2<span class="fl">.5</span>, <span class="at">upr =</span> Q97<span class="fl">.5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-542"><a href="#cb7-542" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age)</span>
-<span id="cb7-543"><a href="#cb7-543" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-544"><a href="#cb7-544" aria-hidden="true" tabindex="-1"></a><span class="co"># # Data Summary</span></span>
-<span id="cb7-545"><a href="#cb7-545" aria-hidden="true" tabindex="-1"></a>wt_summ <span class="ot">&lt;-</span> wt_dat <span class="sc">%&gt;%</span></span>
-<span id="cb7-546"><a href="#cb7-546" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age, terminal_fct, ageclass3) <span class="sc">%&gt;%</span></span>
-<span id="cb7-547"><a href="#cb7-547" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb7-548"><a href="#cb7-548" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_wt =</span> <span class="fu">mean</span>(Wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb7-549"><a href="#cb7-549" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_wt   =</span> <span class="fu">sd</span>(Wt,   <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">n</span>()),</span>
-<span id="cb7-550"><a href="#cb7-550" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb7-551"><a href="#cb7-551" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-552"><a href="#cb7-552" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> age <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> <span class="fu">ifelse</span>(terminal_fct <span class="sc">==</span> <span class="st">"Terminal"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
-<span id="cb7-553"><a href="#cb7-553" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-554"><a href="#cb7-554" aria-hidden="true" tabindex="-1"></a><span class="co"># # Figure plot </span></span>
-<span id="cb7-555"><a href="#cb7-555" aria-hidden="true" tabindex="-1"></a>wt_fig <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(wt_pred_pop, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> predicted)) <span class="sc">+</span></span>
-<span id="cb7-556"><a href="#cb7-556" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(</span>
-<span id="cb7-557"><a href="#cb7-557" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr, <span class="at">fill =</span> ageclass3,</span>
-<span id="cb7-558"><a href="#cb7-558" aria-hidden="true" tabindex="-1"></a>        <span class="at">group =</span> <span class="fu">interaction</span>(ageclass3, terminal_fct)),</span>
-<span id="cb7-559"><a href="#cb7-559" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.20</span></span>
-<span id="cb7-560"><a href="#cb7-560" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-561"><a href="#cb7-561" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
-<span id="cb7-562"><a href="#cb7-562" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">linetype =</span> terminal_fct, <span class="at">color =</span> ageclass3,</span>
-<span id="cb7-563"><a href="#cb7-563" aria-hidden="true" tabindex="-1"></a>        <span class="at">group =</span> <span class="fu">interaction</span>(ageclass3, terminal_fct)),</span>
-<span id="cb7-564"><a href="#cb7-564" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.2</span></span>
-<span id="cb7-565"><a href="#cb7-565" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-566"><a href="#cb7-566" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(</span>
-<span id="cb7-567"><a href="#cb7-567" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> wt_summ,</span>
-<span id="cb7-568"><a href="#cb7-568" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> mean_wt,</span>
-<span id="cb7-569"><a href="#cb7-569" aria-hidden="true" tabindex="-1"></a>        <span class="at">ymin =</span> mean_wt <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt,</span>
-<span id="cb7-570"><a href="#cb7-570" aria-hidden="true" tabindex="-1"></a>        <span class="at">ymax =</span> mean_wt <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt,</span>
-<span id="cb7-571"><a href="#cb7-571" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> ageclass3,</span>
-<span id="cb7-572"><a href="#cb7-572" aria-hidden="true" tabindex="-1"></a>        <span class="at">linetype =</span> terminal_fct),</span>
-<span id="cb7-573"><a href="#cb7-573" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb7-574"><a href="#cb7-574" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-575"><a href="#cb7-575" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> maturity <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
-<span id="cb7-576"><a href="#cb7-576" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> prime_max <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
-<span id="cb7-577"><a href="#cb7-577" aria-hidden="true" tabindex="-1"></a>  <span class="co"># My Theme</span></span>
-<span id="cb7-578"><a href="#cb7-578" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb7-579"><a href="#cb7-579" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#F9F9F9"</span>),</span>
-<span id="cb7-580"><a href="#cb7-580" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-581"><a href="#cb7-581" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-582"><a href="#cb7-582" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-583"><a href="#cb7-583" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb7-584"><a href="#cb7-584" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"purple"</span>),</span>
-<span id="cb7-585"><a href="#cb7-585" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">color =</span> <span class="st">"#8E44AD"</span>),</span>
-<span id="cb7-586"><a href="#cb7-586" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-587"><a href="#cb7-587" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
-<span id="cb7-588"><a href="#cb7-588" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-589"><a href="#cb7-589" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-590"><a href="#cb7-590" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Axis labels and legends</span></span>
-<span id="cb7-591"><a href="#cb7-591" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb7-592"><a href="#cb7-592" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Impact of Age on Wean Weight"</span>,</span>
-<span id="cb7-593"><a href="#cb7-593" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Terminal vs Non-Terminal"</span>,</span>
-<span id="cb7-594"><a href="#cb7-594" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mother's Age (Years)"</span>,</span>
-<span id="cb7-595"><a href="#cb7-595" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Wean Weight (kg)"</span>,</span>
-<span id="cb7-596"><a href="#cb7-596" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Age Class"</span>,</span>
-<span id="cb7-597"><a href="#cb7-597" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Terminal Status"</span></span>
-<span id="cb7-598"><a href="#cb7-598" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb7-599"><a href="#cb7-599" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-600"><a href="#cb7-600" aria-hidden="true" tabindex="-1"></a>  <span class="co"># My custom palette styling for lines and fill</span></span>
-<span id="cb7-601"><a href="#cb7-601" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Terminal"</span> <span class="ot">=</span> <span class="st">"dotdash"</span>)) <span class="sc">+</span></span>
-<span id="cb7-602"><a href="#cb7-602" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>)) <span class="sc">+</span></span>
-<span id="cb7-603"><a href="#cb7-603" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>))</span>
-<span id="cb7-604"><a href="#cb7-604" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(wt_fig)</span>
-<span id="cb7-605"><a href="#cb7-605" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-606"><a href="#cb7-606" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-607"><a href="#cb7-607" aria-hidden="true" tabindex="-1"></a><span class="fu"># Attempting Brms Wean Weight</span></span>
-<span id="cb7-608"><a href="#cb7-608" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-611"><a href="#cb7-611" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-612"><a href="#cb7-612" aria-hidden="true" tabindex="-1"></a><span class="co"># # Data prep</span></span>
-<span id="cb7-613"><a href="#cb7-613" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_dat &lt;- bioseal %&gt;%</span></span>
-<span id="cb7-614"><a href="#cb7-614" aria-hidden="true" tabindex="-1"></a><span class="co">#   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %&gt;%</span></span>
-<span id="cb7-615"><a href="#cb7-615" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(!is.na(Wt), !is.na(age)) %&gt;%</span></span>
-<span id="cb7-616"><a href="#cb7-616" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(</span></span>
-<span id="cb7-617"><a href="#cb7-617" aria-hidden="true" tabindex="-1"></a><span class="co">#     terminal   = ifelse(bio_age == 0, 1, 0),</span></span>
-<span id="cb7-618"><a href="#cb7-618" aria-hidden="true" tabindex="-1"></a><span class="co">#     year_fct   = factor(year),</span></span>
-<span id="cb7-619"><a href="#cb7-619" aria-hidden="true" tabindex="-1"></a><span class="co">#     age10      = (age - maturity) / 10,</span></span>
-<span id="cb7-620"><a href="#cb7-620" aria-hidden="true" tabindex="-1"></a><span class="co">#     ageclass3  = if ("ageclass3" %in% names(.)) ageclass3 else case_when(</span></span>
-<span id="cb7-621"><a href="#cb7-621" aria-hidden="true" tabindex="-1"></a><span class="co">#       age &lt;  maturity                  ~ "inexperienced",</span></span>
-<span id="cb7-622"><a href="#cb7-622" aria-hidden="true" tabindex="-1"></a><span class="co">#       age &gt;= maturity &amp; age &lt;= maturity + 5 ~ "prime",</span></span>
-<span id="cb7-623"><a href="#cb7-623" aria-hidden="true" tabindex="-1"></a><span class="co">#       TRUE                             ~ "experienced"</span></span>
-<span id="cb7-624"><a href="#cb7-624" aria-hidden="true" tabindex="-1"></a><span class="co">#     ),</span></span>
-<span id="cb7-625"><a href="#cb7-625" aria-hidden="true" tabindex="-1"></a><span class="co">#     ageclass3  = factor(ageclass3, levels = c("inexperienced","prime","experienced"))</span></span>
-<span id="cb7-626"><a href="#cb7-626" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
-<span id="cb7-627"><a href="#cb7-627" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-628"><a href="#cb7-628" aria-hidden="true" tabindex="-1"></a><span class="co"># # Bayesian model (defaults for priors)</span></span>
-<span id="cb7-629"><a href="#cb7-629" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_brm &lt;- brm(</span></span>
-<span id="cb7-630"><a href="#cb7-630" aria-hidden="true" tabindex="-1"></a><span class="co">#   Wt ~ age10*ageclass3 + terminal*ageclass3 + (1 | year_fct) + (1 | animalID),</span></span>
-<span id="cb7-631"><a href="#cb7-631" aria-hidden="true" tabindex="-1"></a><span class="co">#   data   = wt_dat,</span></span>
-<span id="cb7-632"><a href="#cb7-632" aria-hidden="true" tabindex="-1"></a><span class="co">#   family = gaussian(),</span></span>
-<span id="cb7-633"><a href="#cb7-633" aria-hidden="true" tabindex="-1"></a><span class="co">#   chains = 4, iter = 4000, warmup = 1000, seed = 123,</span></span>
-<span id="cb7-634"><a href="#cb7-634" aria-hidden="true" tabindex="-1"></a><span class="co">#   control = list(adapt_delta = 0.95)</span></span>
-<span id="cb7-635"><a href="#cb7-635" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb7-636"><a href="#cb7-636" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-637"><a href="#cb7-637" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(wt_brm)        # check Rhat ~ 1, effective sample sizes</span></span>
-<span id="cb7-638"><a href="#cb7-638" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-639"><a href="#cb7-639" aria-hidden="true" tabindex="-1"></a><span class="co"># # Prediction grid — population-level</span></span>
-<span id="cb7-640"><a href="#cb7-640" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_grid &lt;- tidyr::expand_grid(</span></span>
-<span id="cb7-641"><a href="#cb7-641" aria-hidden="true" tabindex="-1"></a><span class="co">#   age = 3:22,</span></span>
-<span id="cb7-642"><a href="#cb7-642" aria-hidden="true" tabindex="-1"></a><span class="co">#   terminal = 0:1,</span></span>
-<span id="cb7-643"><a href="#cb7-643" aria-hidden="true" tabindex="-1"></a><span class="co">#   ageclass3 = levels(wt_dat$ageclass3)</span></span>
-<span id="cb7-644"><a href="#cb7-644" aria-hidden="true" tabindex="-1"></a><span class="co"># ) %&gt;%</span></span>
-<span id="cb7-645"><a href="#cb7-645" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(</span></span>
-<span id="cb7-646"><a href="#cb7-646" aria-hidden="true" tabindex="-1"></a><span class="co">#     age10 = (age - maturity) / 10,</span></span>
-<span id="cb7-647"><a href="#cb7-647" aria-hidden="true" tabindex="-1"></a><span class="co">#     terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))</span></span>
-<span id="cb7-648"><a href="#cb7-648" aria-hidden="true" tabindex="-1"></a><span class="co">#   )</span></span>
-<span id="cb7-649"><a href="#cb7-649" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-650"><a href="#cb7-650" aria-hidden="true" tabindex="-1"></a><span class="co"># pred &lt;- fitted(wt_brm, newdata = wt_grid, re_formula = NA, summary = TRUE)</span></span>
-<span id="cb7-651"><a href="#cb7-651" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_pred_pop &lt;- bind_cols(wt_grid, as_tibble(pred)) %&gt;%</span></span>
-<span id="cb7-652"><a href="#cb7-652" aria-hidden="true" tabindex="-1"></a><span class="co">#   rename(predicted = Estimate, lo = Q2.5, hi = Q97.5)</span></span>
-<span id="cb7-653"><a href="#cb7-653" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-654"><a href="#cb7-654" aria-hidden="true" tabindex="-1"></a><span class="co"># # Empirical summary (points + SE like your original)</span></span>
-<span id="cb7-655"><a href="#cb7-655" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_summ &lt;- wt_dat %&gt;%</span></span>
-<span id="cb7-656"><a href="#cb7-656" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))) %&gt;%</span></span>
-<span id="cb7-657"><a href="#cb7-657" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(age, terminal_fct, ageclass3) %&gt;%</span></span>
-<span id="cb7-658"><a href="#cb7-658" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarize(</span></span>
-<span id="cb7-659"><a href="#cb7-659" aria-hidden="true" tabindex="-1"></a><span class="co">#     mean_wt = mean(Wt, na.rm = TRUE),</span></span>
-<span id="cb7-660"><a href="#cb7-660" aria-hidden="true" tabindex="-1"></a><span class="co">#     se_wt   = sd(Wt, na.rm = TRUE) / sqrt(n()),</span></span>
-<span id="cb7-661"><a href="#cb7-661" aria-hidden="true" tabindex="-1"></a><span class="co">#     .groups = "drop"</span></span>
-<span id="cb7-662"><a href="#cb7-662" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) %&gt;%</span></span>
-<span id="cb7-663"><a href="#cb7-663" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))</span></span>
-<span id="cb7-664"><a href="#cb7-664" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-665"><a href="#cb7-665" aria-hidden="true" tabindex="-1"></a><span class="co"># # Figure (same style, with Bayesian CI ribbon)</span></span>
-<span id="cb7-666"><a href="#cb7-666" aria-hidden="true" tabindex="-1"></a><span class="co"># wt_fig &lt;- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +</span></span>
-<span id="cb7-667"><a href="#cb7-667" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_ribbon(aes(ymin = lo, ymax = hi, fill = ageclass3), alpha = 0.15, show.legend = FALSE) +</span></span>
-<span id="cb7-668"><a href="#cb7-668" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_pointrange(</span></span>
-<span id="cb7-669"><a href="#cb7-669" aria-hidden="true" tabindex="-1"></a><span class="co">#     data = wt_summ,</span></span>
-<span id="cb7-670"><a href="#cb7-670" aria-hidden="true" tabindex="-1"></a><span class="co">#     aes(y = mean_wt,</span></span>
-<span id="cb7-671"><a href="#cb7-671" aria-hidden="true" tabindex="-1"></a><span class="co">#         ymin = mean_wt - 1.96 * se_wt,</span></span>
-<span id="cb7-672"><a href="#cb7-672" aria-hidden="true" tabindex="-1"></a><span class="co">#         ymax = mean_wt + 1.96 * se_wt,</span></span>
-<span id="cb7-673"><a href="#cb7-673" aria-hidden="true" tabindex="-1"></a><span class="co">#         linetype = terminal_fct,</span></span>
-<span id="cb7-674"><a href="#cb7-674" aria-hidden="true" tabindex="-1"></a><span class="co">#         color = ageclass3),</span></span>
-<span id="cb7-675"><a href="#cb7-675" aria-hidden="true" tabindex="-1"></a><span class="co">#     show.legend = FALSE</span></span>
-<span id="cb7-676"><a href="#cb7-676" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb7-677"><a href="#cb7-677" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_line(aes(linetype = terminal_fct, color = ageclass3), linewidth = 1.2) +</span></span>
-<span id="cb7-678"><a href="#cb7-678" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +</span></span>
-<span id="cb7-679"><a href="#cb7-679" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_minimal() +</span></span>
-<span id="cb7-680"><a href="#cb7-680" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme(</span></span>
-<span id="cb7-681"><a href="#cb7-681" aria-hidden="true" tabindex="-1"></a><span class="co">#     panel.background = element_rect(fill = "#F9F9F9"),</span></span>
-<span id="cb7-682"><a href="#cb7-682" aria-hidden="true" tabindex="-1"></a><span class="co">#     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),</span></span>
-<span id="cb7-683"><a href="#cb7-683" aria-hidden="true" tabindex="-1"></a><span class="co">#     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),</span></span>
-<span id="cb7-684"><a href="#cb7-684" aria-hidden="true" tabindex="-1"></a><span class="co">#     axis.text.x  = element_text(color = "#7F8C8D", size = 12),</span></span>
-<span id="cb7-685"><a href="#cb7-685" aria-hidden="true" tabindex="-1"></a><span class="co">#     axis.text.y  = element_text(color = "#7F8C8D", size = 12),</span></span>
-<span id="cb7-686"><a href="#cb7-686" aria-hidden="true" tabindex="-1"></a><span class="co">#     plot.subtitle = element_text(hjust = 0.5, size = 12, color = "purple"),</span></span>
-<span id="cb7-687"><a href="#cb7-687" aria-hidden="true" tabindex="-1"></a><span class="co">#     plot.title = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),</span></span>
-<span id="cb7-688"><a href="#cb7-688" aria-hidden="true" tabindex="-1"></a><span class="co">#     legend.title = element_text(size = 13, face = "bold"),</span></span>
-<span id="cb7-689"><a href="#cb7-689" aria-hidden="true" tabindex="-1"></a><span class="co">#     legend.text  = element_text(size = 11)</span></span>
-<span id="cb7-690"><a href="#cb7-690" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb7-691"><a href="#cb7-691" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(</span></span>
-<span id="cb7-692"><a href="#cb7-692" aria-hidden="true" tabindex="-1"></a><span class="co">#     title = "Impact of Age on Wean Weight",</span></span>
-<span id="cb7-693"><a href="#cb7-693" aria-hidden="true" tabindex="-1"></a><span class="co">#     subtitle = "Bayesian population mean with 95% credible intervals\nTerminal vs Nonterminal across three age classes",</span></span>
-<span id="cb7-694"><a href="#cb7-694" aria-hidden="true" tabindex="-1"></a><span class="co">#     x = "Mother's Age (Years)",</span></span>
-<span id="cb7-695"><a href="#cb7-695" aria-hidden="true" tabindex="-1"></a><span class="co">#     y = "Wean Weight (kg)",</span></span>
-<span id="cb7-696"><a href="#cb7-696" aria-hidden="true" tabindex="-1"></a><span class="co">#     color = "Age Class",</span></span>
-<span id="cb7-697"><a href="#cb7-697" aria-hidden="true" tabindex="-1"></a><span class="co">#     linetype = "Terminal Status"</span></span>
-<span id="cb7-698"><a href="#cb7-698" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
-<span id="cb7-699"><a href="#cb7-699" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +</span></span>
-<span id="cb7-700"><a href="#cb7-700" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_color_manual(values = c(</span></span>
-<span id="cb7-701"><a href="#cb7-701" aria-hidden="true" tabindex="-1"></a><span class="co">#     "inexperienced" = "#D5A6F6",</span></span>
-<span id="cb7-702"><a href="#cb7-702" aria-hidden="true" tabindex="-1"></a><span class="co">#     "prime"         = "#6DD5B3",</span></span>
-<span id="cb7-703"><a href="#cb7-703" aria-hidden="true" tabindex="-1"></a><span class="co">#     "experienced"   = "#66B2B2"</span></span>
-<span id="cb7-704"><a href="#cb7-704" aria-hidden="true" tabindex="-1"></a><span class="co">#   )) +</span></span>
-<span id="cb7-705"><a href="#cb7-705" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_manual(values = c(</span></span>
-<span id="cb7-706"><a href="#cb7-706" aria-hidden="true" tabindex="-1"></a><span class="co">#     "inexperienced" = "#D5A6F6",</span></span>
-<span id="cb7-707"><a href="#cb7-707" aria-hidden="true" tabindex="-1"></a><span class="co">#     "prime"         = "#6DD5B3",</span></span>
-<span id="cb7-708"><a href="#cb7-708" aria-hidden="true" tabindex="-1"></a><span class="co">#     "experienced"   = "#66B2B2"</span></span>
-<span id="cb7-709"><a href="#cb7-709" aria-hidden="true" tabindex="-1"></a><span class="co">#   ))</span></span>
-<span id="cb7-710"><a href="#cb7-710" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-711"><a href="#cb7-711" aria-hidden="true" tabindex="-1"></a><span class="co"># print(wt_fig)</span></span>
-<span id="cb7-712"><a href="#cb7-712" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb7-713"><a href="#cb7-713" aria-hidden="true" tabindex="-1"></a><span class="co"># # Optional quick checks</span></span>
-<span id="cb7-714"><a href="#cb7-714" aria-hidden="true" tabindex="-1"></a><span class="co"># pp_check(wt_brm)   # posterior predictive check</span></span>
-<span id="cb7-715"><a href="#cb7-715" aria-hidden="true" tabindex="-1"></a><span class="co"># loo(wt_brm)        # model fit comparison if you try alternatives</span></span>
-<span id="cb7-716"><a href="#cb7-716" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-287"><a href="#cb7-287" aria-hidden="true" tabindex="-1"></a><span class="co">#  Prediction grid </span></span>
+<span id="cb7-288"><a href="#cb7-288" aria-hidden="true" tabindex="-1"></a>sex_grid <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(</span>
+<span id="cb7-289"><a href="#cb7-289" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">22</span>, </span>
+<span id="cb7-290"><a href="#cb7-290" aria-hidden="true" tabindex="-1"></a>  <span class="at">terminal =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span>
+<span id="cb7-291"><a href="#cb7-291" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-292"><a href="#cb7-292" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-293"><a href="#cb7-293" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10 =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>, </span>
+<span id="cb7-294"><a href="#cb7-294" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">ifelse</span>(age <span class="sc">&lt;=</span> maturity, <span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>),</span>
+<span id="cb7-295"><a href="#cb7-295" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass =</span> <span class="fu">factor</span>(ageclass, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>, <span class="st">"experienced"</span>))</span>
+<span id="cb7-296"><a href="#cb7-296" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-297"><a href="#cb7-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-298"><a href="#cb7-298" aria-hidden="true" tabindex="-1"></a><span class="co"># fitted() collects the predicted values from brms() and we will store in pred_mat and then put back into grid </span></span>
+<span id="cb7-299"><a href="#cb7-299" aria-hidden="true" tabindex="-1"></a>pred_mat <span class="ot">&lt;-</span> <span class="fu">fitted</span>(</span>
+<span id="cb7-300"><a href="#cb7-300" aria-hidden="true" tabindex="-1"></a>  sex_mod,</span>
+<span id="cb7-301"><a href="#cb7-301" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata     =</span> sex_grid,</span>
+<span id="cb7-302"><a href="#cb7-302" aria-hidden="true" tabindex="-1"></a>  <span class="at">re_formula  =</span> <span class="cn">NA</span>,</span>
+<span id="cb7-303"><a href="#cb7-303" aria-hidden="true" tabindex="-1"></a>  <span class="at">summary     =</span> <span class="cn">TRUE</span></span>
+<span id="cb7-304"><a href="#cb7-304" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-305"><a href="#cb7-305" aria-hidden="true" tabindex="-1"></a><span class="co"># Add to grid</span></span>
+<span id="cb7-306"><a href="#cb7-306" aria-hidden="true" tabindex="-1"></a>sex_pred_pop <span class="ot">&lt;-</span> sex_grid <span class="sc">%&gt;%</span></span>
+<span id="cb7-307"><a href="#cb7-307" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-308"><a href="#cb7-308" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicted_prob_male =</span> pred_mat[, <span class="st">"Estimate"</span>],</span>
+<span id="cb7-309"><a href="#cb7-309" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_low =</span> pred_mat[, <span class="st">"Q2.5"</span>],</span>
+<span id="cb7-310"><a href="#cb7-310" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_high =</span> pred_mat[, <span class="st">"Q97.5"</span>],</span>
+<span id="cb7-311"><a href="#cb7-311" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>))</span>
+<span id="cb7-312"><a href="#cb7-312" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-313"><a href="#cb7-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-314"><a href="#cb7-314" aria-hidden="true" tabindex="-1"></a><span class="co">#Summary </span></span>
+<span id="cb7-315"><a href="#cb7-315" aria-hidden="true" tabindex="-1"></a>sex_summ <span class="ot">&lt;-</span> sex_dat <span class="sc">%&gt;%</span></span>
+<span id="cb7-316"><a href="#cb7-316" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-317"><a href="#cb7-317" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>, <span class="st">"Terminal"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb7-318"><a href="#cb7-318" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age, terminal_fct, ageclass) <span class="sc">%&gt;%</span></span>
+<span id="cb7-319"><a href="#cb7-319" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb7-320"><a href="#cb7-320" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_male =</span> <span class="fu">mean</span>(is_male, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-321"><a href="#cb7-321" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_prop =</span> <span class="fu">sqrt</span>((prop_male <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> prop_male)) <span class="sc">/</span> <span class="fu">n</span>()), </span>
+<span id="cb7-322"><a href="#cb7-322" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb7-323"><a href="#cb7-323" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-324"><a href="#cb7-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> age <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> <span class="fu">ifelse</span>(terminal_fct <span class="sc">==</span> <span class="st">"Terminal"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb7-325"><a href="#cb7-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-326"><a href="#cb7-326" aria-hidden="true" tabindex="-1"></a><span class="co"># Sex Pred Fig</span></span>
+<span id="cb7-327"><a href="#cb7-327" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sex_pred_pop, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> predicted_prob_male)) <span class="sc">+</span></span>
+<span id="cb7-328"><a href="#cb7-328" aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> ci_low, <span class="at">ymax =</span> ci_high, <span class="at">fill =</span> ageclass), <span class="at">alpha =</span> <span class="fl">0.15</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb7-329"><a href="#cb7-329" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-330"><a href="#cb7-330" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Dashed SE bars by terminal status (hidden from legend)</span></span>
+<span id="cb7-331"><a href="#cb7-331" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(</span>
+<span id="cb7-332"><a href="#cb7-332" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> sex_summ,</span>
+<span id="cb7-333"><a href="#cb7-333" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb7-334"><a href="#cb7-334" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> prop_male, </span>
+<span id="cb7-335"><a href="#cb7-335" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymin =</span> prop_male <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_prop, </span>
+<span id="cb7-336"><a href="#cb7-336" aria-hidden="true" tabindex="-1"></a>      <span class="at">ymax =</span> prop_male <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_prop, </span>
+<span id="cb7-337"><a href="#cb7-337" aria-hidden="true" tabindex="-1"></a>      <span class="at">linetype =</span> terminal_fct,</span>
+<span id="cb7-338"><a href="#cb7-338" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> ageclass</span>
+<span id="cb7-339"><a href="#cb7-339" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-340"><a href="#cb7-340" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-341"><a href="#cb7-341" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-342"><a href="#cb7-342" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(</span>
+<span id="cb7-343"><a href="#cb7-343" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> terminal_fct,</span>
+<span id="cb7-344"><a href="#cb7-344" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> ageclass</span>
+<span id="cb7-345"><a href="#cb7-345" aria-hidden="true" tabindex="-1"></a>  ), <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb7-346"><a href="#cb7-346" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> maturity <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
+<span id="cb7-347"><a href="#cb7-347" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-348"><a href="#cb7-348" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb7-349"><a href="#cb7-349" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#F9F9F9"</span>),</span>
+<span id="cb7-350"><a href="#cb7-350" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-351"><a href="#cb7-351" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-352"><a href="#cb7-352" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb7-353"><a href="#cb7-353" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb7-354"><a href="#cb7-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"purple"</span>),</span>
+<span id="cb7-355"><a href="#cb7-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">color =</span> <span class="st">"#8E44AD"</span>),</span>
+<span id="cb7-356"><a href="#cb7-356" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-357"><a href="#cb7-357" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
+<span id="cb7-358"><a href="#cb7-358" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-359"><a href="#cb7-359" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-360"><a href="#cb7-360" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Offspring Sex Ratio by Maternal Age"</span>, </span>
+<span id="cb7-361"><a href="#cb7-361" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Terminal vs Non-Terminal Mothers"</span>,</span>
+<span id="cb7-362"><a href="#cb7-362" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mother's Age (Years)"</span>, </span>
+<span id="cb7-363"><a href="#cb7-363" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Probability Offspring is Male"</span>,</span>
+<span id="cb7-364"><a href="#cb7-364" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Age Class"</span>,</span>
+<span id="cb7-365"><a href="#cb7-365" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Terminal Status"</span></span>
+<span id="cb7-366"><a href="#cb7-366" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-367"><a href="#cb7-367" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Terminal"</span> <span class="ot">=</span> <span class="st">"dotdash"</span>)) <span class="sc">+</span></span>
+<span id="cb7-368"><a href="#cb7-368" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>)) <span class="sc">+</span></span>
+<span id="cb7-369"><a href="#cb7-369" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>))</span>
+<span id="cb7-370"><a href="#cb7-370" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-371"><a href="#cb7-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-372"><a href="#cb7-372" aria-hidden="true" tabindex="-1"></a><span class="fu"># Wean Weight Model </span></span>
+<span id="cb7-373"><a href="#cb7-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-376"><a href="#cb7-376" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb7-377"><a href="#cb7-377" aria-hidden="true" tabindex="-1"></a><span class="co"># #First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +</span></span>
+<span id="cb7-378"><a href="#cb7-378" aria-hidden="true" tabindex="-1"></a>prime_max <span class="ot">&lt;-</span> <span class="dv">14</span></span>
+<span id="cb7-379"><a href="#cb7-379" aria-hidden="true" tabindex="-1"></a><span class="co"># # Creating third age calss as a function </span></span>
+<span id="cb7-380"><a href="#cb7-380" aria-hidden="true" tabindex="-1"></a>ageclass3_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(a, <span class="at">mat =</span> maturity, <span class="at">prime_hi =</span> prime_max) {</span>
+<span id="cb7-381"><a href="#cb7-381" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb7-382"><a href="#cb7-382" aria-hidden="true" tabindex="-1"></a>    a <span class="sc">&lt;=</span> mat      <span class="sc">~</span> <span class="st">"inexperienced"</span>,</span>
+<span id="cb7-383"><a href="#cb7-383" aria-hidden="true" tabindex="-1"></a>    a <span class="sc">&lt;=</span> prime_hi <span class="sc">~</span> <span class="st">"prime"</span>,</span>
+<span id="cb7-384"><a href="#cb7-384" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span>          <span class="sc">~</span> <span class="st">"experienced"</span></span>
+<span id="cb7-385"><a href="#cb7-385" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-386"><a href="#cb7-386" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-387"><a href="#cb7-387" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb7-388"><a href="#cb7-388" aria-hidden="true" tabindex="-1"></a><span class="co"># #Data Prep</span></span>
+<span id="cb7-389"><a href="#cb7-389" aria-hidden="true" tabindex="-1"></a>wt_dat <span class="ot">&lt;-</span> bioseal <span class="sc">%&gt;%</span></span>
+<span id="cb7-390"><a href="#cb7-390" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) <span class="sc">%&gt;%</span></span>
+<span id="cb7-391"><a href="#cb7-391" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Wt), <span class="sc">!</span><span class="fu">is.na</span>(age)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-392"><a href="#cb7-392" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-393"><a href="#cb7-393" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal   =</span> <span class="fu">as.integer</span>(<span class="fu">ifelse</span>(bio_age <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)),  <span class="co"># clean 0/1</span></span>
+<span id="cb7-394"><a href="#cb7-394" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb7-395"><a href="#cb7-395" aria-hidden="true" tabindex="-1"></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>,<span class="st">"Terminal"</span>)),</span>
+<span id="cb7-396"><a href="#cb7-396" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10      =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>,</span>
+<span id="cb7-397"><a href="#cb7-397" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass3  =</span> <span class="fu">factor</span>(<span class="fu">ageclass3_fun</span>(age),</span>
+<span id="cb7-398"><a href="#cb7-398" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>,<span class="st">"prime"</span>,<span class="st">"experienced"</span>)),</span>
+<span id="cb7-399"><a href="#cb7-399" aria-hidden="true" tabindex="-1"></a>    <span class="at">year       =</span> <span class="fu">factor</span>(year),</span>
+<span id="cb7-400"><a href="#cb7-400" aria-hidden="true" tabindex="-1"></a>    <span class="at">animalID   =</span> <span class="fu">factor</span>(animalID)</span>
+<span id="cb7-401"><a href="#cb7-401" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-402"><a href="#cb7-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-403"><a href="#cb7-403" aria-hidden="true" tabindex="-1"></a><span class="co"># Bayesian Model</span></span>
+<span id="cb7-404"><a href="#cb7-404" aria-hidden="true" tabindex="-1"></a>wt_brm <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb7-405"><a href="#cb7-405" aria-hidden="true" tabindex="-1"></a>  Wt <span class="sc">~</span> age10 <span class="sc">+</span> age10<span class="sc">:</span>ageclass3 <span class="sc">+</span> terminal<span class="sc">:</span>ageclass3 <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> year) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> animalID),</span>
+<span id="cb7-406"><a href="#cb7-406" aria-hidden="true" tabindex="-1"></a>  <span class="at">data   =</span> wt_dat,</span>
+<span id="cb7-407"><a href="#cb7-407" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()</span>
+<span id="cb7-408"><a href="#cb7-408" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-409"><a href="#cb7-409" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb7-410"><a href="#cb7-410" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wt_brm)</span>
+<span id="cb7-411"><a href="#cb7-411" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(wt_brm)</span>
+<span id="cb7-412"><a href="#cb7-412" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb7-413"><a href="#cb7-413" aria-hidden="true" tabindex="-1"></a><span class="co"># Pred Grid</span></span>
+<span id="cb7-414"><a href="#cb7-414" aria-hidden="true" tabindex="-1"></a>wt_grid <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(</span>
+<span id="cb7-415"><a href="#cb7-415" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">22</span>,</span>
+<span id="cb7-416"><a href="#cb7-416" aria-hidden="true" tabindex="-1"></a>  <span class="at">terminal =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span>
+<span id="cb7-417"><a href="#cb7-417" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-418"><a href="#cb7-418" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-419"><a href="#cb7-419" aria-hidden="true" tabindex="-1"></a>    <span class="at">age10       =</span> (age <span class="sc">-</span> maturity) <span class="sc">/</span> <span class="dv">10</span>,</span>
+<span id="cb7-420"><a href="#cb7-420" aria-hidden="true" tabindex="-1"></a>    <span class="at">ageclass3   =</span> <span class="fu">factor</span>(<span class="fu">ageclass3_fun</span>(age),</span>
+<span id="cb7-421"><a href="#cb7-421" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"inexperienced"</span>,<span class="st">"prime"</span>,<span class="st">"experienced"</span>)),</span>
+<span id="cb7-422"><a href="#cb7-422" aria-hidden="true" tabindex="-1"></a>    <span class="at">terminal_fct =</span> <span class="fu">factor</span>(terminal, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb7-423"><a href="#cb7-423" aria-hidden="true" tabindex="-1"></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span>,<span class="st">"Terminal"</span>))</span>
+<span id="cb7-424"><a href="#cb7-424" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-425"><a href="#cb7-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-426"><a href="#cb7-426" aria-hidden="true" tabindex="-1"></a>wt_pred <span class="ot">&lt;-</span> <span class="fu">fitted</span>(</span>
+<span id="cb7-427"><a href="#cb7-427" aria-hidden="true" tabindex="-1"></a>  wt_brm,</span>
+<span id="cb7-428"><a href="#cb7-428" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata    =</span> wt_grid,</span>
+<span id="cb7-429"><a href="#cb7-429" aria-hidden="true" tabindex="-1"></a>  <span class="at">re_formula =</span> <span class="cn">NA</span>,</span>
+<span id="cb7-430"><a href="#cb7-430" aria-hidden="true" tabindex="-1"></a>  <span class="at">summary    =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-431"><a href="#cb7-431" aria-hidden="true" tabindex="-1"></a>  <span class="at">probs      =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)</span>
+<span id="cb7-432"><a href="#cb7-432" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb7-433"><a href="#cb7-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-434"><a href="#cb7-434" aria-hidden="true" tabindex="-1"></a>wt_pred_pop <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(wt_grid, wt_pred) <span class="sc">%&gt;%</span></span>
+<span id="cb7-435"><a href="#cb7-435" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">predicted =</span> Estimate, <span class="at">lwr =</span> Q2<span class="fl">.5</span>, <span class="at">upr =</span> Q97<span class="fl">.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-436"><a href="#cb7-436" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age)</span>
+<span id="cb7-437"><a href="#cb7-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-438"><a href="#cb7-438" aria-hidden="true" tabindex="-1"></a><span class="co"># # Data Summary</span></span>
+<span id="cb7-439"><a href="#cb7-439" aria-hidden="true" tabindex="-1"></a>wt_summ <span class="ot">&lt;-</span> wt_dat <span class="sc">%&gt;%</span></span>
+<span id="cb7-440"><a href="#cb7-440" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age, terminal_fct, ageclass3) <span class="sc">%&gt;%</span></span>
+<span id="cb7-441"><a href="#cb7-441" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb7-442"><a href="#cb7-442" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_wt =</span> <span class="fu">mean</span>(Wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb7-443"><a href="#cb7-443" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_wt   =</span> <span class="fu">sd</span>(Wt,   <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">n</span>()),</span>
+<span id="cb7-444"><a href="#cb7-444" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb7-445"><a href="#cb7-445" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-446"><a href="#cb7-446" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> age <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> <span class="fu">ifelse</span>(terminal_fct <span class="sc">==</span> <span class="st">"Terminal"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb7-447"><a href="#cb7-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-448"><a href="#cb7-448" aria-hidden="true" tabindex="-1"></a><span class="co"># # Figure plot </span></span>
+<span id="cb7-449"><a href="#cb7-449" aria-hidden="true" tabindex="-1"></a>wt_fig <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(wt_pred_pop, <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> predicted)) <span class="sc">+</span></span>
+<span id="cb7-450"><a href="#cb7-450" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(</span>
+<span id="cb7-451"><a href="#cb7-451" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">ymin =</span> lwr, <span class="at">ymax =</span> upr, <span class="at">fill =</span> ageclass3,</span>
+<span id="cb7-452"><a href="#cb7-452" aria-hidden="true" tabindex="-1"></a>        <span class="at">group =</span> <span class="fu">interaction</span>(ageclass3, terminal_fct)),</span>
+<span id="cb7-453"><a href="#cb7-453" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.20</span></span>
+<span id="cb7-454"><a href="#cb7-454" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-455"><a href="#cb7-455" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb7-456"><a href="#cb7-456" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">linetype =</span> terminal_fct, <span class="at">color =</span> ageclass3,</span>
+<span id="cb7-457"><a href="#cb7-457" aria-hidden="true" tabindex="-1"></a>        <span class="at">group =</span> <span class="fu">interaction</span>(ageclass3, terminal_fct)),</span>
+<span id="cb7-458"><a href="#cb7-458" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.2</span></span>
+<span id="cb7-459"><a href="#cb7-459" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-460"><a href="#cb7-460" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(</span>
+<span id="cb7-461"><a href="#cb7-461" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> wt_summ,</span>
+<span id="cb7-462"><a href="#cb7-462" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> mean_wt,</span>
+<span id="cb7-463"><a href="#cb7-463" aria-hidden="true" tabindex="-1"></a>        <span class="at">ymin =</span> mean_wt <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt,</span>
+<span id="cb7-464"><a href="#cb7-464" aria-hidden="true" tabindex="-1"></a>        <span class="at">ymax =</span> mean_wt <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> se_wt,</span>
+<span id="cb7-465"><a href="#cb7-465" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> ageclass3,</span>
+<span id="cb7-466"><a href="#cb7-466" aria-hidden="true" tabindex="-1"></a>        <span class="at">linetype =</span> terminal_fct),</span>
+<span id="cb7-467"><a href="#cb7-467" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-468"><a href="#cb7-468" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-469"><a href="#cb7-469" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> maturity <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
+<span id="cb7-470"><a href="#cb7-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> prime_max <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"#9B59B6"</span>) <span class="sc">+</span></span>
+<span id="cb7-471"><a href="#cb7-471" aria-hidden="true" tabindex="-1"></a>  <span class="co"># My Theme</span></span>
+<span id="cb7-472"><a href="#cb7-472" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb7-473"><a href="#cb7-473" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#F9F9F9"</span>),</span>
+<span id="cb7-474"><a href="#cb7-474" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-475"><a href="#cb7-475" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#8E44AD"</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-476"><a href="#cb7-476" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb7-477"><a href="#cb7-477" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"#7F8C8D"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb7-478"><a href="#cb7-478" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"purple"</span>),</span>
+<span id="cb7-479"><a href="#cb7-479" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">color =</span> <span class="st">"#8E44AD"</span>),</span>
+<span id="cb7-480"><a href="#cb7-480" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb7-481"><a href="#cb7-481" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
+<span id="cb7-482"><a href="#cb7-482" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-483"><a href="#cb7-483" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-484"><a href="#cb7-484" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Axis labels and legends</span></span>
+<span id="cb7-485"><a href="#cb7-485" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-486"><a href="#cb7-486" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Impact of Age on Wean Weight"</span>,</span>
+<span id="cb7-487"><a href="#cb7-487" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Terminal vs Non-Terminal"</span>,</span>
+<span id="cb7-488"><a href="#cb7-488" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Mother's Age (Years)"</span>,</span>
+<span id="cb7-489"><a href="#cb7-489" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Wean Weight (kg)"</span>,</span>
+<span id="cb7-490"><a href="#cb7-490" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Age Class"</span>,</span>
+<span id="cb7-491"><a href="#cb7-491" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Terminal Status"</span></span>
+<span id="cb7-492"><a href="#cb7-492" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-493"><a href="#cb7-493" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-494"><a href="#cb7-494" aria-hidden="true" tabindex="-1"></a>  <span class="co"># My custom palette styling for lines and fill</span></span>
+<span id="cb7-495"><a href="#cb7-495" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Nonterminal"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"Terminal"</span> <span class="ot">=</span> <span class="st">"dotdash"</span>)) <span class="sc">+</span></span>
+<span id="cb7-496"><a href="#cb7-496" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>)) <span class="sc">+</span></span>
+<span id="cb7-497"><a href="#cb7-497" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#D5A6F6"</span>, <span class="st">"#6DD5B3"</span>, <span class="st">"#9B59B6"</span>, <span class="st">"#66B2B2"</span>))</span>
+<span id="cb7-498"><a href="#cb7-498" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(wt_fig)</span>
+<span id="cb7-499"><a href="#cb7-499" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
