@@ -67,6 +67,8 @@ pop_fig <- ggplot(pop_breed, aes(x = factor(age), y = n, fill = terminal_fct)) +
     fill = "Terminal Status",
     title = "# of Adult Females by Terminal Status"
   ) +
+  
+#Insert Cute theme!
   theme_minimal(base_size = 15) +
   theme(
     panel.grid.major = element_line(color = "pink", linewidth = 0.3),  
@@ -143,7 +145,7 @@ lact_dat2 <- lact_dat2 %>%
 
 #Brm model for lac dur
 lac_brm <- brm(
-  lact_dur ~ age10 + age10:ageclass + terminal:ageclass + (1 | season),
+  lact_dur ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | season),
   data   = lact_dat2,
   family = negbinomial()
 )
@@ -189,7 +191,7 @@ lact_summ2 <- lact_dat2 %>%
   ) %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
 # 
-# #  Full plot (posterior mean + 95% CrI ribbon) (hopefully..)
+# #  Full plot (posterior mean + 95% CrI ribbon) 
 lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   geom_ribbon(
     aes(ymin = lwr, ymax = upr,
@@ -215,7 +217,7 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   ) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
 
-  # styling
+#Insert Cute theme!
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9", color = NA),
@@ -238,16 +240,16 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
   scale_fill_manual(values  = c("#D5A6F6", "#6DD5B3"))
-# 
+
 print(lac_plot2)
 ```
 
-# Wean Weight Model 
+# Wean Weight Model
 
 ```{r}
-# #First we know that we want 3 age classes.. so lets do ages 3-6, 7-12, 13 +
+# #First we know that we want 3 age classes
 prime_max <- 14
-# # Creating third age calss as a function 
+# # Creating third age class as a function 
 ageclass3_fun <- function(a, mat = maturity, prime_hi = prime_max) {
   dplyr::case_when(
     a <= mat      ~ "inexperienced",
@@ -339,7 +341,7 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   ) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
   geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
-  # My Theme
+#Insert Cute theme!
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
@@ -460,6 +462,8 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
     color = ageclass
   ), linewidth = 1.2) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+  
+#Insert Cute theme!
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
