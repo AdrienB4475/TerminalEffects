@@ -391,15 +391,14 @@ sex_dat <- bioseal %>%
   )
 
 # Brms Model 
-set.seed(123)#Ok so I believe this is to make it that the posteriors the brms model uses is the same each time??
+set.seed(123)#Ok so I believe this is to make it that the posteriors the brms model uses is the same each time?? set.seed doesnt work as well with cores()
 sex_mod <- brm(
   formula = is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
   data    = sex_dat,
   family  = bernoulli(link = "logit"),
-  cores   = max(1, parallel::detectCores() - 1),
-  iter    = 4000,
-  chains  = 4,
-  backend = "rstan" # or "cmdstanr" if you use cmdstanr
+  iter    = 4000, #how long chain will run for (bump up to 8000 for paper)
+  chains  = 4,  # number of mcmc chains (4, 6, 8) can have shorter more chains or longer less chains
+  backend = "rstan"  #no u turn samples 
 )
 summary(sex_mod)
 
