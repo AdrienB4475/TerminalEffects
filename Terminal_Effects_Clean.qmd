@@ -10,6 +10,8 @@ format:
     warning: false
     toc: true
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Downloading the Data and Libraries
@@ -249,15 +251,7 @@ print(lac_plot2)
 ```{r}
 # #First we know that we want 3 age classes
 prime_max <- 14
-# # Creating third age class as a function 
-ageclass3_fun <- function(a, mat = maturity, prime_hi = prime_max) {
-  dplyr::case_when(
-    a <= mat      ~ "inexperienced",
-    a <= prime_hi ~ "prime",
-    TRUE          ~ "experienced"
-  )
-}
-# 
+
 # #Data Prep
 wt_dat <- bioseal %>%
   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>%
@@ -265,17 +259,22 @@ wt_dat <- bioseal %>%
   mutate(
     terminal   = as.integer(ifelse(bio_age == 0, 1, 0)),  # clean 0/1
     terminal_fct = factor(terminal, levels = c(0,1),
-                          labels = c("Nonterminal","Terminal")),
-    age10      = (age - maturity) / 10,
-    ageclass3  = factor(ageclass3_fun(age),
-                        levels = c("inexperienced","prime","experienced")),
+                          labels = c("Nonterminal", "Terminal")),
+    # age10      = (age - maturity) / 10,
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("inexperienced", "prime", "post-prime")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max),
     year       = factor(year),
     animalID   = factor(animalID)
   )
 
 # Bayesian Model
 wt_brm <- brm(
-  Wt ~ age10 + age10:ageclass3 + terminal:ageclass3 + (1 | year) + (1 | animalID),
+  Wt ~ age + age_prime + age_post_prime +
+    terminal:ageclass3 + 
+    (1 | year) + (1 | animalID),
   data   = wt_dat,
   family = gaussian()
 )
@@ -289,9 +288,11 @@ wt_grid <- tidyr::expand_grid(
   terminal = 0:1
 ) %>%
   mutate(
-    age10       = (age - maturity) / 10,
-    ageclass3   = factor(ageclass3_fun(age),
-                         levels = c("inexperienced","prime","experienced")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max),
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("inexperienced", "prime", "post-prime")),
     terminal_fct = factor(terminal, levels = c(0,1),
                           labels = c("Nonterminal","Terminal"))
   )
