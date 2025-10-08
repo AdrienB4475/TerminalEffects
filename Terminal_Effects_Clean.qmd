@@ -489,3 +489,5 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
+
+Just trying to see if it auto updates here
