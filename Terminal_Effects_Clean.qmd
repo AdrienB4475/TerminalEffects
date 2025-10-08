@@ -247,6 +247,22 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
 print(lac_plot2)
 ```
 
+## Lactation Duration Results Summary
+
+Rhat =1.0; models convergence is accurate, intervals accurate
+
+Seasonal differences (sd = 0.11) matter more than individual differences (sd = .02)
+
+Age does not directly correlate to trend (Est = .02)
+
+Terminal experienced mothers negative and credibly below 0 (Est -0.06)
+
+About a 6% shorter lactation duration for terminal experienced mothers compared to non-terminal experienced mothers
+
+Terminal status in inexperienced mothers (Est -0.02) does not have strong correlation
+
+Takeaway: Overall, terminal status only effected experienced mothers, all other effects are uncertain.
+
 # Wean Weight Model
 
 ```{r}
@@ -373,6 +389,18 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
 print(wt_fig)
 ```
 
+## Wean Weight Summary Results
+
+Rhat = 1 which means the model converged nicely meaning all estimates should be reliable.
+
+From this, we see that age has a positive outcome on the effect (Est: + 10.37)
+
+Prime (Est -8.88) and Post-prime (Est -6.03) age classes are credibly lower
+
+Estimates don't support that terminal status interacting with age class changes chance of wean weight outcome.
+
+Variation for individual(Est: 9.86) and year (Est: 7.74) are substantial
+
 # Sex Ratios Model and Figure
 
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
@@ -444,9 +472,10 @@ sex_summ <- sex_dat %>%
 
 # Sex Pred Fig
 ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
- geom_ribbon(aes(ymin = ci_low, ymax = ci_high, fill = ageclass), alpha = 0.15, show.legend = FALSE) +
-  
-  # Dashed SE bars by terminal status (hidden from legend)
+ geom_ribbon(
+   aes(ymin = ci_low, ymax = ci_high, fill = ageclass, 
+             group = interaction(ageclass, terminal_fct)),
+             alpha = 0.15, show.legend = FALSE) +
   geom_pointrange(
     data = sex_summ,
     aes(
@@ -490,4 +519,12 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
 
-take two
+## Offspring Sex Ratio Summary Results:
+
+Rhat = 1 which means the model converged nicely meaning all estimates should be reliable.
+
+Slight variation for individual and year (Est: 0.17 for both)
+
+Only terminal status is positively associate with the outcome in experienced mothers (Est: 0.39)
+
+Effects of age are uncertain, intercept near 0 and not credibly different than 0
