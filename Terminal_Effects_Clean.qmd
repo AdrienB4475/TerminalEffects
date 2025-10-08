@@ -1,5 +1,8 @@
 ---
 title: "Studying Terminal Effects in Northern Elephant Seals"
+project: 
+  type: website
+  output-dir: docs
 format:
   html:
     echo: false
