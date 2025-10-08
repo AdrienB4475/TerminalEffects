@@ -181,8 +181,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000433 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.33 seconds.
+Chain 1: Gradient evaluation took 0.000562 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 5.62 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -199,15 +199,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 25.632 seconds (Warm-up)
-Chain 1:                10.396 seconds (Sampling)
-Chain 1:                36.028 seconds (Total)
+Chain 1:  Elapsed Time: 24.391 seconds (Warm-up)
+Chain 1:                5.226 seconds (Sampling)
+Chain 1:                29.617 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000331 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 3.31 seconds.
+Chain 2: Gradient evaluation took 0.000339 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 3.39 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -224,15 +224,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 25.311 seconds (Warm-up)
-Chain 2:                5.264 seconds (Sampling)
-Chain 2:                30.575 seconds (Total)
+Chain 2:  Elapsed Time: 25.316 seconds (Warm-up)
+Chain 2:                5.263 seconds (Sampling)
+Chain 2:                30.579 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 0.000366 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 3.66 seconds.
+Chain 3: Gradient evaluation took 0.000334 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 3.34 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -249,15 +249,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 24.765 seconds (Warm-up)
-Chain 3:                10.419 seconds (Sampling)
-Chain 3:                35.184 seconds (Total)
+Chain 3:  Elapsed Time: 24.79 seconds (Warm-up)
+Chain 3:                5.986 seconds (Sampling)
+Chain 3:                30.776 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 0.000348 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 3.48 seconds.
+Chain 4: Gradient evaluation took 0.000343 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 3.43 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -274,9 +274,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 23.551 seconds (Warm-up)
-Chain 4:                10.403 seconds (Sampling)
-Chain 4:                33.954 seconds (Total)
+Chain 4:  Elapsed Time: 24.41 seconds (Warm-up)
+Chain 4:                5.249 seconds (Sampling)
+Chain 4:                29.659 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -290,29 +290,29 @@ Formula: lact_dur ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) 
 Multilevel Hyperparameters:
 ~animalID (Number of levels: 1199) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     0.02      0.01     0.00     0.04 1.00     1335     2217
+sd(Intercept)     0.02      0.01     0.00     0.04 1.01      743     1022
 
 ~season (Number of levels: 47) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     0.11      0.02     0.08     0.15 1.00     1451     2322
+sd(Intercept)     0.11      0.02     0.08     0.15 1.01      921     1617
 
 Regression Coefficients:
                                Estimate Est.Error l-95% CI u-95% CI Rhat
-Intercept                          2.97      0.02     2.92     3.02 1.00
-age10                              0.02      0.03    -0.04     0.08 1.00
-age10:ageclassinexperienced        0.09      0.11    -0.13     0.32 1.00
+Intercept                          2.97      0.02     2.92     3.01 1.01
+age10                              0.02      0.03    -0.04     0.09 1.00
+age10:ageclassinexperienced        0.10      0.11    -0.13     0.31 1.00
 ageclassexperienced:terminal      -0.06      0.02    -0.10    -0.01 1.00
-ageclassinexperienced:terminal    -0.02      0.02    -0.06     0.03 1.00
+ageclassinexperienced:terminal    -0.02      0.02    -0.07     0.03 1.00
                                Bulk_ESS Tail_ESS
-Intercept                          1488     2024
-age10                              6085     2796
-age10:ageclassinexperienced        5571     3100
-ageclassexperienced:terminal       5467     2765
-ageclassinexperienced:terminal     8078     2406
+Intercept                           839     1566
+age10                              3195     3121
+age10:ageclassinexperienced        2944     2976
+ageclassexperienced:terminal       4040     2980
+ageclassinexperienced:terminal     3864     3011
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-shape     7.45      0.26     6.96     7.98 1.00     6388     2737
+shape     7.45      0.28     6.92     8.02 1.00     4027     2612
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -335,8 +335,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code>
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000202 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.02 seconds.
+Chain 1: Gradient evaluation took 0.000206 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.06 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -353,15 +353,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 4.223 seconds (Warm-up)
-Chain 1:                2.784 seconds (Sampling)
-Chain 1:                7.007 seconds (Total)
+Chain 1:  Elapsed Time: 4.534 seconds (Warm-up)
+Chain 1:                2.84 seconds (Sampling)
+Chain 1:                7.374 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 9.4e-05 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.94 seconds.
+Chain 2: Gradient evaluation took 9e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.9 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -378,15 +378,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 4.044 seconds (Warm-up)
-Chain 2:                2.801 seconds (Sampling)
-Chain 2:                6.845 seconds (Total)
+Chain 2:  Elapsed Time: 6.853 seconds (Warm-up)
+Chain 2:                2.845 seconds (Sampling)
+Chain 2:                9.698 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 8.3e-05 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.83 seconds.
+Chain 3: Gradient evaluation took 8.5e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.85 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -403,15 +403,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 4.809 seconds (Warm-up)
-Chain 3:                2.806 seconds (Sampling)
-Chain 3:                7.615 seconds (Total)
+Chain 3:  Elapsed Time: 5.425 seconds (Warm-up)
+Chain 3:                2.842 seconds (Sampling)
+Chain 3:                8.267 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 8.3e-05 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.83 seconds.
+Chain 4: Gradient evaluation took 8.6e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.86 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -428,9 +428,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 4.119 seconds (Warm-up)
-Chain 4:                2.803 seconds (Sampling)
-Chain 4:                6.922 seconds (Total)
+Chain 4:  Elapsed Time: 9.115 seconds (Warm-up)
+Chain 4:                2.848 seconds (Sampling)
+Chain 4:                11.963 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -444,33 +444,33 @@ Formula: Wt ~ age + age_prime + age_post_prime + terminal:ageclass3 + (1 | year)
 Multilevel Hyperparameters:
 ~animalID (Number of levels: 779) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     9.87      0.62     8.62    11.05 1.00     1300     2420
+sd(Intercept)     9.85      0.61     8.68    11.07 1.00     1322     2155
 
 ~year (Number of levels: 42) 
               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sd(Intercept)     7.78      1.25     5.60    10.41 1.01      953     1845
+sd(Intercept)     7.82      1.27     5.61    10.59 1.00      826     1451
 
 Regression Coefficients:
                                 Estimate Est.Error l-95% CI u-95% CI Rhat
-Intercept                          58.45      3.27    51.89    64.79 1.00
-age                                10.37      0.58     9.24    11.50 1.00
-age_prime                          -8.88      0.71   -10.30    -7.49 1.00
-age_post_prime                     -6.02      1.16    -8.26    -3.70 1.00
-terminal:ageclass3inexperienced    -1.32      1.58    -4.34     1.82 1.00
-terminal:ageclass3prime             0.91      1.62    -2.34     4.03 1.00
-terminal:ageclass3postMprime        3.55      5.31    -7.04    14.01 1.00
+Intercept                          58.35      3.22    52.18    64.57 1.00
+age                                10.39      0.56     9.30    11.47 1.00
+age_prime                          -8.90      0.70   -10.23    -7.55 1.00
+age_post_prime                     -6.00      1.11    -8.18    -3.87 1.00
+terminal:ageclass3inexperienced    -1.25      1.61    -4.36     1.92 1.00
+terminal:ageclass3prime             0.91      1.61    -2.40     4.03 1.00
+terminal:ageclass3postMprime        3.45      5.24    -6.91    13.76 1.00
                                 Bulk_ESS Tail_ESS
-Intercept                           2089     2743
-age                                 2881     3210
-age_prime                           2911     3094
-age_post_prime                      3622     2940
-terminal:ageclass3inexperienced     5074     3050
-terminal:ageclass3prime             5268     3790
-terminal:ageclass3postMprime        4574     3077
+Intercept                           1995     2768
+age                                 3047     3331
+age_prime                           2952     3133
+age_post_prime                      2905     3124
+terminal:ageclass3inexperienced     3634     3423
+terminal:ageclass3prime             4804     2907
+terminal:ageclass3postMprime        3815     3393
 
 Further Distributional Parameters:
       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-sigma    14.93      0.36    14.25    15.66 1.00     1756     2595
+sigma    14.93      0.36    14.26    15.66 1.00     2014     2784
 
 Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -500,8 +500,8 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 <pre><code>
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000218 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.18 seconds.
+Chain 1: Gradient evaluation took 0.000306 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 3.06 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -518,15 +518,15 @@ Chain 1: Iteration: 3200 / 4000 [ 80%]  (Sampling)
 Chain 1: Iteration: 3600 / 4000 [ 90%]  (Sampling)
 Chain 1: Iteration: 4000 / 4000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 9.152 seconds (Warm-up)
-Chain 1:                8.359 seconds (Sampling)
-Chain 1:                17.511 seconds (Total)
+Chain 1:  Elapsed Time: 9.201 seconds (Warm-up)
+Chain 1:                8.364 seconds (Sampling)
+Chain 1:                17.565 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 0.000135 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 1.35 seconds.
+Chain 2: Gradient evaluation took 0.000137 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 1.37 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -543,9 +543,9 @@ Chain 2: Iteration: 3200 / 4000 [ 80%]  (Sampling)
 Chain 2: Iteration: 3600 / 4000 [ 90%]  (Sampling)
 Chain 2: Iteration: 4000 / 4000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 8.476 seconds (Warm-up)
-Chain 2:                8.362 seconds (Sampling)
-Chain 2:                16.838 seconds (Total)
+Chain 2:  Elapsed Time: 8.53 seconds (Warm-up)
+Chain 2:                8.373 seconds (Sampling)
+Chain 2:                16.903 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).
@@ -568,15 +568,15 @@ Chain 3: Iteration: 3200 / 4000 [ 80%]  (Sampling)
 Chain 3: Iteration: 3600 / 4000 [ 90%]  (Sampling)
 Chain 3: Iteration: 4000 / 4000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 8.983 seconds (Warm-up)
-Chain 3:                8.343 seconds (Sampling)
-Chain 3:                17.326 seconds (Total)
+Chain 3:  Elapsed Time: 8.997 seconds (Warm-up)
+Chain 3:                8.349 seconds (Sampling)
+Chain 3:                17.346 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 0.000136 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 1.36 seconds.
+Chain 4: Gradient evaluation took 0.000139 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 1.39 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -593,9 +593,9 @@ Chain 4: Iteration: 3200 / 4000 [ 80%]  (Sampling)
 Chain 4: Iteration: 3600 / 4000 [ 90%]  (Sampling)
 Chain 4: Iteration: 4000 / 4000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 8.667 seconds (Warm-up)
-Chain 4:                8.369 seconds (Sampling)
-Chain 4:                17.036 seconds (Total)
+Chain 4:  Elapsed Time: 8.697 seconds (Warm-up)
+Chain 4:                8.407 seconds (Sampling)
+Chain 4:                17.104 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
