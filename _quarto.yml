@@ -1,7 +1,10 @@
 project:
   type: website
   output-dir: docs
-
+website:
+  repo-url: https://github.com/adrienb4475/TerminalEffects
+  repo-actions: [source, issue]    
+  site-url: https://adrienb4475.github.io/TerminalEffects/
 format:
   html:
     toc: true
