@@ -1,3 +1,13 @@
 project:
-  title: "Terminal Effects Clean"
-  output-dir: "../docs"
+  type: website
+  output-dir: docs
+
+format:
+  html:
+    toc: true
+    echo: false
+    fig-width: 7
+    fig-height: 5
+    code-fold: true
+    code-tools: true
+    warning: false
