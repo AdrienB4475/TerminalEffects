@@ -344,13 +344,25 @@ wt_dat <- bioseal %>%
     year       = factor(year),
     animalID   = factor(animalID)
   )
+#Setting Priors with Gausian family 
+#First calc mean and sd of weight
+pr_wt <- mean(wt_dat$Wt, na.rm = TRUE)
+sd_wt <- sd(wt_dat$Wt, na.rm = TRUE)
 
+priors_wt <- c(
+  #Intercept (3, pr_wt, sd_wt)
+  prior(student_t(3, 117, 22), class = "Intercept"),
+  prior(normal(0, 0.5), class = "b"),
+  prior(exponential(1), class = "sd"),
+  prior(student_t(3, 0, 22/2), class = "sigma") #Gaussian distribution setup 
+)
 # Bayesian Model
 wt_brm <- brm(
   Wt ~ age + age_prime + age_post_prime +
     terminal:ageclass3 + 
     (1 | year) + (1 | animalID),
   data   = wt_dat,
+  prior = priors_wt, 
   family = gaussian(),
   iter    = 4000, 
   chains  = 4,  
