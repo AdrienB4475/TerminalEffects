@@ -170,6 +170,14 @@ lact_dat2 <- lact_info %>%
 lact_dat2 <- lact_dat2 %>% 
   distinct(animalID, season, .keep_all = TRUE)
 
+lact_count <- lact_dat2 %>%
+  group_by(age, ageclass, terminal) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  complete(age, ageclass, terminal_fct, fill = list(n = 0))
+
+lact_top    <- 1.5   # Terminal (regular font) 
+lact_bot <- 0.1   # Nonterminal (italic font) 
 ```
 
 ### How to Get Priors for Models
@@ -253,13 +261,13 @@ lact_summ2 <- lact_dat2 %>%
     .groups   = "drop"
   ) %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
-# 
-# #  Full plot (posterior mean + 95% CrI ribbon) 
-lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
+
+#Lactation Duration Plot
+ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   geom_ribbon(
     aes(ymin = lwr, ymax = upr,
         fill = ageclass,
-        group = interaction(ageclass, terminal_fct)),   # <-- key
+        group = interaction(ageclass, terminal_fct)),
     alpha = 0.20, show.legend = TRUE
   ) +
   geom_line(
@@ -280,17 +288,39 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   ) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
 
-#Insert Cute theme!
+  #Add Counts to Plot
+  coord_cartesian(clip = "off") +
+  theme(plot.margin = margin(12, 18, 12, 12)) +
+  geom_text(
+    data = lact_count %>% filter(terminal_fct == "Terminal", n > 0),
+    aes(x = age, y = Inf, label = n,
+        group = interaction(ageclass, terminal_fct)),
+    vjust = 1.8, size = 3.2, color = "black", fontface = "plain",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = lact_count %>% filter(terminal_fct == "Nonterminal", n > 0),
+    aes(x = age, y = Inf, label = n,
+        group = interaction(ageclass, terminal_fct)),
+    vjust = 3.5, size = 3.2, color = "black", fontface = "italic",
+    inherit.aes = FALSE
+  ) +
+
+  # Insert My Personal Theme!
   theme_minimal() +
   theme(
-    panel.background = element_rect(fill = "#F9F9F9", color = NA),
-    axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
-    axis.text.x  = element_text(color = "#7F8C8D", size = 12),
-    axis.text.y  = element_text(color = "#7F8C8D", size = 12),
-    plot.title   = element_text(hjust = 0.5, size = 18, face = "italic", color = "#8E44AD"),
-    legend.title = element_text(size = 13, face = "bold"),
-    legend.text  = element_text(size = 11)
+    panel.background  = element_rect(fill = "#F9F9F9", color = NA),
+    panel.border      = element_rect(color = "black", fill = NA, linewidth = 0.8),  # solid box
+    axis.line         = element_line(color = "black", linewidth = 0.6),             # solid axes
+    axis.ticks        = element_line(color = "black"),
+    axis.title.x      = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.title.y      = element_text(color = "#8E44AD", size = 14, face = "bold"),
+    axis.text.x       = element_text(color = "#7F8C8D", size = 12),
+    axis.text.y       = element_text(color = "#7F8C8D", size = 12),
+    plot.title        = element_text(hjust = 0.5, size = 18, face = "italic",
+                                     color = "#8E44AD"),
+    legend.title      = element_text(size = 13, face = "bold"),
+    legend.text       = element_text(size = 11)
   ) +
   labs(
     title = "Effect of Age on Lactation Duration",
@@ -304,7 +334,6 @@ lac_plot2 <- ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
   scale_fill_manual(values  = c("#D5A6F6", "#6DD5B3"))
 
-print(lac_plot2)
 ```
 
 ## Lactation Duration Results Summary
@@ -344,6 +373,17 @@ wt_dat <- bioseal %>%
     year       = factor(year),
     animalID   = factor(animalID)
   )
+
+#Plotting counts: 
+wt_count <- wt_dat %>%
+  group_by(age, age_prime, age_post_prime, ageclass3, terminal) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  complete(age, age_prime, age_post_prime, ageclass3, terminal_fct, fill = list(n = 0))
+
+wt_top    <- 1.5   # Terminal (regular font) 
+wt_bot <- 0.1   # Nonterminal (italic font) 
+
 #Setting Priors with Gausian family 
 #First calc mean and sd of weight
 pr_wt <- mean(wt_dat$Wt, na.rm = TRUE)
@@ -362,7 +402,7 @@ wt_brm <- brm(
     terminal:ageclass3 + 
     (1 | year) + (1 | animalID),
   data   = wt_dat,
-  prior = priors_wt, 
+  # prior = priors_wt, 
   family = gaussian(),
   iter    = 4000, 
   chains  = 4,  
@@ -409,8 +449,8 @@ wt_summ <- wt_dat %>%
   ) %>%
   mutate(age = age + 0.15 * ifelse(terminal_fct == "Terminal", 1, -1))
 
-#Figure plot 
-wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
+#Wean Weight Plot
+ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   geom_ribbon(
     aes(ymin = lwr, ymax = upr, fill = ageclass3,
         group = interaction(ageclass3, terminal_fct)),
@@ -432,9 +472,29 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   ) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
   geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
+  
+#Plot Counts 
+  coord_cartesian(clip = "off") +
+  theme(plot.margin = margin(12, 18, 12, 12)) +
+  geom_text(
+    data = wt_count %>% filter(terminal_fct == "Terminal", n > 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
+    vjust = wt_top, size = 3.2, color = "black", fontface = "plain",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = wt_count %>% filter(terminal_fct == "Nonterminal", n> 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
+    vjust = wt_bot + 4, size = 3.2, color = "black", fontface = "italic",
+    inherit.aes = FALSE
+  ) +
+  
 #Insert Cute theme!
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
+    panel.border      = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    axis.line         = element_line(color = "black", linewidth = 0.6),
+    axis.ticks        = element_line(color = "black"),
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.text.x = element_text(color = "#7F8C8D", size = 12),
@@ -448,7 +508,6 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   # Axis labels and legends
   labs(
     title = "Impact of Age on Wean Weight",
-    subtitle = "Terminal vs Non-Terminal",
     x = "Mother's Age (Years)",
     y = "Wean Weight (kg)",
     color = "Age Class",
@@ -459,7 +518,7 @@ wt_fig <- ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
-print(wt_fig)
+
 ```
 
 ## Wean Weight Summary Results
@@ -494,25 +553,26 @@ sex_dat <- bioseal %>%
 
 #Need a Count for all ageclass, age, and terminal status individuals to plot onto graph:
 sex_count <- sex_dat %>%
-  group_by(age, terminal, ageclass) %>%
+  group_by(age, ageclass, terminal) %>%
   summarise(n = n(), .groups = "drop") %>%
-  mutate(
-    terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))
-  )
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  complete(age, ageclass, terminal_fct, fill = list(n = 0))
+
+sex_top    <- 1.5   # Terminal (regular font) 
+sex_bot <- 0.1   # Nonterminal (italic font) 
 
 #Setting priors 
-sex_priors <- prior(c(
-  prior(normal(0, 0.7), class = b, coef = age10),
-  prior(normal(0, 0.7), class = b, coef = age10:ageclassexperienced),
-  prior(normal(0, 0.7), class = b, coef = ageclassinexperienced:terminal),
-  prior(normal(0, 0.7), class = b, coef = ageclassexperienced:terminal)
-))
+# sex_priors <- prior(c(
+#   prior(normal(0, 0.7), class = b, coef = age10),
+#   prior(normal(0, 0.7), class = b, coef = age10:ageclassexperienced),
+#   prior(normal(0, 0.7), class = b, coef = ageclassinexperienced:terminal),
+#   prior(normal(0, 0.7), class = b, coef = ageclassexperienced:terminal)
+# ))
 
 # Brms Model 
 
 sex_mod <- brm(
   is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
-  prior = sex_priors,
   data    = sex_dat,
   family  = bernoulli(link = "logit"),
   iter    = 4000, #how long chain will run for (bump up to 8000 for paper)
@@ -583,14 +643,20 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
   ), linewidth = 1.2) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
   
-  #Insert counts onto figures!
-   geom_text(
-    data = sex_count,
-    aes(x = age, y = 0.02, label = paste0("n=", n), color = ageclass),
-    size = 3,
-    angle = 90,
-    vjust = 0,
-    show.legend = FALSE
+#Add Counts
+  coord_cartesian(clip = "off") +
+  theme(plot.margin = margin(12, 18, 12, 12)) +
+  geom_text(
+    data = sex_count %>% filter(terminal_fct == "Terminal", n > 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass, terminal_fct)),
+    vjust = sex_top, size = 3.2, color = "black", fontface = "plain",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = sex_count %>% filter(terminal_fct == "Nonterminal", n> 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass, terminal_fct)),
+    vjust = sex_bot + 4, size = 3.2, color = "black", fontface = "italic",
+    inherit.aes = FALSE
   ) +
   
 #Insert Cute theme!
@@ -639,6 +705,16 @@ surv_recr_data <- pup_surv_dat %>%
   filter(pupyearborn <= 2016) %>% 
   filter(age < 20) %>% 
   mutate(pup_surv_int = as.integer(pup_survived))
+
+#Count Data
+pup_count <- surv_recr_data %>%
+  group_by(age, age_prime, age_post_prime, ageclass3, terminal) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
+  complete(age, age_prime, age_post_prime, ageclass3, terminal_fct, fill = list(n = 0))
+
+pup_top    <- 1.5   # Terminal (regular font) 
+pup_bot <- 0.1   # Nonterminal (italic font) 
 
 #Specify Priors here:
 pup_surv_prior <- c(
@@ -730,6 +806,22 @@ ggplot(pup_surv_pop, aes(x = age, y = predicted_pup_surv)) +
     color = ageclass3
   ), linewidth = 1.2) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+ 
+ #Plot Counts 
+  coord_cartesian(clip = "off") +
+  theme(plot.margin = margin(12, 18, 12, 12)) +
+  geom_text(
+    data = wt_count %>% filter(terminal_fct == "Terminal", n > 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
+    vjust = wt_top, size = 3.2, color = "black", fontface = "plain",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = wt_count %>% filter(terminal_fct == "Nonterminal", n> 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
+    vjust = wt_bot + 4, size = 3.2, color = "black", fontface = "italic",
+    inherit.aes = FALSE
+  ) +
   
 #Insert Cute theme!
   theme_minimal() +
