@@ -15,7 +15,13 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+
+
 # Downloading the Data and Libraries
+
+
+
 
 ```{r}
 #| label: setup
@@ -38,7 +44,13 @@ maturity <- 6
 prime_max <- 14
 ```
 
+
+
+
 # Modified Datasets
+
+
+
 
 ```{r}
 #BIOSEAL (creates terminal status and calculates age)
@@ -99,7 +111,13 @@ pup_surv_dat <- read_csv(here::here("data/raw/128L pull 2023_12_05.csv"),
   ungroup()
 ```
 
+
+
+
 # Adult Female Population Figure
+
+
+
 
 ```{r}
 #Create terminal to be a factor here 
@@ -135,6 +153,9 @@ pop_fig <- ggplot(pop_breed, aes(x = factor(age), y = n, fill = terminal_fct)) +
 print(pop_fig)
 ```
 
+
+
+
 # Lactation Duration Model and Figures
 
 1.) Modify the data set to only contain females so when "obssex" = "F" during the breeding season so when timeofyear = breeding
@@ -142,6 +163,9 @@ print(pop_fig)
 2.) Then contain only adult females observed with a pup
 
 3.) Then calculation lactation duration using earliest date when "withpup" = 1 and then latest date when "withpup" = 1
+
+
+
 
 ```{r}
 
@@ -177,7 +201,13 @@ lact_top    <- 1.5   # Terminal (regular font)
 lact_bot <- 0.1   # Nonterminal (italic font) 
 ```
 
+
+
+
 ### How to Get Priors for Models
+
+
+
 
 ```{r}
 # 1. First use get_prior() function and insert your model in order to inspect parameters... example
@@ -201,7 +231,13 @@ lact_prior <- c(
   
 ```
 
+
+
+
 ## Lactation Duration Model with Bayesian Stats
+
+
+
 
 ```{r}
 
@@ -332,6 +368,9 @@ ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
 
 ```
 
+
+
+
 ## Lactation Duration Results Summary
 
 Rhat =1.0; models convergence is accurate, intervals accurate
@@ -349,6 +388,9 @@ Terminal status in inexperienced mothers (Est -0.02) does not have strong correl
 Takeaway: Overall, terminal status only effected experienced mothers, all other effects are uncertain.
 
 # Wean Weight Model
+
+
+
 
 ```{r}
 
@@ -520,6 +562,9 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
 
 ```
 
+
+
+
 ## Wean Weight Summary Results
 
 Rhat = 1 which means the model converged nicely meaning all estimates should be reliable.
@@ -535,6 +580,9 @@ Variation for individual(Est: 9.86) and year (Est: 7.74) are substantial
 # Sex Ratios Model and Figure
 
 We hypothesize that young terminal moms will have a higher chance of giving birth to a male offspring sex ratio than non terminal moms. Whereas old terminal moms will produce less males compared to non terminal moms
+
+
+
 
 ```{r}
 # Offspring sex ratio dataset 
@@ -690,6 +738,9 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
 
+
+
+
 ## Offspring Sex Ratio Summary Results:
 
 Rhat = 1 which means the model converged nicely meaning all estimates should be reliable.
@@ -701,6 +752,9 @@ Only terminal status is positively associate with the outcome in experienced mot
 Effects of age are uncertain, intercept near 0 and not credibly different than 0
 
 # Pup Survival Figure
+
+
+
 
 ```{r}
 # Isolate pup survival/recruitment 
@@ -856,6 +910,9 @@ ggplot(pup_surv_pop, aes(x = age, y = predicted_pup_surv)) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
 ```
 
+
+
+
 ## Pup Survival Results Summary
 
 Rhat **= 1** for all parameters, indicating good convergence and reliable estimates.
@@ -883,3 +940,4 @@ wean weight model do normal (0, 5) instead of (0, 2)
 table in supplementary for every prior and details
 
 start updating draft (feel free to use \_\_\_)
+
