@@ -135,11 +135,7 @@ pop_fig <- ggplot(pop_breed, aes(x = factor(age), y = n, fill = terminal_fct)) +
 print(pop_fig)
 ```
 
-In some species terminal investment shows only in early years of reproduction, or during prime ages for breeding but often not in older ages due to senescence
-
 # Lactation Duration Model and Figures
-
-My plan for this is to attempt to calculate lactation duration using the whole database by
 
 1.) Modify the data set to only contain females so when "obssex" = "F" during the breeding season so when timeofyear = breeding
 
@@ -192,18 +188,17 @@ get_prior(
   family = negbinomial()
 )
 
-#2. since we cant insert a log(mean()) into the prior we can use an intercept anchor:
-lact_int <- log(mean(lact_dat2$lact_dur, na.rm = TRUE))
-
-# 3. And then lact_int value of 2.9 was you can use for the class = intercept line
-#Then assume your predictors as 1 unit = 1 SD so you can use this: 
-        #for neg binomial you use normal(log()) and class as your intercept center around your mean 
+#Then set a prior for everything starting with Intercept 
 lact_prior <- c(
-  prior(normal(2.9, 1), class = "Intercept"),
-  prior(normal(0, 1), class = "b"),   #This is where it accounts for fixed effects 
-  prior(exponential(1), class = "sd"),  #Then account for random effects here 
-  prior(lognormal(log(2), 0.5), class = "shape")   #For this since we have overdispersion use log (>0)
+  prior(normal(22, 3), class = "Intercept"),
+  prior(normal(0, 5), class = "b", coef = "age"),
+  prior(normal(0, 5), class = "b", coef = "age:ageclassinexperienced"),
+  prior(normal(0, 5), class = "b", coef = "ageclassexperienced:terminal"),
+  prior(normal(0, 5), class = "b", coef = "ageclassinexperienced:terminal"),
+  prior(student_t(3,0, 5), class = "sd", group = "animalID"),
+  prior(student_t(3,0, 5), class = "sd", group = "year_fct")
 )
+  
 ```
 
 ## Lactation Duration Model with Bayesian Stats
@@ -221,8 +216,8 @@ lac_brm <- brm(
   backend = "rstan"   
 )
 
-
 summary(lac_brm)
+pp_check(lac_brm)
 
 # # Prediction grid
 lac_grid2 <- tidyr::expand_grid(
@@ -386,30 +381,33 @@ wt_top    <- 1.5   # Terminal (regular font)
 wt_bot <- 0.1   # Nonterminal (italic font) 
 
 #Setting Priors with Gausian family 
-#First calc mean and sd of weight
-pr_wt <- mean(wt_dat$Wt, na.rm = TRUE)
-sd_wt <- sd(wt_dat$Wt, na.rm = TRUE)
-
 priors_wt <- c(
-  #Intercept (3, pr_wt, sd_wt)
-  prior(student_t(3, 117, 22), class = "Intercept"),
-  prior(normal(0, 0.5), class = "b"),
-  prior(exponential(1), class = "sd"),
-  prior(student_t(3, 0, 22/2), class = "sigma") #Gaussian distribution setup 
+  prior(normal(100, 10), class = "Intercept"),
+  prior(normal(0,2), class = "b", coef = "age"),
+  prior(normal(0,2), class = "b", coef = "age_post_prime"),
+  prior(normal(0,2), class = "b", coef = "age_prime"),
+  prior(normal(0,2), class = "b", coef = "terminal:ageclass3inexperienced"),
+  prior(normal(0,2), class = "b", coef = "terminal:ageclass3postMprime"),
+  prior(normal(0,2), class = "b", coef = "terminal:ageclass3prime"),
+  prior(student_t(3, 0, 20), class = "sd", group = "animalID"),
+  prior(student_t(3, 0, 20), class = "sd", group = "year"),
+  prior(student_t(3, 0, 20), class = "sigma")
 )
+
+
 # Bayesian Model
 wt_brm <- brm(
   Wt ~ age + age_prime + age_post_prime +
     terminal:ageclass3 + 
     (1 | year) + (1 | animalID),
   data   = wt_dat,
-  # prior = priors_wt, 
   family = gaussian(),
+  prior = priors_wt, 
   iter    = 4000, 
   chains  = 4,  
   backend = "rstan"
 )
-# 
+
 summary(wt_brm)
 pp_check(wt_brm)
 
@@ -563,12 +561,15 @@ sex_top    <- 1.5   # Terminal (regular font)
 sex_bot <- 0.1   # Nonterminal (italic font) 
 
 #Setting priors 
-# sex_priors <- prior(c(
-#   prior(normal(0, 0.7), class = b, coef = age10),
-#   prior(normal(0, 0.7), class = b, coef = age10:ageclassexperienced),
-#   prior(normal(0, 0.7), class = b, coef = ageclassinexperienced:terminal),
-#   prior(normal(0, 0.7), class = b, coef = ageclassexperienced:terminal)
-# ))
+priors_sex <- c(
+  prior(normal(0, 2), class = "Intercept"),
+  prior(normal(0, 2), class = "b", coef = "age10"),
+  prior(normal(0, 2), class = "b", coef = "age10:ageclassexperienced"),
+  prior(normal(0, 2), class = "b", coef = "ageclassexperienced:terminal"),
+  prior(normal(0, 2), class = "b", coef = "ageclassinexperienced:terminal"),
+  prior(student_t(3, 0, 2), class = "sd", group = "animalID"),
+  prior(student_t(3, 0, 2), class = "sd", group = "year_fct")
+)
 
 # Brms Model 
 
@@ -576,11 +577,14 @@ sex_mod <- brm(
   is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
   data    = sex_dat,
   family  = bernoulli(link = "logit"),
-  iter    = 4000, #how long chain will run for (bump up to 8000 for paper)
-  chains  = 4,  # number of mcmc chains (4, 6, 8) can have shorter more chains or longer less chains
-  backend = "rstan"  #no u turn samples 
+  prior = priors_sex, 
+  iter    = 4000, 
+  chains  = 4,  
+  backend = "rstan"  
 )
+
 summary(sex_mod)
+pp_check(sex_mod)
 
 #  Prediction grid 
 sex_grid <- tidyr::expand_grid(
@@ -740,6 +744,7 @@ pup_surv_mod <- brm(
 )
 
 summary(pup_surv_mod)
+pp_check(pup_surv_mod)
 
 #  Prediction grid 
 pup_grid <- tidyr::expand_grid(
@@ -763,6 +768,7 @@ pup_mat <- fitted(
   re_formula  = NA,
   summary     = TRUE
 )
+
 
 # Add to grid
 pup_surv_pop <- pup_grid %>%
