@@ -145,7 +145,7 @@ print(pop_fig)
 
 ```{r}
 
-#To create lactation duration were gonna just make another object in the environment:
+#Calculating lactation duration 
 lact_info <- resight %>%
   filter(withpup == 1) %>%
   group_by(animalID, season, age, max_age, bio_age, terminal) %>%
@@ -174,19 +174,12 @@ lact_count <- lact_dat2 %>%
   complete(age, ageclass, terminal_fct, fill = list(n = 0))
 
 lact_top    <- 1.5   # Terminal (regular font) 
-lact_bot <- 0.1   # Nonterminal (italic font) 
+lact_bot <- 0.1   # Nonterminal (italic font)
 ```
 
-### How to Get Priors for Models
+## Lactation Duration Model with Bayesian Stats
 
 ```{r}
-# 1. First use get_prior() function and insert your model in order to inspect parameters... example
-
-get_prior(
-  lact_dur ~ age + age:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
-  data = lact_dat2,
-  family = negbinomial()
-)
 
 #Then set a prior for everything starting with Intercept 
 lact_prior <- c(
@@ -198,12 +191,7 @@ lact_prior <- c(
   prior(student_t(3,0, 5), class = "sd", group = "animalID"),
   prior(student_t(3,0, 5), class = "sd", group = "year_fct")
 )
-  
-```
 
-## Lactation Duration Model with Bayesian Stats
-
-```{r}
 
 #Brm model for lac dur
 lac_brm <- brm(
