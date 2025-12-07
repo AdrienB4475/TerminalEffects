@@ -35,6 +35,7 @@ library (brms)
 library (ggeffects)
 library (tidybayes)
 library (rstan)
+library(loo)
 
 
 #Initial Data Pull
@@ -63,7 +64,8 @@ bioseal <- sealdat %>% filter(observed == 1, tagsex == "F") %>%
          firstobsbreed = as.Date(firstobsbreed, format = "%Y-%m-%d"), 
          lastobsbreed = as.Date(lastobsbreed, format = "%Y-%m-%d"), 
          lactation_duration = as.numeric(difftime(lastobsbreed, firstobsbreed, units = "days"))) %>%
-  filter(age > 2)
+  filter(age > 2, 
+         year > 1987)
 
 #Full Resight database 
 resight <- read_csv(here::here("data/raw/fullresights.csv")) %>%
@@ -76,7 +78,8 @@ resight <- read_csv(here::here("data/raw/fullresights.csv")) %>%
     bio_age = max_age - age,
     terminal = ifelse(bio_age == 0, 1, 0)
   ) %>%
-  filter(age > 2) %>%
+  filter(age > 2,
+         year > 1987) %>%
   ungroup()
 
 #PUP SURVIVAL
@@ -98,13 +101,13 @@ pup_surv_dat <- read_csv(here::here("data/raw/128L pull 2023_12_05.csv"),
          max_age = max(age, na.rm = TRUE),
          bio_age = max_age - age,
          terminal = ifelse(bio_age == 0, 1, 0),
-         ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
+         ageclass = ifelse(age <= maturity, "pre-prime", "experienced"),
          age10 = (age - maturity) / 10, 
          year_fct = factor(season),
          pup_surv_int = as.integer(pup_survived),
          ageclass3  = cut(age, 
                      breaks = c(0, maturity, prime_max, Inf),
-                     labels = c("inexperienced", "prime", "post-prime")),
+                     labels = c("pre-prime", "prime", "post-prime")),
          age_prime = (age - maturity) * (age >= maturity),
          age_post_prime = (age - prime_max) * (age >= prime_max),
          ) %>% 
@@ -169,7 +172,7 @@ print(pop_fig)
 
 ```{r}
 
-#To create lactation duration were gonna just make another object in the environment:
+#Calculating lactation duration 
 lact_info <- resight %>%
   filter(withpup == 1) %>%
   group_by(animalID, season, age, max_age, bio_age, terminal) %>%
@@ -184,51 +187,24 @@ lact_info <- resight %>%
 lact_dat2 <- lact_info %>% 
   dplyr::select(animalID, bio_age, lact_dur, season, terminal, age) %>% 
   mutate( 
-    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
-    age10 = (age - maturity) / 10, 
-    year_fct = factor(season))
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("pre-prime", "prime", "post-prime")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max), 
+    season_fct = factor(season))
 
 lact_dat2 <- lact_dat2 %>% 
   distinct(animalID, season, .keep_all = TRUE)
 
 lact_count <- lact_dat2 %>%
-  group_by(age, ageclass, terminal) %>%
+  group_by(age, age_prime, age_post_prime, ageclass3, terminal) %>%
   summarise(n = n(), .groups = "drop") %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-  complete(age, ageclass, terminal_fct, fill = list(n = 0))
+  complete(age, age_prime, age_post_prime, ageclass3, terminal_fct, fill = list(n = 0))
 
 lact_top    <- 1.5   # Terminal (regular font) 
-lact_bot <- 0.1   # Nonterminal (italic font) 
-```
-
-
-
-
-### How to Get Priors for Models
-
-
-
-
-```{r}
-# 1. First use get_prior() function and insert your model in order to inspect parameters... example
-
-get_prior(
-  lact_dur ~ age + age:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
-  data = lact_dat2,
-  family = negbinomial()
-)
-
-#Then set a prior for everything starting with Intercept 
-lact_prior <- c(
-  prior(normal(22, 3), class = "Intercept"),
-  prior(normal(0, 5), class = "b", coef = "age"),
-  prior(normal(0, 5), class = "b", coef = "age:ageclassinexperienced"),
-  prior(normal(0, 5), class = "b", coef = "ageclassexperienced:terminal"),
-  prior(normal(0, 5), class = "b", coef = "ageclassinexperienced:terminal"),
-  prior(student_t(3,0, 5), class = "sd", group = "animalID"),
-  prior(student_t(3,0, 5), class = "sd", group = "year_fct")
-)
-  
+lact_bot <- 0.1   # Nonterminal (italic font)
 ```
 
 
@@ -241,9 +217,23 @@ lact_prior <- c(
 
 ```{r}
 
+#Then set a prior for everything starting with Intercept 
+lact_prior <- c(
+  prior(normal(22, 3), class = "Intercept"),
+  prior(normal(0, 5), class = "b", coef = "age"),
+  prior(normal(0, 5), class = "b", coef = "age_post_prime"),
+  prior(normal(0, 5), class = "b", coef = "age_prime"),
+  prior(normal(0, 5), class = "b", coef = "terminal:ageclass3postMprime"),
+  prior(normal(0, 5), class = "b", coef = "terminal:ageclass3preMprime"),
+  prior(normal(0, 5), class = "b", coef = "terminal:ageclass3prime"),
+  prior(student_t(3,0, 5), class = "sd", group = "animalID"),
+  prior(student_t(3,0, 5), class = "sd", group = "season_fct")
+)
+
+
 #Brm model for lac dur
 lac_brm <- brm(
-  lact_dur ~ age + age:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
+  lact_dur ~ age + age_prime + age_post_prime + terminal:ageclass3 + (1 | animalID) + (1 | season_fct),
   data   = lact_dat2,
   prior = lact_prior,
   family = negbinomial(),
@@ -261,13 +251,15 @@ lac_grid2 <- tidyr::expand_grid(
   terminal = 0:1
 ) %>%
   mutate(
-    age10    = (age - maturity) / 10,
-    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
-    ageclass = factor(ageclass, levels = c("inexperienced","experienced")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max),
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("pre-prime", "prime", "post-prime")),
     terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))
   )
  
-# # Population-level predictions (exclude random effects), with 95% CrI
+# Population-level predictions (exclude random effects), with 95% CrI
 pred_df <- fitted(
   lac_brm,
   newdata    = lac_grid2,
@@ -283,10 +275,10 @@ lac_pred_pop2 <- bind_cols(lac_grid2, pred_df) %>%
     upr       = Q97.5
   )
 
-# # Raw-data summaries 
+# Raw-data summaries 
 lact_summ2 <- lact_dat2 %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal","Terminal"))) %>%
-  group_by(age, terminal_fct, ageclass) %>%
+  group_by(age, terminal_fct, ageclass3) %>%
   summarize(
     mean_lact = mean(lact_dur),
     se_lact   = sd(lact_dur) / sqrt(n()),
@@ -298,13 +290,13 @@ lact_summ2 <- lact_dat2 %>%
 ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   geom_ribbon(
     aes(ymin = lwr, ymax = upr,
-        fill = ageclass,
-        group = interaction(ageclass, terminal_fct)),
+        fill = ageclass3,
+        group = interaction(ageclass3, terminal_fct)),
     alpha = 0.20, show.legend = TRUE
   ) +
   geom_line(
-    aes(linetype = terminal_fct, color = ageclass,
-        group = interaction(ageclass, terminal_fct)),
+    aes(linetype = terminal_fct, color = ageclass3,
+        group = interaction(ageclass3, terminal_fct)),
     linewidth = 1.2
   ) +
   geom_pointrange(
@@ -313,12 +305,13 @@ ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
       y = mean_lact,
       ymin = mean_lact - 1.96 * se_lact,
       ymax = mean_lact + 1.96 * se_lact,
-      color = ageclass,
+      color = ageclass3,
       linetype = terminal_fct
     ),
     show.legend = FALSE
   ) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+  geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
 
   #Add Counts to Plot
   coord_cartesian(clip = "off") +
@@ -326,14 +319,14 @@ ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
   geom_text(
     data = lact_count %>% filter(terminal_fct == "Terminal", n > 0),
     aes(x = age, y = Inf, label = n,
-        group = interaction(ageclass, terminal_fct)),
+        group = interaction(ageclass3, terminal_fct)),
     vjust = 1.8, size = 3.2, color = "black", fontface = "plain",
     inherit.aes = FALSE
   ) +
   geom_text(
     data = lact_count %>% filter(terminal_fct == "Nonterminal", n > 0),
     aes(x = age, y = Inf, label = n,
-        group = interaction(ageclass, terminal_fct)),
+        group = interaction(ageclass3, terminal_fct)),
     vjust = 3.5, size = 3.2, color = "black", fontface = "italic",
     inherit.aes = FALSE
   ) +
@@ -363,8 +356,9 @@ ggplot(lac_pred_pop2, aes(x = age, y = predicted)) +
     linetype = "Terminal Status"
   ) +
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
-  scale_color_manual(values = c("#D5A6F6", "#6DD5B3")) +
-  scale_fill_manual(values  = c("#D5A6F6", "#6DD5B3"))
+   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
+  scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
+
 
 ```
 
@@ -399,16 +393,15 @@ wt_dat <- bioseal %>%
   dplyr::select(animalID, bio_age, lactation_duration, year, pupsex, Wt, age) %>%
   filter(!is.na(Wt), !is.na(age)) %>%
   mutate(
-    terminal   = as.integer(ifelse(bio_age == 0, 1, 0)),  # clean 0/1
+    terminal   = as.integer(ifelse(bio_age == 0, 1, 0)),
     terminal_fct = factor(terminal, levels = c(0,1),
                           labels = c("Nonterminal", "Terminal")),
-    # age10      = (age - maturity) / 10,
     ageclass3  = cut(age, 
                      breaks = c(0, maturity, prime_max, Inf),
-                     labels = c("inexperienced", "prime", "post-prime")),
+                     labels = c("pre-prime", "prime", "post-prime")),
     age_prime = (age - maturity) * (age >= maturity),
     age_post_prime = (age - prime_max) * (age >= prime_max),
-    year       = factor(year),
+    year_fct       = factor(year),
     animalID   = factor(animalID)
   )
 
@@ -425,14 +418,9 @@ wt_bot <- 0.1   # Nonterminal (italic font)
 #Setting Priors with Gausian family 
 priors_wt <- c(
   prior(normal(100, 10), class = "Intercept"),
-  prior(normal(0,4), class = "b", coef = "age"),
-  prior(normal(0,4), class = "b", coef = "age_post_prime"),
-  prior(normal(0,4), class = "b", coef = "age_prime"),
-  prior(normal(0,4), class = "b", coef = "terminal:ageclass3inexperienced"),
-  prior(normal(0,4), class = "b", coef = "terminal:ageclass3postMprime"),
-  prior(normal(0,4), class = "b", coef = "terminal:ageclass3prime"),
+  prior(normal(0,4), class = "b"),
   prior(student_t(3, 0, 20), class = "sd", group = "animalID"),
-  prior(student_t(3, 0, 20), class = "sd", group = "year"),
+  prior(student_t(3, 0, 20), class = "sd", group = "year_fct"),
   prior(student_t(3, 0, 20), class = "sigma")
 )
 
@@ -441,7 +429,7 @@ priors_wt <- c(
 wt_brm <- brm(
   Wt ~ age + age_prime + age_post_prime +
     terminal:ageclass3 + 
-    (1 | year) + (1 | animalID),
+    (1 | year_fct) + (1 | animalID),
   data   = wt_dat,
   family = gaussian(),
   prior = priors_wt, 
@@ -463,7 +451,7 @@ wt_grid <- tidyr::expand_grid(
     age_post_prime = (age - prime_max) * (age >= prime_max),
     ageclass3  = cut(age, 
                      breaks = c(0, maturity, prime_max, Inf),
-                     labels = c("inexperienced", "prime", "post-prime")),
+                     labels = c("pre-prime", "prime", "post-prime")),
     terminal_fct = factor(terminal, levels = c(0,1),
                           labels = c("Nonterminal","Terminal"))
   )
@@ -530,7 +518,7 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
     inherit.aes = FALSE
   ) +
   
-#Insert Cute theme!
+#Insert Personal theme!
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
     panel.border      = element_rect(color = "black", fill = NA, linewidth = 0.5),
@@ -545,8 +533,6 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
     legend.title = element_text(size = 13, face = "bold"),
     legend.text = element_text(size = 11)
   ) +
-
-  # Axis labels and legends
   labs(
     title = "Impact of Age on Wean Weight",
     x = "Mother's Age (Years)",
@@ -554,8 +540,6 @@ ggplot(wt_pred_pop, aes(x = age, y = predicted)) +
     color = "Age Class",
     linetype = "Terminal Status"
   ) +
-
-  # My custom palette styling for lines and fill
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
@@ -592,18 +576,20 @@ sex_dat <- bioseal %>%
   mutate(
     is_male = ifelse(pupsex == "M", 1, 0),  # 1 = male, 0 = female
     terminal = ifelse(bio_age == 0, 1, 0), 
-    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
-    ageclass = factor(ageclass, levels = c("inexperienced", "experienced")),
-    age10 = (age - maturity) / 10, 
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("pre-prime", "prime", "post-prime")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max),
     year_fct = factor(year)
   )
 
-#Need a Count for all ageclass, age, and terminal status individuals to plot onto graph:
+#Count for all ageclass, age, and terminal status individuals to plot onto graph:
 sex_count <- sex_dat %>%
-  group_by(age, ageclass, terminal) %>%
+  group_by(age, age_prime, age_post_prime, ageclass3, terminal) %>%
   summarise(n = n(), .groups = "drop") %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-  complete(age, ageclass, terminal_fct, fill = list(n = 0))
+  complete(age, age_prime, age_post_prime, ageclass3, terminal_fct, fill = list(n = 0))
 
 sex_top    <- 1.5   # Terminal (regular font) 
 sex_bot <- 0.1   # Nonterminal (italic font) 
@@ -611,10 +597,12 @@ sex_bot <- 0.1   # Nonterminal (italic font)
 #Setting priors 
 priors_sex <- c(
   prior(normal(0, 2), class = "Intercept"),
-  prior(normal(0, 2), class = "b", coef = "age10"),
-  prior(normal(0, 2), class = "b", coef = "age10:ageclassexperienced"),
-  prior(normal(0, 2), class = "b", coef = "ageclassexperienced:terminal"),
-  prior(normal(0, 2), class = "b", coef = "ageclassinexperienced:terminal"),
+  prior(normal(0, 2), class = "b", coef = "age"),
+  prior(normal(0, 2), class = "b", coef = "age_post_prime"),
+  prior(normal(0, 2), class = "b", coef = "age_prime"),
+  prior(normal(0, 2), class = "b", coef = "terminal:ageclass3postMprime"),
+  prior(normal(0, 2), class = "b", coef = "terminal:ageclass3preMprime"),
+  prior(normal(0, 2), class = "b", coef = "terminal:ageclass3prime"),
   prior(student_t(3, 0, 2), class = "sd", group = "animalID"),
   prior(student_t(3, 0, 2), class = "sd", group = "year_fct")
 )
@@ -622,7 +610,7 @@ priors_sex <- c(
 # Brms Model 
 
 sex_mod <- brm(
-  is_male ~ age10 + age10:ageclass + terminal:ageclass + (1 | animalID) + (1 | year_fct),
+  is_male ~ age + age_prime + age_post_prime + terminal:ageclass3 + (1 | animalID) + (1 | year_fct),
   data    = sex_dat,
   family  = bernoulli(link = "logit"),
   prior = priors_sex, 
@@ -640,9 +628,11 @@ sex_grid <- tidyr::expand_grid(
   terminal = 0:1
 ) %>% 
   mutate(
-    age10 = (age - maturity) / 10, 
-    ageclass = ifelse(age <= maturity, "inexperienced", "experienced"),
-    ageclass = factor(ageclass, levels = c("inexperienced", "experienced"))
+    ageclass3  = cut(age, 
+                     breaks = c(0, maturity, prime_max, Inf),
+                     labels = c("pre-prime", "prime", "post-prime")),
+    age_prime = (age - maturity) * (age >= maturity),
+    age_post_prime = (age - prime_max) * (age >= prime_max),
   )
 
 # fitted() collects the predicted values from brms() and we will store in pred_mat and then put back into grid 
@@ -665,7 +655,7 @@ sex_pred_pop <- sex_grid %>%
 sex_summ <- sex_dat %>%
   ungroup() %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
-  group_by(age, terminal_fct, ageclass) %>%
+  group_by(age, terminal_fct, ageclass3) %>%
   summarize(
     prop_male = mean(is_male, na.rm = TRUE),
     se_prop = sqrt((prop_male * (1 - prop_male)) / n()), 
@@ -676,8 +666,8 @@ sex_summ <- sex_dat %>%
 # Sex Pred Fig
 ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
  geom_ribbon(
-   aes(ymin = ci_low, ymax = ci_high, fill = ageclass, 
-             group = interaction(ageclass, terminal_fct)),
+   aes(ymin = ci_low, ymax = ci_high, fill = ageclass3, 
+             group = interaction(ageclass3, terminal_fct)),
              alpha = 0.15, show.legend = FALSE) +
   geom_pointrange(
     data = sex_summ,
@@ -686,28 +676,30 @@ ggplot(sex_pred_pop, aes(x = age, y = predicted_prob_male)) +
       ymin = prop_male - 1.96 * se_prop, 
       ymax = prop_male + 1.96 * se_prop, 
       linetype = terminal_fct,
-      color = ageclass
+      color = ageclass3
     ),
     show.legend = FALSE
   ) +
   geom_line(aes(
     linetype = terminal_fct,
-    color = ageclass
+    color = ageclass3
   ), linewidth = 1.2) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+  geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") +
   
 #Add Counts
   coord_cartesian(clip = "off") +
   theme(plot.margin = margin(12, 18, 12, 12)) +
   geom_text(
     data = sex_count %>% filter(terminal_fct == "Terminal", n > 0),
-    aes(x = age, y = Inf, label = n, group = interaction(ageclass, terminal_fct)),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
     vjust = sex_top, size = 3.2, color = "black", fontface = "plain",
     inherit.aes = FALSE
   ) +
   geom_text(
     data = sex_count %>% filter(terminal_fct == "Nonterminal", n> 0),
-    aes(x = age, y = Inf, label = n, group = interaction(ageclass, terminal_fct)),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
     vjust = sex_bot + 4, size = 3.2, color = "black", fontface = "italic",
     inherit.aes = FALSE
   ) +
@@ -766,7 +758,7 @@ surv_recr_data <- pup_surv_dat %>%
   mutate(pup_surv_int = as.integer(pup_survived))
 
 #Count Data
-pup_count <- surv_recr_data %>%
+pup_count <- pup_surv_dat %>%
   group_by(age, age_prime, age_post_prime, ageclass3, terminal) %>%
   summarise(n = n(), .groups = "drop") %>%
   mutate(terminal_fct = factor(terminal, labels = c("Nonterminal", "Terminal"))) %>%
@@ -777,24 +769,25 @@ pup_bot <- 0.1   # Nonterminal (italic font)
 
 #Specify Priors here:
 pup_surv_prior <- c(
-  prior(normal(0, 2), class = b, coef = age),
-  prior(normal(0, 2), class = b, coef = age_post_prime),
-  prior(normal(0, 2), class = b, coef = age_prime),
-  prior(normal(0, 2), class = b, coef = terminal:ageclass3inexperienced),
-  prior(normal(0, 2), class = b, coef = terminal:ageclass3postMprime),
-  prior(normal(0, 2), class = b, coef = terminal:ageclass3prime)
-)
+  prior(normal(0, 5), class = Intercept),
+  prior(normal(0, 2), class = b, coef = "age"),
+  prior(normal(0, 2), class = b, coef = "age_post_prime"),
+  prior(normal(0, 2), class = b, coef = "age_prime"),
+  prior(normal(0, 2), class = b, coef = "terminal:ageclass3preMprime"),
+  prior(normal(0, 2), class = b, coef = "terminal:ageclass3postMprime"),
+  prior(normal(0, 2), class = b, coef = "terminal:ageclass3prime")
+ )
 
 #Pup Surv Model
 pup_surv_mod <- brm(
   pup_surv_int ~ age + age_prime + age_post_prime + terminal:ageclass3 + 
-    (1 | animalID) + (1 | year_fct),
-  prior = pup_surv_prior, 
+   (1 | animalID) + (1 | year_fct),
+  prior = pup_surv_prior,
   data    = surv_recr_data,
   family  = bernoulli(link = "logit"),
-  iter    = 4000, #how long chain will run for (bump up to 8000 for paper)
-  chains  = 4,  # number of mcmc chains (4, 6, 8) can have shorter more chains or longer less chains
-  backend = "rstan"  #no u turn samples 
+  iter    = 4000, 
+  chains  = 4, 
+  backend = "rstan"  
 )
 
 summary(pup_surv_mod)
@@ -810,7 +803,7 @@ pup_grid <- tidyr::expand_grid(
     age_post_prime = (age - prime_max) * (age >= prime_max),
     ageclass3  = cut(age, 
                      breaks = c(0, maturity, prime_max, Inf),
-                     labels = c("inexperienced", "prime", "post-prime")),
+                     labels = c("pre-prime", "prime", "post-prime")),
     terminal_fct = factor(terminal, levels = c(0,1),
                           labels = c("Nonterminal","Terminal"))
   )
@@ -867,27 +860,30 @@ ggplot(pup_surv_pop, aes(x = age, y = predicted_pup_surv)) +
     color = ageclass3
   ), linewidth = 1.2) +
   geom_vline(xintercept = maturity + 0.5, linetype = "dashed", color = "#9B59B6") +
+  geom_vline(xintercept = prime_max + 0.5, linetype = "dashed", color = "#9B59B6") +
  
  #Plot Counts 
   coord_cartesian(clip = "off") +
   theme(plot.margin = margin(12, 18, 12, 12)) +
   geom_text(
-    data = wt_count %>% filter(terminal_fct == "Terminal", n > 0),
-    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
-    vjust = wt_top, size = 3.2, color = "black", fontface = "plain",
+    data = pup_count %>% filter(terminal_fct == "Terminal", n > 0),
+    aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal)),
+    vjust = pup_top, size = 3.2, color = "black", fontface = "plain",
     inherit.aes = FALSE
   ) +
   geom_text(
-    data = wt_count %>% filter(terminal_fct == "Nonterminal", n> 0),
+    data = pup_count %>% filter(terminal_fct == "Nonterminal", n> 0),
     aes(x = age, y = Inf, label = n, group = interaction(ageclass3, terminal_fct)),
-    vjust = wt_bot + 4, size = 3.2, color = "black", fontface = "italic",
+    vjust = pup_bot + 4, size = 3.2, color = "black", fontface = "italic",
     inherit.aes = FALSE
   ) +
   
 #Insert Cute theme!
-  theme_minimal() +
   theme(
     panel.background = element_rect(fill = "#F9F9F9"),
+    panel.border      = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    axis.line         = element_line(color = "black", linewidth = 0.6),
+    axis.ticks        = element_line(color = "black"),
     axis.title.x = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.title.y = element_text(color = "#8E44AD", size = 14, face = "bold"),
     axis.text.x = element_text(color = "#7F8C8D", size = 12),
@@ -897,14 +893,17 @@ ggplot(pup_surv_pop, aes(x = age, y = predicted_pup_surv)) +
     legend.title = element_text(size = 13, face = "bold"),
     legend.text = element_text(size = 11)
   ) +
+
+  # Axis labels and legends
   labs(
-    title = "Probability of Pup Survival", 
-    subtitle = "Terminal vs Non-Terminal Mothers",
-    x = "Mother's Age (Years)", 
-    y = "Probability Offspring Survives",
+    title = "Pup Survival Probability",
+    x = "Mother's Age (Years)",
+    y = "Pup Survival Probability",
     color = "Age Class",
     linetype = "Terminal Status"
   ) +
+
+  # My custom palette styling for lines and fill
   scale_linetype_manual(values = c("Nonterminal" = "solid", "Terminal" = "dotdash")) +
   scale_color_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2")) +
   scale_fill_manual(values = c("#D5A6F6", "#6DD5B3", "#9B59B6", "#66B2B2"))
@@ -925,19 +924,347 @@ The interaction between terminal status and age class is weak overall, for some 
 
 Overall, the model shows no strong evidence for consistent effects of age, age class, or terminal status on the outcome, with wide uncertainty across parameters. no credibility according to the bayesian stats summary
 
-Drop all animals older than 15, drop third age class, go back to one bp, age10... could make 2nd bp at age 11 for senescence (1 probably more ideal)
+# WAIC Comparisons
 
-add sample sizes for each age(terminal vs non-terminal)
+## Lactation Duration 
 
-Specify stronger priors
 
-Open issue for why first age class seems wrong
 
-Add priors for all logistic regression models
 
-wean weight model do normal (0, 5) instead of (0, 2)
+```{r}
+waic(lac_brm)
 
-table in supplementary for every prior and details
+#Setting up our competing models
 
-start updating draft (feel free to use \_\_\_)
+#lac_brm will serve as our breakpoint model
+
+#Linear model: 
+lac_lin <- brm(
+  lact_dur ~ age +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | season_fct),
+  data   = lact_dat2,
+  family = negbinomial(),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Quadratic model:
+#Create a centered age and squared age 
+lact_dat2 <- lact_dat2 %>% 
+  mutate(
+    age_c  = age - mean(age, na.rm = TRUE),
+    age_c2 = age_c^2
+  )
+
+lac_quad <- brm(
+  lact_dur ~ age_c + age_c2 +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | season_fct),
+  data   = lact_dat2,
+  family = negbinomial(),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Now add WAIC comparisons to each of these 
+# add WAIC to each fitted model
+lac_brm <- add_criterion(lac_brm, "waic")
+lac_quad  <- add_criterion(lac_quad,  "waic")
+lac_lin   <- add_criterion(lac_lin,   "waic")
+
+#Quick Comparison
+loo_compare(lac_brm, lac_quad, lac_lin, criterion = "waic")
+
+#Then list out/ summary
+lac_mods <- list(
+  Breakpoint = lac_brm,
+  Quadratic  = lac_quad,
+  Linear     = lac_lin
+)
+
+#Now we prepare it to be in a table with weights for docs!
+# extract WAIC estimates
+waic_lac <- c(
+  Breakpoint = lac_brm$criteria$waic$estimates["waic", "Estimate"],
+  Quadratic  = lac_quad$criteria$waic$estimates["waic", "Estimate"],
+  Linear     = lac_lin$criteria$waic$estimates["waic", "Estimate"]
+)
+
+# ΔWAIC relative to best model
+min_waic   <- min(waic_lac)
+delta_waic <- waic_lac - min_waic
+
+# model weights based on WAIC
+lac_weights <- exp(-0.5 * delta_waic)
+lac_weights <- lac_weights / sum(lac_weights)
+
+# Build comparison table
+lac_waic_tab <- tibble::tibble(
+  Model      = names(waic_lac),
+  WAIC       = round(waic_lac, 2),
+  `Δ WAIC`   = round(delta_waic, 2),
+  Weight     = round(lac_weights, 3)
+)
+
+view(lac_waic_tab)
+```
+
+
+
+
+## Wean Weight 
+
+
+
+
+```{r}
+#Set up competing models
+#wt_brm will serve as breakpoint model
+
+wt_lin <- brm(
+  Wt ~ age +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = wt_dat,
+  family = gaussian(),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Quadratic Model: 
+#Create a centered age and squared age 
+wt_dat <- wt_dat %>% 
+  mutate(
+    age_c  = age - mean(age, na.rm = TRUE),
+    age_c2 = age_c^2
+  )
+
+wt_quad <- brm(
+  Wt ~ age_c + age_c2 +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = wt_dat,
+  family = gaussian(),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Now add WAIC comparisons to each of these 
+# add WAIC to each fitted model
+wt_brm <- add_criterion(wt_brm, "waic")
+wt_quad  <- add_criterion(wt_quad,  "waic")
+wt_lin   <- add_criterion(wt_lin,   "waic")
+
+#Quick Comparison
+loo_compare(wt_brm, wt_quad, wt_lin, criterion = "waic")
+
+#Then list out/ summary
+wt_mods <- list(
+  Breakpoint = wt_brm,
+  Quadratic  = wt_quad,
+  Linear     = wt_lin
+)
+
+#Now we prepare it to be in a table with weights for docs!
+# extract WAIC estimates
+waic_wt <- c(
+  Breakpoint = wt_brm$criteria$waic$estimates["waic", "Estimate"],
+  Quadratic  = wt_quad$criteria$waic$estimates["waic", "Estimate"],
+  Linear     = wt_lin$criteria$waic$estimates["waic", "Estimate"]
+)
+
+# ΔWAIC relative to best model
+wt_min_waic   <- min(waic_wt)
+wt_delta_waic <- waic_wt - wt_min_waic
+
+# model weights based on WAIC
+wt_weights <- exp(-0.5 * wt_delta_waic)
+wt_weights <- wt_weights / sum(wt_weights)
+
+# Build comparison table
+wt_waic_tab <- tibble::tibble(
+  Model      = names(waic_wt),
+  WAIC       = round(waic_wt, 2),
+  `Δ WAIC`   = round(wt_delta_waic, 2),
+  Weight     = round(wt_weights, 3)
+)
+
+view(wt_waic_tab)
+```
+
+
+
+
+## Offspring Sex Ratio
+
+
+
+
+```{r}
+#Set up competing models
+#sex_mod will serve as breakpoint model
+
+sex_lin <- brm(
+  is_male ~ age +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = sex_dat,
+  family = bernoulli(link = "logit"),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Quadratic Model: 
+#Create a centered age and squared age 
+sex_dat <- sex_dat %>% 
+  mutate(
+    age_c  = age - mean(age, na.rm = TRUE),
+    age_c2 = age_c^2
+  )
+
+sex_quad <- brm(
+  is_male ~ age_c + age_c2 +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = sex_dat,
+  family = bernoulli(link = "logit"),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Now add WAIC comparisons to each of these 
+# add WAIC to each fitted model
+sex_mod <- add_criterion(sex_mod, "waic")
+sex_quad  <- add_criterion(sex_quad,  "waic")
+sex_lin   <- add_criterion(sex_lin,   "waic")
+
+#Quick Comparison
+loo_compare(sex_mod, sex_quad, sex_lin, criterion = "waic")
+
+#Then list out/ summary
+sex_mods <- list(
+  Breakpoint = sex_mod,
+  Quadratic  = sex_quad,
+  Linear     = sex_lin
+)
+
+#Now we prepare it to be in a table with weights for docs!
+# extract WAIC estimates
+waic_sex <- c(
+  Breakpoint = sex_mod$criteria$waic$estimates["waic", "Estimate"],
+  Quadratic  = sex_quad$criteria$waic$estimates["waic", "Estimate"],
+  Linear     = sex_lin$criteria$waic$estimates["waic", "Estimate"]
+)
+
+# ΔWAIC relative to best model
+sex_min_waic   <- min(waic_sex)
+sex_delta_waic <- waic_sex - sex_min_waic
+
+# model weights based on WAIC
+sex_weights <- exp(-0.5 * sex_delta_waic)
+sex_weights <- sex_weights / sum(sex_weights)
+
+# Build comparison table
+sex_waic_tab <- tibble::tibble(
+  Model      = names(waic_sex),
+  WAIC       = round(waic_sex, 2),
+  `Δ WAIC`   = round(sex_delta_waic, 2),
+  Weight     = round(sex_weights, 3)
+)
+
+view(sex_waic_tab)
+```
+
+
+
+
+## Probability of pup survival
+
+
+
+
+```{r}
+#Set up competing models
+#pup_surv_mod will serve as breakpoint model
+
+pup_lin <- brm(
+  pup_surv_int ~ age +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = surv_recr_data,
+  family = bernoulli(link = "logit"),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Quadratic Model: 
+#Create a centered age and squared age 
+surv_recr_data <- surv_recr_data %>% 
+  mutate(
+    age_c  = age - mean(age, na.rm = TRUE),
+    age_c2 = age_c^2
+  )
+
+pup_quad <- brm(
+  pup_surv_int ~ age_c + age_c2 +
+    terminal:ageclass3 +
+    (1 | animalID) + (1 | year_fct),
+  data   = surv_recr_data,
+  family = bernoulli(link = "logit"),
+  iter   = 4000,
+  chains = 4,
+  backend = "rstan"
+)
+
+#Now add WAIC comparisons to each of these 
+# add WAIC to each fitted model
+# add WAIC to each fitted model
+pup_surv_mod <- add_criterion(pup_surv_mod, "waic")
+pup_quad  <- add_criterion(pup_quad,  "waic")
+pup_lin   <- add_criterion(pup_lin,   "waic")
+
+#Quick Comparison
+loo_compare(pup_surv_mod, pup_quad, pup_lin, criterion = "waic")
+
+#Then list out/ summary
+pup_mods <- list(
+  Breakpoint = pup_surv_mod,
+  Quadratic  = pup_quad,
+  Linear     = pup_lin
+)
+
+#Now we prepare it to be in a table with weights for docs!
+# extract WAIC estimates
+waic_pup <- c(
+  Breakpoint = pup_surv_mod$criteria$waic$estimates["waic", "Estimate"],
+  Quadratic  = pup_quad$criteria$waic$estimates["waic", "Estimate"],
+  Linear     = pup_lin$criteria$waic$estimates["waic", "Estimate"]
+)
+
+# ΔWAIC relative to best model
+pup_min_waic   <- min(waic_pup)
+pup_delta_waic <- waic_pup - pup_min_waic
+
+# model weights based on WAIC
+pup_weights <- exp(-0.5 * pup_delta_waic)
+pup_weights <- pup_weights / sum(pup_weights)
+
+# Build comparison table
+pup_waic_tab <- tibble::tibble(
+  Model      = names(waic_pup),
+  WAIC       = round(waic_pup, 2),
+  `Δ WAIC`   = round(pup_delta_waic, 2),
+  Weight     = round(pup_weights, 3)
+)
+
+view(pup_waic_tab)
+```
 
